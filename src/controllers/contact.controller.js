@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { catchAsync } = require("../utils/catchAsync");
 const { ApiResponse } = require("../utils/apiResponse");
-// const nodemailer = require("nodemailer"); // Ready for real implementation
+const { sendContactNotification } = require("../utils/email");
 
 const CONTACTS_FILE = path.join(__dirname, "..", "..", "contacts.json");
 
@@ -43,9 +43,10 @@ const submitContact = catchAsync(async (req, res) => {
         submittedAt: new Date().toISOString(),
         ip: req.ip || "unknown"
     });
-    writeContacts(data);
-
-    console.log(`[Contact] New submission from ${name} <${email}> | Subject: "${subject}" | Total: ${data.contacts.length}`);
+    // Delay file write by 500ms to allow the HTTP response to complete before nodemon restarts the server
+    setTimeout(() => {
+        writeContacts(data);
+    }, 500);
 
     return res.status(201).json(
         new ApiResponse(

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AASW Foundation</title>
+    <!-- Use Roboto to match Google's aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --g-blue: #1a73e8;
+            --g-blue-hover: #1b66c9;
+            --g-blue-focus: #e8f0fe;
+            --g-border: #dadce0;
+            --g-text: #202124;
+            --g-text-light: #5f6368;
+            --g-bg: #fff;
+            --error-red: #d93025;
+            --error-bg: #fce8e6;
+        }
+
+        body {
+            font-family: 'Roboto', arial, sans-serif;
+            background-color: #f0f4f9;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: var(--g-text);
+        }
+
+        .login-container {
+            background: var(--g-bg);
+            border: 1px solid var(--g-border);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 448px;
+            padding: 48px 40px 36px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--g-text);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            margin: 0 0 10px;
+        }
+
+        .sub-header {
+            font-size: 16px;
+            color: var(--g-text-light);
+            margin: 0 0 40px;
+        }
+
+        .error-message {
+            background-color: var(--error-bg);
+            color: var(--error-red);
+            font-size: 14px;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            text-align: left;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .error-message.visible {
+            display: flex;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            font-size: 16px;
+            border: 1px solid var(--g-border);
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--g-text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--g-blue);
+            box-shadow: inset 0 0 0 1px var(--g-blue);
+        }
+
+        .form-group input::placeholder {
+            color: transparent;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 14px;
+            left: 12px;
+            background: #fff;
+            padding: 0 4px;
+            color: var(--g-text-light);
+            font-size: 16px;
+            transition: 0.2s ease all;
+            pointer-events: none;
+        }
+
+        /* Floating label mechanics */
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -8px;
+            font-size: 12px;
+            color: var(--g-blue);
+        }
+
+        .form-group input:not(:focus):not(:placeholder-shown) + label {
+            color: var(--g-text-light);
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn-link {
+            color: var(--g-blue);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 8px 8px;
+            margin-left: -8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .btn-link:hover {
+            background-color: var(--g-blue-focus);
+        }
+
+        .btn-primary {
+            background-color: var(--g-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--g-blue-hover);
+            box-shadow: 0 1px 2px rgba(66,133,244,0.3), 0 1px 3px rgba(66,133,244,0.15);
+        }
+
+        .btn-primary[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .footer-links {
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--g-text-light);
+            max-width: 448px;
+            width: 100%;
+        }
+
+        .footer-links select {
+            border: none;
+            background: transparent;
+            color: var(--g-text-light);
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+        }
+        
+        .footer-links div a {
+            color: var(--g-text-light);
+            text-decoration: none;
+            margin-left: 16px;
+        }
+        .footer-links div a:hover {
+            background-color: rgba(0,0,0,0.04);
+            border-radius: 4px;
+            padding: 4px;
+            margin: -4px 12px -4px -4px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="login-container">
+            <div class="logo" style="margin-bottom: 16px;">
+                <a href="/"><img src="images/logo.png" alt="AASW Logo" style="height: 48px; width: auto;"></a>
+            </div>
+            <h1>Login</h1>
+            <p class="sub-header">Welcome to AASW Foundation</p>
+
+            <div class="error-message" id="errorMsg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+                </svg>
+                <span id="errorText"></span>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder="Email" required autocomplete="username">
+                    <label for="email">Email address</label>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+                    <label for="password">Enter your password</label>
+                </div>
+                
+                <div style="text-align: left; margin-bottom: 24px; margin-top: 16px; font-size: 14px;">
+                    Don't have an account? <a href="signup.html" style="color:var(--g-blue); text-decoration:none; font-weight:500;">Sign up</a>
+                </div>
+
+                <div class="action-row" style="margin-top: 24px;">
+                    <a href="/" class="btn-link">Return to Home</a>
+                    <button type="submit" class="btn-primary" id="loginBtn">Login</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="footer-links">
+            <select aria-label="Language selection">
+                <option value="en">English (United States)</option>
+                <option value="hi">हिन्दी (India)</option>
+            </select>
+            <div>
+                <a href="#">Help</a>
+                <a href="/privacy.html">Privacy</a>
+                <a href="/governance.html">Terms</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+            const btn = document.getElementById('loginBtn');
+
+            btn.textContent = 'Logging in...';
+            btn.disabled = true;
+            errorMsg.classList.remove('visible');
+
+            try {
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = data.data.redirect || '/';
+                } else {
+                    errorText.textContent = data.message || "Invalid email or password";
+                    errorMsg.classList.add('visible');
+                    btn.textContent = 'Login';
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                errorText.textContent = "Network error. Try again.";
+                errorMsg.classList.add('visible');
+                btn.textContent = 'Login';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -143,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('valVisitors').textContent = (data.overview.totalVisitors || 0).toLocaleString('en-IN');
                 document.getElementById('valMessages').textContent = (data.overview.totalContacts || 0).toLocaleString('en-IN');
                 document.getElementById('valSubscribers').textContent = (data.overview.totalSubscribers || 0).toLocaleString('en-IN');
+                if (document.getElementById('valMemberships')) {
+                    document.getElementById('valMemberships').textContent = (data.overview.totalMemberships || 0).toLocaleString('en-IN');
+                }
                 
                 // --- Helper function for dates ---
                 const renderDate = (dstr) => {
@@ -219,6 +222,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     allUsersTbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 2rem;">No subscribers available</td></tr>';
                 }
                 
+                // --- Update FULL Memberships Table (Memberships Tab) ---
+                const allMembershipsTbody = document.getElementById('allMembershipsTbody');
+                if (allMembershipsTbody) {
+                    if (data.allMemberships && data.allMemberships.length > 0) {
+                        allMembershipsTbody.innerHTML = '';
+                        data.allMemberships.forEach(mem => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td style="font-family: monospace;">${escapeHtml(mem.id)}</td>
+                                <td><strong>${escapeHtml(mem.email)}</strong></td>
+                                <td><span style="background:#e8f0fe; color:#1a73e8; padding:4px 8px; border-radius:12px; font-size:0.8rem; font-weight:600;">${escapeHtml(mem.planName)}</span></td>
+                                <td style="font-weight:700; color:#10b981;">₹${mem.amount}</td>
+                                <td style="font-family: monospace;">${escapeHtml(mem.txnId)}</td>
+                                <td>${renderDate(mem.date)}</td>
+                            `;
+                            allMembershipsTbody.appendChild(tr);
+                        });
+                    } else {
+                        allMembershipsTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem;">No memberships available</td></tr>';
+                    }
+                }
+                
             }
         } catch (err) {
             console.error("Failed to fetch dashboard stats", err);
@@ -226,6 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('recentMessagesTbody').innerHTML = errHtml;
             document.getElementById('allMessagesTbody').innerHTML = errHtml;
             document.getElementById('allUsersTbody').innerHTML = errHtml;
+            if (document.getElementById('allMembershipsTbody')) {
+                document.getElementById('allMembershipsTbody').innerHTML = errHtml;
+            }
         }
     };
     

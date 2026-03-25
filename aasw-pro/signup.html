@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up - AASW Foundation</title>
+    <!-- Use Roboto to match Google's aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --g-blue: #1a73e8;
+            --g-blue-hover: #1b66c9;
+            --g-blue-focus: #e8f0fe;
+            --g-border: #dadce0;
+            --g-text: #202124;
+            --g-text-light: #5f6368;
+            --g-bg: #fff;
+            --error-red: #d93025;
+            --error-bg: #fce8e6;
+        }
+
+        body {
+            font-family: 'Roboto', arial, sans-serif;
+            background-color: #f0f4f9;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: var(--g-text);
+        }
+
+        .login-container {
+            background: var(--g-bg);
+            border: 1px solid var(--g-border);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 448px;
+            padding: 48px 40px 36px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--g-text);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            margin: 0 0 10px;
+        }
+
+        .sub-header {
+            font-size: 16px;
+            color: var(--g-text-light);
+            margin: 0 0 40px;
+        }
+
+        .error-message {
+            background-color: var(--error-bg);
+            color: var(--error-red);
+            font-size: 14px;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            text-align: left;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .error-message.visible {
+            display: flex;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            font-size: 16px;
+            border: 1px solid var(--g-border);
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--g-text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--g-blue);
+            box-shadow: inset 0 0 0 1px var(--g-blue);
+        }
+
+        .form-group input::placeholder {
+            color: transparent;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 14px;
+            left: 12px;
+            background: #fff;
+            padding: 0 4px;
+            color: var(--g-text-light);
+            font-size: 16px;
+            transition: 0.2s ease all;
+            pointer-events: none;
+        }
+
+        /* Floating label mechanics */
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -8px;
+            font-size: 12px;
+            color: var(--g-blue);
+        }
+
+        .form-group input:not(:focus):not(:placeholder-shown) + label {
+            color: var(--g-text-light);
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn-link {
+            color: var(--g-blue);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 8px 8px;
+            margin-left: -8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .btn-link:hover {
+            background-color: var(--g-blue-focus);
+        }
+
+        .btn-primary {
+            background-color: var(--g-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--g-blue-hover);
+            box-shadow: 0 1px 2px rgba(66,133,244,0.3), 0 1px 3px rgba(66,133,244,0.15);
+        }
+
+        .btn-primary[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .footer-links {
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--g-text-light);
+            max-width: 448px;
+            width: 100%;
+        }
+
+        .footer-links select {
+            border: none;
+            background: transparent;
+            color: var(--g-text-light);
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+        }
+        
+        .footer-links div a {
+            color: var(--g-text-light);
+            text-decoration: none;
+            margin-left: 16px;
+        }
+        .footer-links div a:hover {
+            background-color: rgba(0,0,0,0.04);
+            border-radius: 4px;
+            padding: 4px;
+            margin: -4px 12px -4px -4px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="login-container">
+            <div class="logo" style="margin-bottom: 16px;">
+                <a href="/"><img src="images/logo.png" alt="AASW Logo" style="height: 48px; width: auto;"></a>
+            </div>
+            <h1>Create an account</h1>
+            <p class="sub-header">Join the AASW Foundation Community</p>
+
+            <div class="error-message" id="errorMsg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+                </svg>
+                <span id="errorText"></span>
+            </div>
+
+            <form id="signupForm">
+                <div id="registrationFields">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Name" required autocomplete="name">
+                        <label for="name">Full Name</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Email" required autocomplete="username">
+                        <label for="email">Email address</label>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+                        <label for="password">Create your password</label>
+                    </div>
+                </div>
+
+                <div id="otpFields" style="display: none;">
+                    <p style="text-align:left; color: var(--g-text); font-size: 14px; margin-bottom: 16px;">We sent a 6-digit code to your email. Enter it below to verify.</p>
+                    <div class="form-group">
+                        <input type="text" id="otp" name="otp" placeholder="OTP" autocomplete="one-time-code" maxlength="6">
+                        <label for="otp">Enter OTP</label>
+                    </div>
+                    <div id="otpTimerContainer" style="text-align: right; color: var(--g-text-light); font-size: 13px; margin-top: -10px; margin-bottom: 16px;">
+                        Expires in <span id="otpTime" style="font-weight: 600; color: #d93025;">03:00</span>
+                    </div>
+                </div>
+                
+                <div id="loginLinkContainer" style="text-align: left; margin-bottom: 24px; margin-top: 16px; font-size: 14px;">
+                    Already have an account? <a href="login.html" style="color:var(--g-blue); text-decoration:none; font-weight:500;">Log in instead</a>
+                </div>
+
+                <div class="action-row" style="margin-top: 24px;">
+                    <a href="/" class="btn-link">Return to Home</a>
+                    <button type="submit" class="btn-primary" id="signupBtn">Sign up</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="footer-links">
+            <select aria-label="Language selection">
+                <option value="en">English (United States)</option>
+                <option value="hi">हिन्दी (India)</option>
+            </select>
+            <div>
+                <a href="#">Help</a>
+                <a href="/privacy.html">Privacy</a>
+                <a href="/governance.html">Terms</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isOtpStep = false;
+        let registeredEmail = "";
+        let otpTimerInterval;
+
+        function startOtpTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+            otpTimerInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(otpTimerInterval);
+                    display.textContent = "00:00";
+                    document.getElementById('otp').disabled = true;
+                    const btn = document.getElementById('signupBtn');
+                    btn.disabled = true;
+                    btn.textContent = 'OTP Expired';
+                    btn.style.backgroundColor = '#9ca3af'; // gray out
+                    document.getElementById('errorText').textContent = "OTP has expired. Please refresh the page to try again.";
+                    document.getElementById('errorMsg').classList.add('visible');
+                }
+            }, 1000);
+        }
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+            const btn = document.getElementById('signupBtn');
+
+            errorMsg.classList.remove('visible');
+
+            if (!isOtpStep) {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                btn.textContent = 'Signing up...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/v1/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (res.ok) {
+                        // Switch to OTP step
+                        isOtpStep = true;
+                        registeredEmail = email;
+                        
+                        document.getElementById('registrationFields').style.display = 'none';
+                        document.getElementById('otpFields').style.display = 'block';
+                        document.getElementById('loginLinkContainer').style.display = 'none';
+                        document.getElementById('otp').setAttribute('required', 'true');
+                        
+                        btn.textContent = 'Verify OTP';
+                        btn.disabled = false;
+                        document.querySelector('h1').textContent = 'Verify Email';
+                        document.querySelector('.sub-header').textContent = 'Almost there!';
+                        startOtpTimer(180, document.getElementById('otpTime')); // 3 minutes
+                    } else {
+                        errorText.textContent = data.message || "Failed to sign up";
+                        errorMsg.classList.add('visible');
+                        btn.textContent = 'Sign up';
+                        btn.disabled = false;
+                    }
+                } catch (err) {
+                    errorText.textContent = "Network error. Try again.";
+                    errorMsg.classList.add('visible');
+                    btn.textContent = 'Sign up';
+                    btn.disabled = false;
+                }
+            } else {
+                // Verify OTP
+                const otp = document.getElementById('otp').value;
+                
+                btn.textContent = 'Verifying...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/v1/auth/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: registeredEmail, otp })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (res.ok) {
+                        clearInterval(otpTimerInterval);
+                        btn.textContent = 'Success!';
+                        btn.style.backgroundColor = '#059669';
+                        setTimeout(() => {
+                            window.location.href = '/login.html';
+                        }, 1000);
+                    } else {
+                        errorText.textContent = data.message || "Invalid OTP";
+                        errorMsg.classList.add('visible');
+                        btn.textContent = 'Verify OTP';
+                        btn.disabled = false;
+                    }
+                } catch (err) {
+                    errorText.textContent = "Network error. Try again.";
+                    errorMsg.classList.add('visible');
+                    btn.textContent = 'Verify OTP';
+                    btn.disabled = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

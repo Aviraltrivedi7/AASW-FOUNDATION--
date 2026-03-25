@@ -74,17 +74,25 @@ router.get('/api/stats', isAuthenticated, (req, res, next) => {
         const subsPath = path.join(process.cwd(), 'subscribers.json');
         if (fs.existsSync(subsPath)) subscribers = JSON.parse(fs.readFileSync(subsPath, 'utf8')).subscribers || [];
 
+        // Fetch memberships
+        let memberships = [];
+        const memPath = path.join(dataPath, 'memberships.json');
+        if (fs.existsSync(memPath)) memberships = JSON.parse(fs.readFileSync(memPath, 'utf8')).memberships || [];
+
         const payload = {
             overview: {
                 totalVisitors: stats.visitors,
                 totalContacts: contacts.length,
-                totalSubscribers: subscribers.length
+                totalSubscribers: subscribers.length,
+                totalMemberships: memberships.length
             },
             pageViews: stats.pageViews,
             recentContacts: contacts.slice(-5).reverse(), // Last 5
             recentSubscribers: subscribers.slice(-5).reverse(), // Last 5
+            recentMemberships: memberships.slice(-5).reverse(), // Last 5
             allContacts: contacts.slice().reverse(),
-            allSubscribers: subscribers.slice().reverse()
+            allSubscribers: subscribers.slice().reverse(),
+            allMemberships: memberships.slice().reverse()
         };
 
         res.status(200).json(new ApiResponse(200, payload, "Admin stats retrieved"));

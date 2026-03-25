@@ -53,6 +53,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link" data-target="memberships">
+                        <i data-lucide="credit-card"></i>
+                        <span>Memberships</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link" data-target="settings">
                         <i data-lucide="settings"></i>
                         <span>Settings</span>
@@ -149,6 +155,17 @@
                             <p class="kpi-title">Newsletter Subscribers</p>
                             <h3 class="kpi-value" id="valSubscribers">...</h3>
                             <p class="kpi-trend positive"><i data-lucide="trending-up"></i> Growing list</p>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass">
+                        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <div class="kpi-details">
+                            <p class="kpi-title">Pro Members</p>
+                            <h3 class="kpi-value" id="valMemberships">...</h3>
+                            <p class="kpi-trend positive"><i data-lucide="check-circle"></i> Donors</p>
                         </div>
                     </div>
                     
@@ -258,6 +275,36 @@
                     </div>
                 </div>
                 <!-- END MESSAGES TAB -->
+
+                <!-- MEMBERSHIPS TAB -->
+                <div id="view-memberships" class="view-section" style="display:none;">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Membership Payments</h1>
+                            <p class="page-subtitle">Verify user payments and active tier subscriptions.</p>
+                        </div>
+                    </div>
+                    <div class="table-container glass" style="margin-top: 2rem;">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Application ID</th>
+                                        <th>Email</th>
+                                        <th>Plan</th>
+                                        <th>Amount</th>
+                                        <th>Transaction ID (UTR)</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allMembershipsTbody">
+                                    <tr><td colspan="6" style="text-align:center; padding: 2rem;">Loading memberships...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MEMBERSHIPS TAB -->
 
                 <!-- SETTINGS TAB -->
                 <div id="view-settings" class="view-section" style="display:none;">

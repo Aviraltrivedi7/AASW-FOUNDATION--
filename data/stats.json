@@ -1,9 +1,15 @@
 {
-  "visitors": 58,
+  "visitors": 138,
   "pageViews": {
-    "/index.html": 31,
+    "/index.html": 73,
     "/dashboard.html": 22,
-    "/admin/dashboard": 3,
-    "/admin/logout": 2
+    "/admin/dashboard": 4,
+    "/admin/logout": 2,
+    "/privacy.html": 6,
+    "/signup.html": 15,
+    "/login.html": 8,
+    "/team.html": 1,
+    "/membership.html": 5,
+    "/refund.html": 2
   }
 }

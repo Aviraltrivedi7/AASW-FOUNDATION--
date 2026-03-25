@@ -12,6 +12,8 @@ const healthRoutes = require("./routes/health.routes");
 const contactRoutes = require("./routes/contact.routes");
 const newsletterRoutes = require("./routes/newsletter.routes");
 const adminRoutes = require("./routes/admin.routes");
+const authRoutes = require("./routes/auth.routes");
+const membershipRoutes = require("./routes/membership.routes");
 const { ApiError } = require("./utils/apiError");
 const session = require("express-session");
 const { visitorTracker } = require("./middlewares/auth.middleware");
@@ -38,7 +40,7 @@ app.use(cors({
         }
         callback(new Error(`CORS policy: origin '${origin}' not allowed`));
     },
-    credentials: false
+    credentials: true
 }));
 
 // Body parsing
@@ -86,6 +88,15 @@ const formLimiter = rateLimit({
     message: { message: "Too many submissions. Please wait 10 minutes before trying again." }
 });
 
+// Auth rate limit — more generous to allow signup + OTP + login flow
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20, // signup + verify-otp + login attempts
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many auth requests. Please wait 15 minutes before trying again." }
+});
+
 // Apply rate limiting to all API routes
 app.use("/api/", apiLimiter);
 
@@ -94,6 +105,8 @@ app.use("/api/", apiLimiter);
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/contact", formLimiter, contactRoutes);
 app.use("/api/v1/newsletter", formLimiter, newsletterRoutes);
+app.use("/api/v1/auth", authLimiter, authRoutes);
+app.use("/api/v1/membership", membershipRoutes);
 app.use("/admin", adminRoutes);
 
 // 3. STATIC FRONTEND SERVING

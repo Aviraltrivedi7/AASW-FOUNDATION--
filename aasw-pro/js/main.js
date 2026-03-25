@@ -277,6 +277,14 @@ const translations = {
   'f-addr': { en: 'Ward No 2 Ambedkar Nagar Rura Kanpur Dehat Uttar Pradesh', hi: 'वार्ड नं 2 अंबेडकर नगर रुरा कानपुर देहात उत्तर प्रदेश' },
   'f-hours': { en: 'Mon – Sat: 9:30 AM – 6:00 PM', hi: 'सोम – शनि: 9:30 AM – 6:00 PM' },
   'f-copy': { en: '© 2025 AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified', hi: '© 2025 AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित' },
+  // Refund Policy page
+  'ref-banner-h': { en: 'Refund & Cancellation Policy', hi: 'रिफंड और कैंसलेशन पॉलिसी' },
+  'ref-banner-p': { en: 'Our policy on refund and cancellation of Membership fees.', hi: 'सदस्यता शुल्क के रिफंड और रद्दीकरण पर हमारी नीति।' },
+  'ref-tag': { en: 'Policies', hi: 'नीतियां' },
+  'ref-h2': { en: 'Refund & Cancellation Policy', hi: 'रिफंड और कैंसलेशन पॉलिसी' },
+  'ref-sub': { en: 'Our policy on refund and cancellation of Membership fees received for AASW Foundation on secure online payment gateway is as under:', hi: 'AASW FOUNDATION के सुरक्षित ऑनलाइन पेमेंट गेटवे के ज़रिए मिली मेंबरशिप फीस के रिफंड और कैंसलेशन के बारे में हमारी पॉलिसी इस प्रकार है:' },
+  'ref-1-p': { en: 'Any request for cancellations and refund of online Membership fees once duly placed on the website, shall not be entertained under any circumstances. No cash or refund of money will be allowed after completing the online Membership fees as it is an extremely cumbersome process. We therefore request you to be sure before you make payment for Membership fees.', hi: 'एक बार वेबसाइट पर विधिवत जमा किए गए ऑनलाइन सदस्यता शुल्क के रद्दीकरण और वापसी के किसी भी अनुरोध पर किसी भी परिस्थिति में विचार नहीं किया जाएगा। ऑनलाइन सदस्यता शुल्क पूरा करने के बाद नकद या पैसे की वापसी की अनुमति नहीं दी जाएगी क्योंकि यह एक अत्यंत बोझिल प्रक्रिया है। इसलिए हम आपसे अनुरोध करते हैं कि सदस्यता शुल्क के लिए भुगतान करने से पहले सुनिश्चित हो लें।' },
+  'f-u3': { en: 'Refund Policy', hi: 'रिफंड नीति' },
   // Governance page
   'gov-banner-h': { en: 'Governance & Accountability', hi: 'शासन और जवाबदेही' },
   'gov-banner-p': { en: 'Transparency and integrity in everything we do', hi: 'हम जो भी करते हैं उसमें पारदर्शिता और ईमानदारी' },
