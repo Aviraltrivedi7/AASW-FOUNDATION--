@@ -57,16 +57,17 @@ const signup = catchAsync(async (req, res, next) => {
             existingUser.otp = otp;
             existingUser.otpExpiry = Date.now() + 3 * 60 * 1000; // 3 minutes
             // Update password hash just in case they typed a different one
-            existingUser.passwordHash = await bcrypt.hash(password, 10);
+            existingUser.passwordHash = await bcrypt.hash(password, 8);
             
             writeUsers(data);
-            await sendOTP(existingUser.email, otp);
+            // Fire-and-forget — don't make user wait for email delivery
+            sendOTP(existingUser.email, otp).catch(err => console.error('[Auth] OTP send failed:', err.message));
             
             return res.status(200).json(new ApiResponse(200, { email: existingUser.email }, "OTP re-sent to email"));
         }
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 8);
     const otp = generateOTP();
 
     const newUser = {
@@ -84,7 +85,8 @@ const signup = catchAsync(async (req, res, next) => {
     writeUsers(data);
 
     // Send email
-    await sendOTP(newUser.email, otp);
+    // Fire-and-forget — don't make user wait for email delivery
+    sendOTP(newUser.email, otp).catch(err => console.error('[Auth] OTP send failed:', err.message));
 
     return res.status(201).json(new ApiResponse(201, { email: newUser.email }, "Signup successful check email for OTP"));
 });

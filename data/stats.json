@@ -1,15 +1,18 @@
 {
-  "visitors": 138,
+  "visitors": 213,
   "pageViews": {
-    "/index.html": 73,
-    "/dashboard.html": 22,
+    "/index.html": 98,
+    "/dashboard.html": 27,
     "/admin/dashboard": 4,
     "/admin/logout": 2,
-    "/privacy.html": 6,
-    "/signup.html": 15,
-    "/login.html": 8,
-    "/team.html": 1,
-    "/membership.html": 5,
-    "/refund.html": 2
+    "/privacy.html": 9,
+    "/signup.html": 21,
+    "/login.html": 25,
+    "/team.html": 6,
+    "/membership.html": 11,
+    "/refund.html": 4,
+    "/admin/dashboard.html": 1,
+    "/admin/login.html": 4,
+    "/governance.html": 1
   }
 }

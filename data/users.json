@@ -79,6 +79,56 @@
       "otp": "490898",
       "otpExpiry": 1774426505770,
       "createdAt": "2026-03-25T08:12:05.770Z"
+    },
+    {
+      "id": "1774728441711",
+      "name": "Test User",
+      "email": "testuser@example.com",
+      "passwordHash": "$2b$08$BYLsQZwq57pM34/eGk9hj.3AJlCdjtU6M3UnkpAazoiYED.dw7Stm",
+      "isVerified": false,
+      "otp": "884189",
+      "otpExpiry": 1774728621711,
+      "createdAt": "2026-03-28T20:07:21.711Z"
+    },
+    {
+      "id": "1774728567916",
+      "name": "Test User",
+      "email": "test88@gmail.com",
+      "passwordHash": "$2b$08$yiVFI6g8r2nv8s9X0gLJVeUnFSKvm/7e0X3xE0ZrWa8SfVbfzUKK2",
+      "isVerified": false,
+      "otp": "540414",
+      "otpExpiry": 1774728747916,
+      "createdAt": "2026-03-28T20:09:27.916Z"
+    },
+    {
+      "id": "1774728749395",
+      "name": "Test User",
+      "email": "test101@gmail.com",
+      "passwordHash": "$2b$08$3.VBDAqZdwAUA5XfHNKgaec2hO2Y31yAuFsjTE45O0pd7RsfpHFvy",
+      "isVerified": false,
+      "otp": "925359",
+      "otpExpiry": 1774728929396,
+      "createdAt": "2026-03-28T20:12:29.396Z"
+    },
+    {
+      "id": "1774728906599",
+      "name": "Demo Tester",
+      "email": "demotester3@test.com",
+      "passwordHash": "$2b$08$NYWkRTYSNI2hp1FPieqKCe66cfyg.qNSFi48eGKBr0Ndkvrpc6gB.",
+      "isVerified": false,
+      "otp": "631311",
+      "otpExpiry": 1774729086599,
+      "createdAt": "2026-03-28T20:15:06.599Z"
+    },
+    {
+      "id": "1774729131241",
+      "name": "Nav Test",
+      "email": "navtest@demo.com",
+      "passwordHash": "$2b$08$.KL7bD8I4NwiPA6uu1ZzZ.s2549QTbxxGwP0w7N.IUHm9m28NcHD6",
+      "isVerified": true,
+      "otp": null,
+      "otpExpiry": null,
+      "createdAt": "2026-03-28T20:18:51.241Z"
     }
   ]
 }

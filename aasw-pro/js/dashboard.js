@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </td>
                             <td>${escapeHtml(msg.email)}</td>
                             <td>${escapeHtml(msg.subject)}</td>
-                            <td>${renderDate(msg.date)}</td>
+                            <td>${renderDate(msg.submittedAt || msg.date)}</td>
                         `;
                         recentTbody.appendChild(tr);
                     });
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${escapeHtml(msg.email)}</td>
                             <td>${escapeHtml(msg.subject)}</td>
                             <td><div style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(msg.message)}">${escapeHtml(msg.message)}</div></td>
-                            <td>${renderDate(msg.date)}</td>
+                            <td>${renderDate(msg.submittedAt || msg.date)}</td>
                         `;
                         allMsgsTbody.appendChild(tr);
                     });
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td><strong>${escapeHtml(sub.email)}</strong></td>
-                            <td>${renderDate(sub.date)}</td>
+                            <td>${renderDate(sub.subscribedAt || sub.date)}</td>
                         `;
                         allUsersTbody.appendChild(tr);
                     });
@@ -248,12 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error("Failed to fetch dashboard stats", err);
             const errHtml = '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: #ef4444;">Failed to load data</td></tr>';
-            document.getElementById('recentMessagesTbody').innerHTML = errHtml;
-            document.getElementById('allMessagesTbody').innerHTML = errHtml;
-            document.getElementById('allUsersTbody').innerHTML = errHtml;
-            if (document.getElementById('allMembershipsTbody')) {
-                document.getElementById('allMembershipsTbody').innerHTML = errHtml;
-            }
+            const recentMsgs = document.getElementById('recentMessagesTbody');
+            const allMsgs = document.getElementById('allMessagesTbody');
+            const allUsers = document.getElementById('allUsersTbody');
+            const allMemberships = document.getElementById('allMembershipsTbody');
+            
+            if (recentMsgs) recentMsgs.innerHTML = errHtml;
+            if (allMsgs) allMsgs.innerHTML = errHtml;
+            if (allUsers) allUsers.innerHTML = errHtml;
+            if (allMemberships) allMemberships.innerHTML = errHtml;
         }
     };
     

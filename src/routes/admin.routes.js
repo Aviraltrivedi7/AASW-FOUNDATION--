@@ -18,11 +18,13 @@ router.get('/login', (req, res) => {
 // Process login
 router.post('/login', (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
         
         if (!email || !password) {
             return res.status(400).json(new ApiError(400, "Email and password are required"));
         }
+
+        email = email.trim().toLowerCase();
 
         const credsPath = path.join(process.cwd(), 'data', 'credentials.json');
         if (!fs.existsSync(credsPath)) {

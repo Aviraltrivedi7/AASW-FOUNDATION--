@@ -8,11 +8,24 @@ const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT) || 465,
     secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports (like 587)
+    pool: true, // reuse connections for faster subsequent emails
+    maxConnections: 3,
+    maxMessages: 50,
+    connectionTimeout: 10000, // 10s connection timeout
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
 });
+
+// Verify SMTP connection on startup so the first email is fast
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    transporter.verify()
+        .then(() => console.log('[Email] SMTP connection pool ready ✓'))
+        .catch((err) => console.error('[Email] SMTP connection failed:', err.message));
+}
 
 const sendOTP = async (toEmail, otp) => {
     // If no email configured, just log to console for development/testing

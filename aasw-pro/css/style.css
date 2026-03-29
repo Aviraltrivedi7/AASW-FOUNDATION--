@@ -34,10 +34,13 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   color: var(--text);
-  background: var(--white);
+  background-color: var(--white);
   overflow-x: hidden;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -1101,6 +1104,8 @@ button { cursor: pointer; font-family: inherit; border: none; }
   color: #fff;
   font-size: 0.9rem;
   outline: none;
+  min-width: 0;
+  width: 100%;
 }
 
 .nl-form input::placeholder {
@@ -1574,6 +1579,8 @@ footer {
   
   .top-right-actions {
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .lang-btn {

@@ -216,6 +216,20 @@
             box-sizing: border-box;
         }
 
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px 24px;
+            }
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                text-align: center;
+            }
+            .footer-links div a {
+                margin: 0 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -289,6 +303,12 @@
     </div>
 
     <script>
+        // Redirect if already logged in
+        fetch('/api/v1/auth/me', { credentials: 'include' })
+          .then(function(r) { return r.json(); })
+          .then(function(d) { if (d.statusCode === 200 && d.data) window.location.href = '/'; })
+          .catch(function() {});
+
         let isOtpStep = false;
         let registeredEmail = "";
         let otpTimerInterval;

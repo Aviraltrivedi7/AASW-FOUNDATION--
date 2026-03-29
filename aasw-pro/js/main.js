@@ -305,7 +305,7 @@ const translations = {
   'team-tag': { en: 'Leadership', hi: 'नेतृत्व' },
   'team-h2': { en: 'Meet Our Dedicated Team', hi: 'हमारी समर्पित टीम से मिलें' },
   'team-sub': { en: 'The passionate individuals working tirelessly to uplift communities and drive positive change across India.', hi: 'भारत भर में समुदायों को ऊपर उठाने और सकारात्मक बदलाव लाने के लिए अथक काम करने वाले जुनूनी लोग।' },
-  'tm1-name': { en: 'SATYA PRAKASH TRIVEDI', hi: 'सत्य प्रकाश त्रिवेदी' },
+  'tm1-name': { en: 'Anupam Trivedi', hi: 'अनुपम त्रिवेदी' },
   'tm1-role': { en: 'Founder & President', hi: 'संस्थापक और अध्यक्ष' },
   'tm1-desc': { en: 'Visionary leader with 20+ years in community development and social welfare across rural India.', hi: '20+ वर्षों के अनुभव के साथ ग्रामीण भारत में सामुदायिक विकास और सामाजिक कल्याण में दूरदर्शी नेता।' },
   // Contact form
@@ -323,6 +323,26 @@ const translations = {
   'contact-info-addr': { en: 'Ward No 2 Ambedkar Nagar Rura Kanpur Dehat Uttar Pradesh', hi: 'वार्ड नं 2 अंबेडकर नगर रुरा कानपुर देहात उत्तर प्रदेश' },
   'contact-info-hours-h': { en: 'Office Hours', hi: 'कार्यालय समय' },
   'contact-info-hours': { en: 'Mon – Sat: 9:30 AM – 6:00 PM', hi: 'सोम – शनि: 9:30 AM – 6:00 PM' },
+  // Nav auth items
+  'nav-login': { en: 'LOGIN', hi: 'लॉगिन' },
+  'nav-signup': { en: 'SIGNUP', hi: 'साइनअप' },
+  'nav-member': { en: 'Become a Member', hi: 'सदस्य बनें' },
+  // Privacy Policy page
+  'priv-banner-h': { en: 'Privacy Policy', hi: 'गोपनीयता नीति' },
+  'priv-banner-p': { en: 'How we collect, use, and protect your personal data', hi: 'हम आपके व्यक्तिगत डेटा को कैसे एकत्र, उपयोग और सुरक्षित करते हैं' },
+  'priv-tag': { en: 'Data Protection', hi: 'डेटा सुरक्षा' },
+  'priv-h2': { en: 'Your Privacy Matters', hi: 'आपकी गोपनीयता महत्वपूर्ण है' },
+  'priv-sub': { en: 'AASW Foundation respects your privacy and is committed to protecting your personal data when you interact with our website, donate, or volunteer with us.', hi: 'AASW फाउंडेशन आपकी गोपनीयता का सम्मान करता है और हमारी वेबसाइट से जुड़ने, दान करने या स्वयंसेवा करने पर आपके व्यक्तिगत डेटा की सुरक्षा के लिए प्रतिबद्ध है।' },
+  'priv-1-h': { en: '1. Information We Collect', hi: '1. हम कौन सी जानकारी एकत्र करते हैं' },
+  'priv-1-p': { en: 'We may collect personal identification information including your name, email address, phone number, and mailing address when you make a donation or subscribe to our newsletter. Payment details are processed securely by our trusted gateway partners (Razorpay/PayU) and are not stored on our servers.', hi: 'जब आप दान करते हैं या हमारे न्यूज़लेटर की सदस्यता लेते हैं तो हम आपका नाम, ईमेल पता, फ़ोन नंबर और डाक पता जैसी व्यक्तिगत पहचान जानकारी एकत्र कर सकते हैं। भुगतान विवरण हमारे विश्वसनीय गेटवे पार्टनर (Razorpay/PayU) द्वारा सुरक्षित रूप से संसाधित किए जाते हैं और हमारे सर्वर पर संग्रहीत नहीं होते।' },
+  'priv-2-h': { en: '2. How We Use Your Information', hi: '2. हम आपकी जानकारी का उपयोग कैसे करते हैं' },
+  'priv-2-l1': { en: 'To process donations and issue 80G tax limit receipts.', hi: 'दान को संसाधित करने और 80G कर छूट रसीदें जारी करने के लिए।' },
+  'priv-2-l2': { en: 'To send periodic updates, newsletters, and impact reports.', hi: 'समय-समय पर अपडेट, न्यूज़लेटर और प्रभाव रिपोर्ट भेजने के लिए।' },
+  'priv-2-l3': { en: 'To improve our website functionality and user experience.', hi: 'हमारी वेबसाइट की कार्यक्षमता और उपयोगकर्ता अनुभव को बेहतर बनाने के लिए।' },
+  'priv-3-h': { en: '3. Data Security', hi: '3. डेटा सुरक्षा' },
+  'priv-3-p': { en: 'We implement a variety of security measures to maintain the safety of your personal information. We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties without your explicit consent.', hi: 'हम आपकी व्यक्तिगत जानकारी की सुरक्षा बनाए रखने के लिए विभिन्न सुरक्षा उपाय लागू करते हैं। हम आपकी स्पष्ट सहमति के बिना आपकी व्यक्तिगत पहचान योग्य जानकारी को बाहरी पक्षों को बेचते, व्यापार या अन्यथा हस्तांतरित नहीं करते।' },
+  'priv-4-h': { en: '4. Contacting Us', hi: '4. हमसे संपर्क करें' },
+  'priv-4-p': { en: 'If there are any questions regarding this privacy policy, you may contact us via our email at aaswfoundation06@gmail.com or by calling us at +91 9984156418.', hi: 'यदि इस गोपनीयता नीति के बारे में कोई प्रश्न हैं, तो आप हमें aaswfoundation06@gmail.com पर ईमेल करके या +91 9984156418 पर कॉल करके संपर्क कर सकते हैं।' },
 };
 
 function initLanguage() {
@@ -382,34 +402,50 @@ function initNewsletter() {
 
       const data = await res.json();
 
-    if (res.ok && res.status !== 409) {
+      if (res.ok && res.status !== 409) {
         input.value = '';
         btn.textContent = lang === 'hi' ? '✓ धन्यवाद!' : '✓ Thank you!';
         btn.style.background = '#059669';
         btn.style.color = '#fff';
+        alert(lang === 'hi' ? 'न्यूज़लेटर की सदस्यता लेने के लिए धन्यवाद!' : 'Thank you for subscribing to our newsletter!');
+        // Do not revert button or re-enable it on success
       } else if (res.status === 409) {
-        // Already subscribed — informational, not an error
         btn.textContent = lang === 'hi' ? 'ℹ पहले से सदस्य' : 'ℹ Already subscribed';
         btn.style.background = '#f59e0b';
         btn.style.color = '#fff';
+        alert(lang === 'hi' ? 'आप पहले से ही हमारे न्यूज़लेटर के सदस्य हैं।' : 'You are already subscribed to our newsletter.');
+        // Revert after 3s so they can try a different email
+        setTimeout(() => {
+          btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.disabled = false;
+        }, 3000);
       } else {
         btn.textContent = lang === 'hi' ? '✗ त्रुटि!' : '✗ Error!';
         btn.style.background = '#ef4444';
         btn.style.color = '#fff';
+        alert(lang === 'hi' ? 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।' : 'Something went wrong. Please try again.');
+        setTimeout(() => {
+          btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.disabled = false;
+        }, 3000);
       }
     } catch (err) {
       console.error('Newsletter subscription failed:', err);
       btn.textContent = lang === 'hi' ? '✗ त्रुटि!' : '✗ Error!';
       btn.style.background = '#ef4444';
       btn.style.color = '#fff';
+      alert(lang === 'hi' ? 'नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : 'Network error, please try again.');
+      setTimeout(() => {
+        btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.disabled = false;
+      }, 3000);
     }
-
-    setTimeout(() => {
-      btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
-      btn.style.background = '';
-      btn.style.color = '';
-      btn.disabled = false;
-    }, 3000);
   });
 }
 
