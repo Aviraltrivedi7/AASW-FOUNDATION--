@@ -167,19 +167,12 @@
             <button onclick="fetchStats()" style="padding:10px 20px; background:var(--green); color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:600;"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
 
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
                     <p>Total Form Submissions</p>
                     <h3 id="statContacts">-</h3>
-                </div>
-            </div>
-            <div class="stat-card gold">
-                <div class="stat-icon"><i class="fas fa-envelope-open-text"></i></div>
-                <div class="stat-info">
-                    <p>Newsletter Subscriptions</p>
-                    <h3 id="statSubscribers">-</h3>
                 </div>
             </div>
             <div class="stat-card blue">
@@ -226,20 +219,7 @@
             </div>
         </div>
 
-        <div class="panel">
-            <h3>Recent Newsletter Signups <span class="badge" id="newsletterBadge">0</span></h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email Address</th>
-                        <th>Subscribed At</th>
-                    </tr>
-                </thead>
-                <tbody id="newsletterTable">
-                    <tr><td colspan="2" style="text-align:center; color:#999">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
+
     </main>
 
     <script>

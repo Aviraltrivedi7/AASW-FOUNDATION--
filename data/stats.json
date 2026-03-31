@@ -1,13 +1,13 @@
 {
-  "visitors": 213,
+  "visitors": 218,
   "pageViews": {
-    "/index.html": 98,
+    "/index.html": 102,
     "/dashboard.html": 27,
     "/admin/dashboard": 4,
     "/admin/logout": 2,
     "/privacy.html": 9,
     "/signup.html": 21,
-    "/login.html": 25,
+    "/login.html": 26,
     "/team.html": 6,
     "/membership.html": 11,
     "/refund.html": 4,
