@@ -1,7 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const { validate } = require('../middlewares/validation.middleware');
-const { requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment } = require('../controllers/membership.controller');
+const { requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment } = require('../controllers/membership.controller');
 
 const router = express.Router();
 
@@ -24,9 +24,28 @@ const submitPaymentSchema = Joi.object({
     txnId: Joi.string().min(5).required().messages({ 'string.min': 'Please enter a valid Transaction ID/UTR.' })
 });
 
+const createOrderSchema = Joi.object({
+    email: Joi.string().email().required(),
+    planId: Joi.string().required(),
+    planName: Joi.string().required(),
+    amount: Joi.number().required()
+});
+
+const verifyPaymentSchema = Joi.object({
+    email: Joi.string().email().required(),
+    planId: Joi.string().required(),
+    planName: Joi.string().required(),
+    amount: Joi.number().required(),
+    razorpay_order_id: Joi.string().required(),
+    razorpay_payment_id: Joi.string().required(),
+    razorpay_signature: Joi.string().required()
+});
+
 router.post('/send-otp', validate(sendOtpSchema), requestEmailOTP);
 router.post('/verify-otp', validate(verifyOtpSchema), verifyEmailOTP);
 router.post('/submit-payment', validate(submitPaymentSchema), submitPayment);
+router.post('/create-order', validate(createOrderSchema), createRazorpayOrder);
+router.post('/verify-payment', validate(verifyPaymentSchema), verifyRazorpayPayment);
 router.get('/plans', getMembershipPlans);
 
 module.exports = router;

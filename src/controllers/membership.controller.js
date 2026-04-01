@@ -4,6 +4,8 @@ const { ApiError } = require('../utils/apiError');
 const { sendOTP } = require('../utils/email');
 const fs = require('fs');
 const path = require('path');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 // Membership plans definition
 const MEMBERSHIP_PLANS = [
@@ -202,4 +204,110 @@ const submitPayment = catchAsync(async (req, res) => {
     );
 });
 
-module.exports = { requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment };
+// POST /api/v1/membership/create-order
+const createRazorpayOrder = catchAsync(async (req, res) => {
+    const { email, planId, amount, planName } = req.body;
+
+    if (!email || !planId || !amount) {
+        throw new ApiError(400, 'All details are required to create an order.');
+    }
+
+    // Verify session
+    if (!req.session.membershipOTP || !req.session.membershipOTP.verified || req.session.membershipOTP.email !== email) {
+        throw new ApiError(401, 'Email verification required before payment.');
+    }
+
+    const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_fallback',
+        key_secret: process.env.RAZORPAY_KEY_SECRET || 'secret_fallback'
+    });
+
+    const options = {
+        amount: Math.round(Number(amount) * 100), // amount in smallest currency unit (paise)
+        currency: 'INR',
+        receipt: 'rec_' + Date.now()
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    if (!order) {
+        throw new ApiError(500, 'Failed to create Razorpay order');
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, {
+            orderId: order.id,
+            amount: order.amount,
+            keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_fallback'
+        }, 'Order created successfully')
+    );
+});
+
+// POST /api/v1/membership/verify-payment
+const verifyRazorpayPayment = catchAsync(async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email, planId, planName, amount } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !email) {
+        throw new ApiError(400, 'Missing payment verification details.');
+    }
+
+    // Verify session
+    if (!req.session.membershipOTP || !req.session.membershipOTP.verified || req.session.membershipOTP.email !== email) {
+        throw new ApiError(401, 'Session invalid or email verification required.');
+    }
+
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'secret_fallback';
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(body.toString())
+        .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+        throw new ApiError(400, 'Invalid payment signature.');
+    }
+
+    // If verification successful, record membership
+    const membershipData = {
+        id: 'MEM-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase(),
+        email,
+        planId,
+        planName,
+        amount: Number(amount),
+        txnId: razorpay_payment_id,
+        orderId: razorpay_order_id,
+        status: 'Active', // Razorpay payments are verified automatically
+        date: new Date().toISOString()
+    };
+
+    // Save to memberships.json
+    const dbPath = path.join(process.cwd(), 'data', 'memberships.json');
+    let memberships = [];
+    
+    // Ensure data dir exists
+    if (!fs.existsSync(path.join(process.cwd(), 'data'))) {
+        fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true });
+    }
+
+    if (fs.existsSync(dbPath)) {
+        try {
+            const fileData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+            memberships = fileData.memberships || [];
+        } catch (e) {
+            console.error('Error reading memberships.json:', e);
+        }
+    }
+
+    memberships.push(membershipData);
+    fs.writeFileSync(dbPath, JSON.stringify({ memberships }, null, 2));
+
+    // Clear session so they have to verify anew next time
+    delete req.session.membershipOTP;
+
+    return res.status(200).json(
+        new ApiResponse(200, { membershipId: membershipData.id }, 'Payment verified successfully.')
+    );
+});
+
+module.exports = { requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment };
