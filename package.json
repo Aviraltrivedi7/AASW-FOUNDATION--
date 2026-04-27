@@ -1,19 +1,24 @@
 {
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch-path=./src --watch-path=./server.js server.js"
   },
   "dependencies": {
+    "@insforge/sdk": "^1.2.5",
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
+    "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.1",
-    "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "nodemailer": "^8.0.2",
+    "pdf-lib": "^1.17.1",
     "razorpay": "^2.9.6"
   },
   "devDependencies": {

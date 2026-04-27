@@ -1,16 +1,72 @@
-const fs = require('fs');
 const path = require('path');
 const { ApiError } = require('../utils/apiError');
+const { insforge } = require('../config/insforge');
+
+// In-memory stats buffer + debounced write
+let statsBuffer = { visitors: 0, pageViews: {} };
+let statsWriteTimer = null;
+let initialized = false;
+
+async function fetchInitialStats() {
+    if (!insforge || initialized) return;
+    try {
+        const { data, error } = await insforge.database.from('site_stats').select('*');
+        if (!error && data) {
+            const vis = data.find(r => r.key === 'visitors');
+            if (vis) statsBuffer.visitors = vis.value;
+            // Load page views from DB into memory
+            data.filter(r => r.key.startsWith('pv_')).forEach(r => {
+                statsBuffer.pageViews[r.key.replace('pv_', '')] = r.value;
+            });
+        }
+        initialized = true;
+    } catch (e) { console.error('Stats init err', e); }
+}
+
+async function flushStats() {
+    if (!insforge || !initialized) return;
+    try {
+        // Upsert visitors
+        await insforge.database.from('site_stats').upsert({ key: 'visitors', value: statsBuffer.visitors });
+        
+        // Upsert page views securely
+        const upserts = Object.keys(statsBuffer.pageViews).map(page => ({
+            key: 'pv_' + page,
+            value: statsBuffer.pageViews[page]
+        }));
+        if (upserts.length > 0) {
+            await insforge.database.from('site_stats').upsert(upserts);
+        }
+    } catch (err) {
+        console.error('[Stats] Error writing stats to DB:', err.message);
+    }
+}
 
 // Middleware to check if admin is logged in
 const isAuthenticated = (req, res, next) => {
+    const jwt = require('jsonwebtoken');
+    const JWT_SECRET = process.env.JWT_SECRET || 'aasw_admin_super_secret_for_jwt_2026';
+
+    // Phase 3 Check (JWT Cookie) — verify actual signature
+    if (req.cookies && req.cookies.admin_token) {
+        try {
+            const decoded = jwt.verify(req.cookies.admin_token, JWT_SECRET);
+            req.admin = decoded; // attach admin info for downstream use
+            return next();
+        } catch (e) {
+            // Invalid/expired token — clear cookie and fall through
+            res.clearCookie('admin_token');
+        }
+    }
+    
+    // Legacy Check
     if (req.session && req.session.adminId) {
         return next();
     }
     
     // If it's an API request, send JSON error
     if (req.originalUrl.startsWith('/admin/api')) {
-        return next(new ApiError(401, "Not authorized to access this route"));
+        return next(new ApiError(401, 'Not authorized to access this route'));
     }
     
     // For HTML pages, redirect to login
@@ -18,33 +74,25 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // Middleware to track unique visitors per page
-const visitorTracker = (req, res, next) => {
-    // Ignore static assets and API routes for visitor tracking
-    const ext = path.extname(req.path);
-    if (ext && ext !== '.html') return next();
+const visitorTracker = async (req, res, next) => {
+    // Ignore static assets and API routes
+    const ext = req.path.match(/\.\w+$/);
+    if (ext && ext[0] !== '.html' && ext[0] !== '.ejs') return next();
     if (req.originalUrl.startsWith('/api/') || req.originalUrl.startsWith('/admin/api/') || req.originalUrl === '/admin/login') {
         return next();
     }
 
+    if (!initialized) await fetchInitialStats();
+
     try {
-        const statsPath = path.join(process.cwd(), 'data', 'stats.json');
-        
-        let stats = { visitors: 0, pageViews: {} };
-        if (fs.existsSync(statsPath)) {
-            stats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
-        }
+        statsBuffer.visitors += 1;
+        const page = req.path === '/' ? '/index' : req.path;
+        statsBuffer.pageViews[page] = (statsBuffer.pageViews[page] || 0) + 1;
 
-        // Increment total visitors (dumb counter for simplicity, could be IP based)
-        stats.visitors += 1;
-
-        // Increment page specific views
-        const page = req.path === '/' ? '/index.html' : req.path;
-        stats.pageViews[page] = (stats.pageViews[page] || 0) + 1;
-
-        fs.writeFileSync(statsPath, JSON.stringify(stats, null, 2));
+        clearTimeout(statsWriteTimer);
+        statsWriteTimer = setTimeout(flushStats, 5000); // 5 sec debounce
     } catch (err) {
-        // Silently fail visitor tracking if there's a file error so we don't block the request
-        console.error("Error tracking visitor:", err);
+        console.error('[Stats] Error tracking visitor:', err.message);
     }
     
     next();

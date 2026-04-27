@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AASW Foundation | The Digital Aura Experience</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@300;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#869cf0",
+                    "outline": "#767576",
+                    "on-secondary": "#360055",
+                    "error-dim": "#d73357",
+                    "on-secondary-fixed": "#540081",
+                    "on-surface": "#ffffff",
+                    "error": "#ff6e84",
+                    "inverse-primary": "#445aa9",
+                    "secondary-fixed": "#eac4ff",
+                    "error-container": "#a70138",
+                    "on-secondary-container": "#eac2ff",
+                    "on-background": "#ffffff",
+                    "tertiary-container": "#7daffc",
+                    "inverse-surface": "#fcf8f9",
+                    "surface-container-lowest": "#000000",
+                    "surface-container-high": "#201f21",
+                    "on-tertiary": "#00396f",
+                    "tertiary-fixed": "#80b2fe",
+                    "on-secondary-fixed-variant": "#7725aa",
+                    "surface-variant": "#262627",
+                    "primary": "#94aaff",
+                    "on-primary-fixed": "#000f40",
+                    "surface-container": "#19191b",
+                    "on-error-container": "#ffb2b9",
+                    "background": "#0e0e0f",
+                    "surface-tint": "#94aaff",
+                    "secondary-dim": "#cb7bff",
+                    "on-error": "#490013",
+                    "inverse-on-surface": "#565556",
+                    "tertiary-dim": "#6fa2ed",
+                    "on-tertiary-fixed": "#001835",
+                    "tertiary-fixed-dim": "#72a5f0",
+                    "on-surface-variant": "#adaaab",
+                    "on-primary": "#072776",
+                    "primary-fixed-dim": "#869cf0",
+                    "surface-container-highest": "#262627",
+                    "secondary-fixed-dim": "#e2b1ff",
+                    "secondary": "#cb7bff",
+                    "on-tertiary-fixed-variant": "#003970",
+                    "on-primary-container": "#001b60",
+                    "on-tertiary-container": "#002e5d",
+                    "tertiary": "#94bdff",
+                    "surface-container-low": "#131314",
+                    "surface": "#0e0e0f",
+                    "on-primary-fixed-variant": "#16307f",
+                    "surface-bright": "#2c2c2d",
+                    "primary-fixed": "#94aaff",
+                    "primary-dim": "#869cf0",
+                    "outline-variant": "#484849",
+                    "secondary-container": "#6c169f",
+                    "surface-dim": "#0e0e0f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { background-color: #0e0e0f; color: #ffffff; }
+        .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .aura-purple { background: radial-gradient(circle at center, rgba(203, 123, 255, 0.15) 0%, transparent 70%); }
+        .aura-blue { background: radial-gradient(circle at center, rgba(148, 170, 255, 0.15) 0%, transparent 70%); }
+        .text-gradient { background: linear-gradient(45deg, #94aaff, #cb7bff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+
+<!-- Navigation Bar (Shared Component Strategy) -->
+<%- include('partials/navbar') %>
+<!-- Hero Slider -->
+<section class="relative min-h-[100svh] lg:h-[921px] w-full overflow-hidden flex items-center flex-col justify-center lg:block lg:flex-row">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40" alt="AASW Foundation - Women Empowerment" src="/images/AASW%201.jpeg"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-background to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 mt-32 lg:mt-0 flex flex-col justify-center h-full">
+<div class="max-w-2xl space-y-8">
+<div class="inline-block px-4 py-1.5 glass rounded-full border border-white/10">
+<span class="text-primary font-label text-[10px] uppercase tracking-[0.3em] font-bold">Aapka Apna Social Welfare Foundation</span>
+</div>
+<h1 class="text-5xl md:text-7xl font-headline font-extrabold text-white leading-tight tracking-tight">
+                    Fueling Women's <span class="text-gradient">Success Through Tech & Enterprise</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl font-light leading-relaxed">
+                    Bridging the divide in digital business ownership and building a new wave of confident, capable, and connected women leaders.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})" class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-10 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest shadow-lg hover:shadow-primary/20 transition-all">
+                        Learn More
+                    </button>
+<button onclick="window.location.href='/membership.html'" class="glass border border-white/10 text-white px-10 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
+                        Join Us
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Introduction Section -->
+<section id="about" class="relative py-32 px-6 md:px-12 overflow-hidden">
+<div class="absolute top-0 right-0 w-[500px] h-[500px] aura-purple blur-[120px] opacity-30 -z-10"></div>
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+<div class="space-y-8">
+<div class="space-y-4">
+<p class="font-label text-xs font-bold text-secondary uppercase tracking-[0.4em]">Introduction</p>
+<h2 class="text-4xl md:text-5xl font-headline font-bold text-white leading-tight">
+                        Bridging the digital divide for women in Uttar Pradesh
+                    </h2>
+</div>
+<p class="text-on-surface-variant leading-relaxed">
+                    The chance for growth, leadership, and groundbreaking ideas belongs to everyone in today's fast-moving world—especially women from disadvantaged communities. Yet, deep-seated barriers still stop countless Indian women from finding their footing in technology, business, and sustainable careers.
+                </p>
+<p class="text-on-surface-variant leading-relaxed">
+                    Aapka Apna Social Welfare Foundation was founded to change this reality. We're a human-centered organization in the heart of Uttar Pradesh, dedicated to bridging the divide in digital business ownership.
+                </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+<div class="glass p-6 rounded-2xl border border-primary/10">
+<h4 class="text-primary font-bold mb-2">Our Objective</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">To encourage women in digital entrepreneurship through educational avenues by providing digital tools, environmental awareness, and business mentoring.</p>
+</div>
+<div class="glass p-6 rounded-2xl border-secondary/10">
+<h4 class="text-secondary font-bold mb-2">Our Aim</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Imagine women becoming inventors and decision-makers, using technology and business to create a sustainable, just society.</p>
+</div>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+<img class="w-full h-[400px] lg:h-[600px] object-cover transition-transform duration-700 group-hover:scale-105" alt="Women empowerment event in Uttar Pradesh" src="/images/digital-divide-women.jpeg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8">
+<p class="text-white font-headline font-bold text-xl italic leading-relaxed">"Stronger women create a better world—socially, environmentally, and financially."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Activities Section (What We Do) -->
+<section class="py-32 px-6 md:px-12 bg-surface-container-low">
+<div class="max-w-7xl mx-auto space-y-16">
+<div class="text-center max-w-3xl mx-auto space-y-4">
+<p class="font-label text-xs font-bold text-primary uppercase tracking-[0.4em]">What We Do</p>
+<h2 class="text-4xl font-headline font-bold text-white">Empowering Through Action</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Activity 1 -->
+<div class="glass p-8 rounded-3xl border border-white/5 hover:border-primary/20 transition-all duration-300 group cursor-pointer">
+<div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 border border-primary/20">
+<span class="material-symbols-outlined text-primary">laptop_mac</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-white mb-3">Digital Skill Development</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Training in E-commerce, Social Media Marketing, and Online Operations to start and maintain digital businesses.</p>
+</div>
+<!-- Activity 2 -->
+<div class="glass p-8 rounded-3xl border border-white/5 hover:border-secondary/20 transition-all duration-300 group cursor-pointer">
+<div class="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center mb-6 border border-secondary/20">
+<span class="material-symbols-outlined text-secondary">eco</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-white mb-3">Green Entrepreneurship</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Focusing on ecologically conscious solutions and sustainable practices in business with heart.</p>
+</div>
+<!-- Activity 3 -->
+<div class="glass p-8 rounded-3xl border border-white/5 hover:border-tertiary/20 transition-all duration-300 group cursor-pointer">
+<div class="w-14 h-14 bg-tertiary/10 rounded-2xl flex items-center justify-center mb-6 border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">groups</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-white mb-3">Mentorship & Support</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Connecting aspiring women entrepreneurs with professionals for step-by-step business building.</p>
+</div>
+<!-- Activity 4 -->
+<div class="glass p-8 rounded-3xl border border-white/5 hover:border-primary/20 transition-all duration-300 group cursor-pointer">
+<div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 border border-primary/20">
+<span class="material-symbols-outlined text-primary">video_library</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-white mb-3">Workshops & Seminars</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Leadership development, financial literacy, and digital innovation through regular gatherings.</p>
+</div>
+<!-- Activity 5 -->
+<div class="glass p-8 rounded-3xl border border-white/5 hover:border-secondary/20 transition-all duration-300 group cursor-pointer">
+<div class="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center mb-6 border border-secondary/20">
+<span class="material-symbols-outlined text-secondary">forum</span>
+</div>
+<h3 class="text-xl font-headline font-bold text-white mb-3">Building Community</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">A growing network for peer learning and collaboration, especially for remote entrepreneurs.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<!-- Goals Section -->
+<section class="py-32 px-6 md:px-12 relative overflow-hidden">
+<div class="absolute top-1/2 left-0 w-[500px] h-[500px] aura-blue blur-[120px] opacity-20 -z-10"></div>
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div class="space-y-8">
+<div class="space-y-4">
+<p class="font-label text-xs font-bold text-tertiary uppercase tracking-[0.4em]">Our Mission</p>
+<h2 class="text-4xl font-headline font-bold text-white">Strategic Goals</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-start gap-4 glass p-4 rounded-xl border border-white/5">
+<span class="text-primary font-bold">01</span>
+<p class="text-on-surface-variant text-sm">Encourage the Indian states to actively support foundations programs and services.</p>
+</div>
+<div class="flex items-start gap-4 glass p-4 rounded-xl border border-white/5">
+<span class="text-secondary font-bold">02</span>
+<p class="text-on-surface-variant text-sm">Increase presence in rural and urban areas for broad reach and involvement.</p>
+</div>
+<div class="flex items-start gap-4 glass p-4 rounded-xl border border-white/5">
+<span class="text-tertiary font-bold">03</span>
+<p class="text-on-surface-variant text-sm">Give special attention to state-specific initiatives for creative social solutions.</p>
+</div>
+<div class="flex items-start gap-4 glass p-4 rounded-xl border border-white/5">
+<span class="text-primary font-bold">04</span>
+<p class="text-on-surface-variant text-sm">Encourage awareness, self-sufficiency, and confidence in digital technology.</p>
+</div>
+<div class="flex items-start gap-4 glass p-4 rounded-xl border border-white/5">
+<span class="text-secondary font-bold">05</span>
+<p class="text-on-surface-variant text-sm">Document and disseminate success stories as inspiration for women in leadership.</p>
+</div>
+</div>
+</div>
+<div class="relative group">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+<div class="space-y-4 sm:space-y-6 sm:pt-12">
+<div class="h-64 rounded-2xl overflow-hidden border border-white/10 relative group/img">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105" src="/images/AASW%202.jpeg" alt="Social Impact"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4"><p class="text-white font-bold text-sm">Social Impact</p></div>
+</div>
+<div class="h-64 rounded-2xl overflow-hidden border border-white/10 relative group/img">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105" src="/images/AASW%205.jpeg" alt="Inclusive Economic Growth"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4"><p class="text-white font-bold text-sm">Inclusive Economic Growth</p></div>
+</div>
+</div>
+<div class="space-y-4 sm:space-y-6">
+<div class="h-64 rounded-2xl overflow-hidden border border-white/10 relative group/img">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105" src="/images/AASW%204.jpeg" alt="Digital Empowerment"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4"><p class="text-secondary font-bold text-sm">Digital Empowerment</p></div>
+</div>
+<div class="h-64 rounded-2xl overflow-hidden border border-white/10 relative group/img">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-105" src="/images/AASW%203.jpeg" alt="Community"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4"><p class="text-white font-bold text-sm">Community</p></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- How We Work Section -->
+<section class="py-32 px-6 md:px-12 bg-surface-container-lowest border-y border-white/5">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20 space-y-4">
+<p class="font-label text-xs font-bold text-secondary uppercase tracking-[0.4em]">Methodology</p>
+<h2 class="text-4xl font-headline font-bold text-white">How We Work</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+<div class="space-y-4">
+<div class="text-3xl font-black text-primary/30">01</div>
+<h4 class="text-xl font-bold text-white">Market Understanding</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">We use a sustainable and scalable model, marrying local understanding with global thought.</p>
+</div>
+<div class="space-y-4">
+<div class="text-3xl font-black text-secondary/30">02</div>
+<h4 class="text-xl font-bold text-white">Identify Impact</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Identifying local challenges and potential changemakers within community structures.</p>
+</div>
+<div class="space-y-4">
+<div class="text-3xl font-black text-tertiary/30">03</div>
+<h4 class="text-xl font-bold text-white">Tailored Training</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Offering tailored digital training and mentorship specialized for women entrepreneurs.</p>
+</div>
+<div class="space-y-4">
+<div class="text-3xl font-black text-primary/30">04</div>
+<h4 class="text-xl font-bold text-white">Responsibility</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Following business development and environmental responsibility in every project.</p>
+</div>
+<div class="space-y-4">
+<div class="text-3xl font-black text-secondary/30">05</div>
+<h4 class="text-xl font-bold text-white">Collaboration</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Building collaboration on a community and advisory leadership basis for long-term trust.</p>
+</div>
+<div class="space-y-4">
+<div class="text-3xl font-black text-tertiary/30">06</div>
+<h4 class="text-xl font-bold text-white">Scaling Up</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Scaling successful initiatives on the basis of data, feedback, and promotion at the state level.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-32 px-6 md:px-12 relative overflow-hidden">
+<div class="absolute bottom-0 left-0 w-[600px] h-[600px] aura-blue blur-[150px] opacity-20 -z-10"></div>
+<div class="max-w-7xl mx-auto space-y-16">
+<div class="flex justify-between items-end">
+<div class="space-y-4">
+<p class="font-label text-xs font-bold text-secondary uppercase tracking-[0.4em]">Testimonials</p>
+<h2 class="text-4xl font-headline font-bold text-white">Impact Stories from the Ground</h2>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Testimonial 1 -->
+<div class="surface-container p-10 rounded-3xl space-y-6 relative border border-white/5">
+<div class="flex text-amber-400 gap-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic text-lg leading-relaxed">"The Shakti program gave me more than just a loan; it gave me the confidence to run my own tailoring shop and send my daughter to college."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center font-bold text-secondary">PD</div>
+<div>
+<p class="font-headline font-bold text-white">Priya Devi</p>
+<p class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Varanasi, UP</p>
+</div>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="surface-container p-10 rounded-3xl space-y-6 relative border border-white/5">
+<div class="flex text-amber-400 gap-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic text-lg leading-relaxed">"Through Arogya Gram, my father received heart treatment without traveling 200km. This service is a lifesaver for our village."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center font-bold text-primary">RG</div>
+<div>
+<p class="font-headline font-bold text-white">Ramesh Gupta</p>
+<p class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Alwar, Rajasthan</p>
+</div>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="surface-container p-10 rounded-3xl space-y-6 relative border border-white/5">
+<div class="flex text-amber-400 gap-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic text-lg leading-relaxed">"Udyam helped me shift to organic farming. My yield has improved, and the market link provided by AASW has doubled my income."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center font-bold text-tertiary">SL</div>
+<div>
+<p class="font-headline font-bold text-white">Sundar Lal</p>
+<p class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Bastar, Chhattisgarh</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Section -->
+<section class="py-32 px-6 md:px-12 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+<div class="glass p-12 rounded-[2rem] border border-white/5 space-y-8">
+<div class="space-y-4">
+<h2 class="text-3xl font-headline font-bold text-white">Get in Touch</h2>
+<p class="text-on-surface-variant">Have questions or want to partner with us? Reach out through the form below.</p>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Full Name</label>
+<input class="w-full bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary text-white py-3 px-4" placeholder="John Doe" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Email Address</label>
+<input class="w-full bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary text-white py-3 px-4" placeholder="john@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Message</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary text-white py-3 px-4" placeholder="Tell us how we can help..." rows="4"></textarea>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">Send Message</button>
+</form>
+</div>
+<div class="flex flex-col justify-center space-y-12">
+<div class="space-y-8">
+<div class="flex gap-6 items-start">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0 border border-primary/20">
+<span class="material-symbols-outlined text-primary">location_on</span>
+</div>
+<div class="space-y-1">
+<h4 class="font-headline font-bold text-white text-lg">Our Headquarters</h4>
+<p class="text-on-surface-variant leading-relaxed">A-12, Green Park Extension, New Delhi - 110016, India</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<div class="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center shrink-0 border border-secondary/20">
+<span class="material-symbols-outlined text-secondary">mail</span>
+</div>
+<div class="space-y-1">
+<h4 class="font-headline font-bold text-white text-lg">Email Us</h4>
+<p class="text-on-surface-variant">contact@aaswfoundation.org</p>
+<p class="text-on-surface-variant">partnerships@aaswfoundation.org</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<div class="w-12 h-12 bg-tertiary/10 rounded-xl flex items-center justify-center shrink-0 border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">call</span>
+</div>
+<div class="space-y-1">
+<h4 class="font-headline font-bold text-white text-lg">Call Support</h4>
+<p class="text-on-surface-variant">+91 11 4050 6070</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer (Shared Component Strategy) -->
+<%- include('partials/footer') %>
+
+<!-- Toast Container -->
+<div id="toast" class="toast"></div>
+
+<style>
+  /* Toast notification */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 0.75rem; z-index: 100; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; backdrop-filter: blur(20px); }
+  .toast.error { background: rgba(255, 110, 132, 0.15); border: 1px solid rgba(255, 110, 132, 0.3); color: #ff6e84; backdrop-filter: blur(20px); }
+</style>
+
+<script>
+// ====== TOAST NOTIFICATION ======
+function showToast(message, type = 'success') {
+  let toast = document.getElementById('toast');
+  if(!toast) return;
+  toast.textContent = message;
+  toast.className = 'toast ' + type + ' show';
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ====== GENERIC FORM HANDLERS ======
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = form.querySelector('input[placeholder*="Doe"]');
+    const emailInput = form.querySelector('input[type="email"]');
+    const msgInput = form.querySelector('textarea');
+    const btn = form.querySelector('button');
+    const originalText = btn ? btn.textContent : 'Sending...';
+    
+    // Contact form check
+    if (nameInput && emailInput && msgInput) {
+        if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+        try {
+          const res = await fetch('/api/v1/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: nameInput.value,
+              email: emailInput.value,
+              subject: 'Contact from Stitch UI',
+              message: msgInput.value
+            })
+          });
+          if (res.ok) {
+            showToast('✓ Message sent successfully!', 'success');
+            form.reset();
+          } else {
+            showToast('Failed to send message', 'error');
+          }
+        } catch (err) {
+          showToast('Network error. Please try again.', 'error');
+        } finally {
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+        }
+    }
+  });
+});
+</script>
+
+</body></html>

@@ -2,39 +2,49 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const compression = require("compression");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 const { errorHandler } = require("./middlewares/error.middleware");
+const { getTranslator } = require("./utils/lang");
 
 // Route imports
 const healthRoutes = require("./routes/health.routes");
 const contactRoutes = require("./routes/contact.routes");
-const newsletterRoutes = require("./routes/newsletter.routes");
 const adminRoutes = require("./routes/admin.routes");
-const authRoutes = require("./routes/auth.routes");
 const membershipRoutes = require("./routes/membership.routes");
 const { ApiError } = require("./utils/apiError");
-const session = require("express-session");
-const { visitorTracker } = require("./middlewares/auth.middleware");
+const { visitorTracker, isAuthenticated } = require('./middlewares/auth.middleware');
 
 const app = express();
 
-// GLOBAL MIDDLEWARES
+// Set View Engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(process.cwd(), 'views'));
 
-// Security headers
+// GLOBAL MIDDLEWARES
+// Gzip compression — reduces response sizes by ~70%, fixes lag/slow loading
+app.use(compression({
+    level: 6,
+    threshold: 1024, // Only compress responses > 1KB
+    filter: (req, res) => {
+        if (req.headers['x-no-compression']) return false;
+        return compression.filter(req, res);
+    }
+}));
+
 app.use(helmet({
     contentSecurityPolicy: false
 }));
 
-// CORS — restrict to allowed origins (set ALLOWED_ORIGINS in .env for production)
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. mobile apps, curl, Postman in dev)
         if (!origin || allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
@@ -43,94 +53,92 @@ app.use(cors({
     credentials: true
 }));
 
-// Body parsing
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-
-// Express Session
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'aasw_super_secret_key_123',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, maxAge: 86400000 } // 1 day
-}));
-
-// Visitor Tracking (Applied before static routes to catch HTML requests)
+app.use(cookieParser());
 app.use(visitorTracker);
 
-// Protect the original dashboard HTML file directly
-const { isAuthenticated } = require("./middlewares/auth.middleware");
-app.get('/dashboard.html', isAuthenticated, (req, res, next) => next());
-
-// HTTP request logging
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 } else {
-    // In production, keep Morgan but log less verbosely as to not crowd logs.
     app.use(morgan("tiny"));
 }
 
-// Rate Limiting — general API protection
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { message: "Too many requests from this IP, please try again after 15 minutes" }
-});
-
-// Strict rate limit for form submissions (contact + newsletter)
-const formLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 5, // max 5 form submissions per 10 minutes per IP
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { message: "Too many submissions. Please wait 10 minutes before trying again." }
-});
-
-// Auth rate limit — more generous to allow signup + OTP + login flow
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // signup + verify-otp + login attempts
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { message: "Too many auth requests. Please wait 15 minutes before trying again." }
-});
-
-// Apply rate limiting to all API routes
+const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
+const formLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 15, standardHeaders: true, legacyHeaders: false });
 app.use("/api/", apiLimiter);
 
-// 2. API ROUTES
-// Routes usage
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/contact", formLimiter, contactRoutes);
-app.use("/api/v1/newsletter", formLimiter, newsletterRoutes);
-app.use("/api/v1/auth", authLimiter, authRoutes);
 app.use("/api/v1/membership", membershipRoutes);
 app.use("/admin", adminRoutes);
 
-// 3. STATIC FRONTEND SERVING
-// Serve static frontend files from 'aasw-pro' directory
-const frontendPath = path.join(__dirname, "..", "aasw-pro");
-app.use(express.static(frontendPath));
-
-// Catch-all route: try to serve matching .html file, else fallback to index.html
-app.use((req, res, next) => {
-    // If it's an API route that wasn't found, send JSON 404 instead of HTML
-    if (req.originalUrl.startsWith("/api/")) {
-        return next(new ApiError(404, "API route not found"));
-    }
-    // Try to serve the requested .html file (e.g. /dashboard → dashboard.html)
-    if (!req.path.endsWith('.html') && req.path !== '/') {
-        const htmlFile = path.join(frontendPath, req.path + '.html');
-        if (fs.existsSync(htmlFile)) {
-            return res.sendFile(htmlFile);
+// Static frontend serving — serve the premium Obsidian Lens HTML pages
+const staticPath = path.join(process.cwd(), "aasw-pro");
+app.use(express.static(staticPath, {
+    maxAge: '1y',          // Cache static assets for 1 year
+    etag: true,            // Enable ETag for cache validation
+    lastModified: true,    // Enable Last-Modified headers
+    immutable: true,       // Tell browsers cached assets won't change
+    setHeaders: (res, filePath) => {
+        // HTML files should not be cached aggressively (they change)
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        }
+        // Images, CSS, JS, fonts — aggressive caching
+        else if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$/.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
     }
-    res.sendFile(path.join(frontendPath, "index.html"));
+}));
+
+// Favicon handler — prevent 404 errors from browsers requesting /favicon.ico
+app.get('/favicon.ico', (req, res) => {
+    const faviconPath = path.join(staticPath, 'favicon.svg');
+    if (fs.existsSync(faviconPath)) {
+        return res.type('image/svg+xml').sendFile(faviconPath);
+    }
+    const pngFavicon = path.join(staticPath, 'images', 'favicon.png');
+    if (fs.existsSync(pngFavicon)) {
+        return res.type('image/png').sendFile(pngFavicon);
+    }
+    res.status(204).end();
 });
 
-// 4. GLOBAL ERROR HANDLER
+// Serve homepage at root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
+});
+
+// Clean URL rewrite — serve /team → /team.html, /membership → /membership.html, etc.
+// This makes footer/internal links without .html extension work correctly
+app.use((req, res, next) => {
+    // Skip API routes, admin routes, static files with extensions, and POST/PUT requests
+    if (req.method !== 'GET' || req.originalUrl.startsWith('/api/') || req.originalUrl.startsWith('/admin')) {
+        return next();
+    }
+    // Skip if URL already has a file extension
+    if (path.extname(req.path)) {
+        return next();
+    }
+    // Try to find a matching .html file
+    const htmlFile = path.join(staticPath, req.path + '.html');
+    if (fs.existsSync(htmlFile)) {
+        return res.sendFile(htmlFile);
+    }
+    next();
+});
+
+// Catch-all: serve static HTML or 404
+app.use((req, res, next) => {
+    if (req.originalUrl.startsWith('/api/') || req.originalUrl.startsWith('/admin')) {
+        return next(new ApiError(404, "API endpoint not found"));
+    }
+    // Serve styled 404 page for browser requests
+    res.status(404).sendFile(path.join(staticPath, '404.html'));
+});
+
+// GLOBAL ERROR HANDLER
 app.use(errorHandler);
 
 module.exports = app;

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AASW Admin | The Obsidian Lens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed-variant": "#003970",
+                      "on-primary": "#072776",
+                      "tertiary": "#94bdff",
+                      "surface-container-high": "#201f21",
+                      "on-error-container": "#ffb2b9",
+                      "on-primary-fixed-variant": "#16307f",
+                      "primary": "#94aaff",
+                      "secondary-container": "#6c169f",
+                      "on-tertiary-container": "#002e5d",
+                      "secondary": "#cb7bff",
+                      "surface-container-highest": "#262627",
+                      "outline-variant": "#484849",
+                      "on-secondary": "#360055",
+                      "inverse-primary": "#445aa9",
+                      "on-error": "#490013",
+                      "on-primary-fixed": "#000f40",
+                      "on-background": "#ffffff",
+                      "outline": "#767576",
+                      "surface-dim": "#0e0e0f",
+                      "secondary-fixed": "#eac4ff",
+                      "error-container": "#a70138",
+                      "surface-container-lowest": "#000000",
+                      "on-surface": "#ffffff",
+                      "on-secondary-fixed": "#540081",
+                      "background": "#0e0e0f",
+                      "surface-variant": "#262627",
+                      "error": "#ff6e84",
+                      "secondary-dim": "#cb7bff",
+                      "primary-fixed-dim": "#869cf0",
+                      "primary-container": "#869cf0",
+                      "surface": "#0e0e0f",
+                      "on-secondary-container": "#eac2ff",
+                      "tertiary-fixed-dim": "#72a5f0",
+                      "tertiary-fixed": "#80b2fe",
+                      "on-primary-container": "#001b60",
+                      "on-secondary-fixed-variant": "#7725aa",
+                      "inverse-on-surface": "#565556",
+                      "on-tertiary": "#00396f",
+                      "surface-bright": "#2c2c2d",
+                      "primary-dim": "#869cf0",
+                      "surface-container-low": "#131314",
+                      "on-surface-variant": "#adaaab",
+                      "surface-tint": "#94aaff",
+                      "inverse-surface": "#fcf8f9",
+                      "error-dim": "#d73357",
+                      "primary-fixed": "#94aaff",
+                      "secondary-fixed-dim": "#e2b1ff",
+                      "on-tertiary-fixed": "#001835",
+                      "surface-container": "#19191b",
+                      "tertiary-dim": "#6fa2ed",
+                      "tertiary-container": "#7daffc"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope", "sans-serif"],
+                      "body": ["Manrope", "sans-serif"],
+                      "label": ["Space Grotesk", "sans-serif"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0e0e0f;
+            color: #ffffff;
+            font-family: 'Manrope', sans-serif;
+            overflow-x: hidden;
+        }
+        .aura-blue {
+            background: radial-gradient(circle at top left, rgba(148, 170, 255, 0.12) 0%, transparent 50%);
+        }
+        .aura-violet {
+            background: radial-gradient(circle at bottom right, rgba(203, 123, 255, 0.1) 0%, transparent 50%);
+        }
+        .glass-card {
+            background: rgba(25, 25, 27, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 170, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<!-- Ambient Aura -->
+<div class="fixed inset-0 aura-blue pointer-events-none"></div>
+<div class="fixed inset-0 aura-violet pointer-events-none"></div>
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen fixed left-0 top-0 bg-[#0a0a0b] flex flex-col border-r border-[#94aaff]/15 z-[60] font-manrope shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+<!-- Brand / Profile Header -->
+<div class="p-8 pb-4">
+<div class="flex items-center gap-4 mb-10">
+<div class="relative flex items-center justify-center w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-primary via-secondary to-primary-container">
+<div class="w-full h-full bg-[#0a0a0b] rounded-full flex items-center justify-center overflow-hidden">
+<span class="text-white font-bold text-lg font-label">Ad</span>
+</div>
+</div>
+<div>
+<h3 class="text-on-surface font-bold text-base leading-tight">Admin / Superuser</h3>
+<p class="text-on-surface-variant text-[0.7rem] font-label uppercase tracking-wider">Managing the Narrative</p>
+</div>
+</div>
+<%- include('partials/navbar') %>
+</div>
+<div class="mt-auto p-8 border-t border-outline-variant/10">
+<a class="flex items-center gap-4 text-[#adaaab] px-6 py-3 transition-all hover:bg-[#131314] hover:text-white mb-2" href="/">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Back to Website</span>
+</a>
+<a class="flex items-center gap-4 text-error px-6 py-3 transition-all hover:bg-error/10 rounded-lg" href="/admin/logout">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Logout</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] z-50 bg-[#0e0e0f]/60 backdrop-blur-[40px] flex justify-between items-center h-16 px-8 ml-[280px]">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-full py-1.5 pl-10 pr-4 text-sm text-on-surface placeholder-on-surface-variant focus:ring-1 focus:ring-primary" placeholder="Search parameters..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full animate-pulse"></span>
+</div>
+<div class="flex items-center gap-3 border-l border-outline-variant/20 pl-6">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional male profile photo for administrative user interface avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkLQV5Ug5BfK-J7YTOIs5ktuPuhW8-WLocwqYQagLi3111kdtDhKdaP0ewlL15NVywQYZUqPEr5hEt7x056gzGJtQc4_0bVShNCpA63tgO1Gr4gj3BsgOjQR_MHbz_TZnpR06OsrdVAWrMBI1jUYmFxpWLQnxyQrYcc0512KHluVCZOKs6sfqE0H7SXyAy58P-42Ipgz_Uf4WykpIw0B7yFtkCx3zo18MX0YRQ1nWbGbcyf2QugOa36U4y13zm1w0043GtqyNvmerI"/>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-white transition-colors">logout</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[280px] pt-24 px-8 pb-12 relative z-10">
+<!-- Hero Section -->
+<section class="mb-12">
+<p class="font-label text-secondary tracking-[0.2em] uppercase text-[0.7rem] font-bold mb-2">Real-time Foundation Metrics &amp; Control</p>
+<h1 class="font-headline text-5xl font-extrabold text-on-surface tracking-tight">Welcome back, Admin 👋</h1>
+</section>
+<!-- KPI Bento Row -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
+<!-- Card 1 -->
+<div class="glass-card p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">visibility</span>
+</div>
+<span class="text-xs text-primary font-label flex items-center gap-1">+12% <span class="material-symbols-outlined text-[10px]">trending_up</span></span>
+</div>
+<div>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-label">Total Visitors</p>
+<h3 class="text-2xl font-bold text-on-surface">148.5k</h3>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">chat_bubble</span>
+</div>
+<span class="text-xs text-secondary font-label flex items-center gap-1">+5% <span class="material-symbols-outlined text-[10px]">trending_up</span></span>
+</div>
+<div>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-label">Messages</p>
+<h3 class="text-2xl font-bold text-on-surface">1,240</h3>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-500">alternate_email</span>
+</div>
+<span class="text-xs text-amber-500 font-label flex items-center gap-1">-2% <span class="material-symbols-outlined text-[10px]">trending_down</span></span>
+</div>
+<div>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-label">Subscribers</p>
+<h3 class="text-2xl font-bold text-on-surface">8.2k</h3>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="glass-card p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-500">verified</span>
+</div>
+<span class="text-xs text-emerald-500 font-label flex items-center gap-1">+18% <span class="material-symbols-outlined text-[10px]">trending_up</span></span>
+</div>
+<div>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-label">Pro Members</p>
+<h3 class="text-2xl font-bold text-on-surface">432</h3>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="glass-card p-6 rounded-xl flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-cyan-400">dns</span>
+</div>
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
+<div class="w-1.5 h-1.5 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+<div>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-label">Server Health</p>
+<h3 class="text-2xl font-bold text-on-surface">Optimal</h3>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Impact By Region (Asymmetric Chart Container) -->
+<div class="lg:col-span-1 glass-card p-8 rounded-xl overflow-hidden relative">
+<h3 class="font-headline font-bold text-lg mb-6">Impact by Region</h3>
+<div class="flex items-center justify-center py-4">
+<div class="relative w-48 h-48">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#19191b" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#94aaff" stroke-dasharray="40 60" stroke-dashoffset="0" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#cb7bff" stroke-dasharray="25 75" stroke-dashoffset="-40" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#7daffc" stroke-dasharray="20 80" stroke-dashoffset="-65" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#262627" stroke-dasharray="15 85" stroke-dashoffset="-85" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-bold">88%</span>
+<span class="text-[0.6rem] font-label uppercase text-on-surface-variant tracking-widest">Growth</span>
+</div>
+</div>
+</div>
+<div class="mt-6 grid grid-cols-2 gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-xs text-on-surface-variant font-label">Rajasthan (40%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-xs text-on-surface-variant font-label">MP (25%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary-container"></div>
+<span class="text-xs text-on-surface-variant font-label">UP (20%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<span class="text-xs text-on-surface-variant font-label">Bihar (15%)</span>
+</div>
+</div>
+</div>
+<!-- Server Performance & Quick Action (Bento Stack) -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Server Performance Bar Chart -->
+<div class="glass-card p-8 rounded-xl">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline font-bold text-lg">Server Performance</h3>
+<div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+<div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+<span class="text-[0.65rem] text-emerald-500 font-bold uppercase tracking-widest font-label">Live</span>
+</div>
+</div>
+<div class="flex items-end justify-between h-32 gap-3">
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 40%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 65%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 55%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 80%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 45%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 70%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 90%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 50%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 60%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 35%"></div>
+<div class="w-full bg-primary/20 rounded-t-sm" style="height: 75%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 85%"></div>
+</div>
+<div class="mt-4 flex justify-between text-on-surface-variant text-[0.6rem] font-label uppercase tracking-widest">
+<span>12:00 PM</span>
+<span>02:00 PM</span>
+<span>04:00 PM</span>
+<span>06:00 PM</span>
+</div>
+</div>
+<!-- Recent Messages Table -->
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-8 pb-4">
+<h3 class="font-headline font-bold text-lg">Recent Messages</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-8 py-4 text-[0.65rem] font-label uppercase tracking-widest text-on-surface-variant">Name</th>
+<th class="px-8 py-4 text-[0.65rem] font-label uppercase tracking-widest text-on-surface-variant">Subject</th>
+<th class="px-8 py-4 text-[0.65rem] font-label uppercase tracking-widest text-on-surface-variant">Date</th>
+<th class="px-8 py-4 text-[0.65rem] font-label uppercase tracking-widest text-on-surface-variant">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Arjun Mehta</span>
+<span class="text-xs text-on-surface-variant">arjun.m@example.com</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">Volunteer Application...</td>
+<td class="px-8 py-4 text-sm font-label text-on-surface-variant">Oct 24, 2023</td>
+<td class="px-8 py-4">
+<span class="px-2 py-1 text-[10px] font-bold uppercase tracking-tighter bg-primary/10 text-primary rounded">New</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Priya Sharma</span>
+<span class="text-xs text-on-surface-variant">p.sharma@foundation.org</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">Partnership Proposal</td>
+<td class="px-8 py-4 text-sm font-label text-on-surface-variant">Oct 23, 2023</td>
+<td class="px-8 py-4">
+<span class="px-2 py-1 text-[10px] font-bold uppercase tracking-tighter bg-on-surface-variant/10 text-on-surface-variant rounded">Read</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold">Rohan Verma</span>
+<span class="text-xs text-on-surface-variant">rohan.v@tech.in</span>
+</div>
+</td>
+<td class="px-8 py-4 text-sm text-on-surface-variant">Technical Support</td>
+<td class="px-8 py-4 text-sm font-label text-on-surface-variant">Oct 22, 2023</td>
+<td class="px-8 py-4">
+<span class="px-2 py-1 text-[10px] font-bold uppercase tracking-tighter bg-primary/10 text-primary rounded">New</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+</main>
+<!-- Subtle Grain Overlay -->
+<div class="fixed inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgPu_yID2NORjzFO6ROi5l09g41TBuku34hUQmfec-HUokvc7r7PJIgu9GIdqaYYVmbP0JSsOgaKoAHpp3NCJ1K51e38UShHBASX44HR7Luwi63Ty99Mm2tVecpVm_T3LjvJo7MJFtfI65acAzg0Z0RZ2YrkL36Rc-YS9yezrt0-kG2WQsFT929lYNP7COFMoe_fUY9Q0bp-hGoke4YXnQtjummrURnDdEm2E5MIER9vUWaskFKtR8KfBWl4d8KRnnP-6sZ9sSkJbd');"></div>
+
+<!-- Toast Container -->
+<div id="toast" class="toast"></div>
+
+<style>
+  /* Toast notification */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 0.75rem; z-index: 100; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; backdrop-filter: blur(20px); }
+  .toast.error { background: rgba(255, 110, 132, 0.15); border: 1px solid rgba(255, 110, 132, 0.3); color: #ff6e84; backdrop-filter: blur(20px); }
+</style>
+
+<script>
+// ====== TOAST NOTIFICATION ======
+function showToast(message, type = 'success') {
+  let toast = document.getElementById('toast');
+  if(!toast) return;
+  toast.textContent = message;
+  toast.className = 'toast ' + type + ' show';
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ====== GENERIC FORM HANDLERS ======
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = form.querySelector('input[placeholder*="Doe"]');
+    const emailInput = form.querySelector('input[type="email"]');
+    const msgInput = form.querySelector('textarea');
+    const btn = form.querySelector('button');
+    const originalText = btn ? btn.textContent : 'Sending...';
+    
+    // Contact form check
+    if (nameInput && emailInput && msgInput) {
+        if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+        try {
+          const res = await fetch('/api/v1/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: nameInput.value,
+              email: emailInput.value,
+              subject: 'Contact from Stitch UI',
+              message: msgInput.value
+            })
+          });
+          if (res.ok) {
+            showToast('✓ Message sent successfully!', 'success');
+            form.reset();
+          } else {
+            showToast('Failed to send message', 'error');
+          }
+        } catch (err) {
+          showToast('Network error. Please try again.', 'error');
+        } finally {
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+        }
+    }
+  });
+});
+</script>
+
+</body></html>

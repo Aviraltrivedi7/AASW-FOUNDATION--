@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
   initCounters();
   initLanguage();
-  initNewsletter();
   initBackToTop();
   initContactForm();
   initSmoothAnchors();
@@ -276,7 +275,7 @@ const translations = {
   'f-h3': { en: 'Connect With Us', hi: 'हमसे जुड़ें' },
   'f-addr': { en: 'Ward No 2 Ambedkar Nagar Rura Kanpur Dehat Uttar Pradesh', hi: 'वार्ड नं 2 अंबेडकर नगर रुरा कानपुर देहात उत्तर प्रदेश' },
   'f-hours': { en: 'Mon – Sat: 9:30 AM – 6:00 PM', hi: 'सोम – शनि: 9:30 AM – 6:00 PM' },
-  'f-copy': { en: '© 2025 AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified', hi: '© 2025 AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित' },
+  'f-copy': { en: '© 2026 AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified', hi: '© 2026 AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित' },
   // Refund Policy page
   'ref-banner-h': { en: 'Refund & Cancellation Policy', hi: 'रिफंड और कैंसलेशन पॉलिसी' },
   'ref-banner-p': { en: 'Our policy on refund and cancellation of Membership fees.', hi: 'सदस्यता शुल्क के रिफंड और रद्दीकरण पर हमारी नीति।' },
@@ -374,80 +373,6 @@ function setLang(lang) {
 
 window.setLang = setLang;
 
-/* ═══ NEWSLETTER ═══ */
-function initNewsletter() {
-  document.getElementById('nlBtn')?.addEventListener('click', async () => {
-    const input = document.getElementById('nlInput');
-    const btn = document.getElementById('nlBtn');
-    const email = input?.value?.trim();
-
-    if (!email || !email.includes('@')) {
-      input.style.outline = '2px solid #ff4444';
-      input.style.outlineOffset = '2px';
-      setTimeout(() => { input.style.outline = ''; }, 2000);
-      return;
-    }
-
-    // Disable button while sending
-    btn.disabled = true;
-    const lang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
-    btn.textContent = lang === 'hi' ? '⏳ भेज रहे हैं...' : '⏳ Sending...';
-
-    try {
-      const res = await fetch('/api/v1/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && res.status !== 409) {
-        input.value = '';
-        btn.textContent = lang === 'hi' ? '✓ धन्यवाद!' : '✓ Thank you!';
-        btn.style.background = '#059669';
-        btn.style.color = '#fff';
-        alert(lang === 'hi' ? 'न्यूज़लेटर की सदस्यता लेने के लिए धन्यवाद!' : 'Thank you for subscribing to our newsletter!');
-        // Do not revert button or re-enable it on success
-      } else if (res.status === 409) {
-        btn.textContent = lang === 'hi' ? 'ℹ पहले से सदस्य' : 'ℹ Already subscribed';
-        btn.style.background = '#f59e0b';
-        btn.style.color = '#fff';
-        alert(lang === 'hi' ? 'आप पहले से ही हमारे न्यूज़लेटर के सदस्य हैं।' : 'You are already subscribed to our newsletter.');
-        // Revert after 3s so they can try a different email
-        setTimeout(() => {
-          btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.disabled = false;
-        }, 3000);
-      } else {
-        btn.textContent = lang === 'hi' ? '✗ त्रुटि!' : '✗ Error!';
-        btn.style.background = '#ef4444';
-        btn.style.color = '#fff';
-        alert(lang === 'hi' ? 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।' : 'Something went wrong. Please try again.');
-        setTimeout(() => {
-          btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.disabled = false;
-        }, 3000);
-      }
-    } catch (err) {
-      console.error('Newsletter subscription failed:', err);
-      btn.textContent = lang === 'hi' ? '✗ त्रुटि!' : '✗ Error!';
-      btn.style.background = '#ef4444';
-      btn.style.color = '#fff';
-      alert(lang === 'hi' ? 'नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : 'Network error, please try again.');
-      setTimeout(() => {
-        btn.textContent = lang === 'hi' ? 'सदस्यता लें' : 'SUBSCRIBE';
-        btn.style.background = '';
-        btn.style.color = '';
-        btn.disabled = false;
-      }, 3000);
-    }
-  });
-}
 
 /* ═══ BACK TO TOP ═══ */
 function initBackToTop() {
@@ -493,14 +418,18 @@ function initScrollProgress() {
 
 /* ═══ DYNAMIC YEAR ═══ */
 function initDynamicYear() {
+  const year = new Date().getFullYear();
   const fCopy = document.querySelector('[data-t="f-copy"]');
   if (fCopy) {
     const isHi = document.body.classList.contains('lang-hi');
-    const year = new Date().getFullYear();
     fCopy.textContent = isHi
       ? `© ${year} AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित`
       : `© ${year} AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified`;
   }
+  // Also update any static copyright elements
+  document.querySelectorAll('.footer-year, [data-year]').forEach(el => {
+    el.textContent = year;
+  });
 }
 
 /* ═══ CONTACT FORM ═══ */
@@ -544,6 +473,7 @@ function initContactForm() {
       const res = await fetch('/api/v1/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           name,
           email,

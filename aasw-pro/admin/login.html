@@ -1,306 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - AASW Foundation Admin</title>
-    <!-- Use Roboto to match Google's aesthetic -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --g-blue: #1a73e8;
-            --g-blue-hover: #1b66c9;
-            --g-blue-focus: #e8f0fe;
-            --g-border: #dadce0;
-            --g-text: #202124;
-            --g-text-light: #5f6368;
-            --g-bg: #fff;
-            --error-red: #d93025;
-            --error-bg: #fce8e6;
-        }
-
-        body {
-            font-family: 'Roboto', arial, sans-serif;
-            background-color: #f0f4f9;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: var(--g-text);
-        }
-
-        .login-container {
-            background: var(--g-bg);
-            border: 1px solid var(--g-border);
-            border-radius: 8px;
-            width: 100%;
-            max-width: 448px;
-            padding: 48px 40px 36px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 500;
-            color: var(--g-text);
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 400;
-            margin: 0 0 10px;
-        }
-
-        .sub-header {
-            font-size: 16px;
-            color: var(--g-text-light);
-            margin: 0 0 40px;
-        }
-
-        .error-message {
-            background-color: var(--error-bg);
-            color: var(--error-red);
-            font-size: 14px;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 24px;
-            text-align: left;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .error-message.visible {
-            display: flex;
-        }
-
-        .form-group {
-            position: relative;
-            margin-bottom: 24px;
-            text-align: left;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 13px 15px;
-            font-size: 16px;
-            border: 1px solid var(--g-border);
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            color: var(--g-text);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--g-blue);
-            box-shadow: inset 0 0 0 1px var(--g-blue);
-        }
-
-        .form-group input::placeholder {
-            color: transparent;
-        }
-
-        .form-group label {
-            position: absolute;
-            top: 14px;
-            left: 12px;
-            background: #fff;
-            padding: 0 4px;
-            color: var(--g-text-light);
-            font-size: 16px;
-            transition: 0.2s ease all;
-            pointer-events: none;
-        }
-
-        /* Floating label mechanics */
-        .form-group input:focus + label,
-        .form-group input:not(:placeholder-shown) + label {
-            top: -8px;
-            font-size: 12px;
-            color: var(--g-blue);
-        }
-
-        .form-group input:not(:focus):not(:placeholder-shown) + label {
-            color: var(--g-text-light);
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
-        }
-
-        .btn-link {
-            color: var(--g-blue);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            padding: 8px 8px;
-            margin-left: -8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        .btn-link:hover {
-            background-color: var(--g-blue-focus);
-        }
-
-        .btn-primary {
-            background-color: var(--g-blue);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--g-blue-hover);
-            box-shadow: 0 1px 2px rgba(66,133,244,0.3), 0 1px 3px rgba(66,133,244,0.15);
-        }
-
-        .btn-primary[disabled] {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .footer-links {
-            margin-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--g-text-light);
-            max-width: 448px;
-            width: 100%;
-        }
-
-        .footer-links select {
-            border: none;
-            background: transparent;
-            color: var(--g-text-light);
-            cursor: pointer;
-            font-family: inherit;
-        }
-        
-        .footer-links div a {
-            color: var(--g-text-light);
-            text-decoration: none;
-            margin-left: 16px;
-        }
-        .footer-links div a:hover {
-            background-color: rgba(0,0,0,0.04);
-            border-radius: 4px;
-            padding: 4px;
-            margin: -4px 12px -4px -4px;
-        }
-
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-    </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AASW Admin | Sign In</title>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: { extend: {
+    colors: {
+      "primary": "#94aaff", "primary-container": "#869cf0", "secondary": "#cb7bff", "secondary-container": "#6c169f",
+      "tertiary": "#94bdff", "tertiary-container": "#7daffc",
+      "background": "#0e0e0f", "surface": "#0e0e0f",
+      "surface-container-lowest": "#000000", "surface-container-low": "#131314",
+      "surface-container": "#19191b", "surface-container-high": "#201f21", "surface-container-highest": "#262627",
+      "surface-variant": "#262627", "on-surface": "#ffffff", "on-surface-variant": "#adaaab",
+      "on-primary": "#072776", "outline-variant": "#484849", "error": "#ff6e84",
+    },
+    fontFamily: { "headline": ["Manrope","sans-serif"], "body": ["Manrope","sans-serif"], "label": ["Space Grotesk","sans-serif"] }
+  }}
+}
+</script>
+<style>
+  body { background-color: #0e0e0f; color: #ffffff; font-family: 'Manrope', sans-serif; }
+  .aura-blue { background: radial-gradient(circle at top left, rgba(148, 170, 255, 0.12) 0%, transparent 50%); }
+  .aura-violet { background: radial-gradient(circle at bottom right, rgba(203, 123, 255, 0.1) 0%, transparent 50%); }
+  .text-gradient { background: linear-gradient(45deg, #94aaff, #cb7bff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(12px); }
+  .btn-glow:hover { box-shadow: 0 0 30px rgba(148, 170, 255, 0.4); }
+  .input-focus:focus { box-shadow: 0 0 0 2px rgba(148, 170, 255, 0.3); }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .float-anim { animation: float 6s ease-in-out infinite; }
+</style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center overflow-hidden relative">
 
-    <div class="wrapper">
-        <div class="login-container">
-            <div class="logo" style="margin-bottom: 16px;">
-                <img src="/images/logo.png" alt="AASW Logo" style="height: 48px; width: auto;">
-            </div>
-            <h1>Sign in</h1>
-            <p class="sub-header">Use your Administrator Account</p>
+<!-- Ambient Background -->
+<div class="fixed inset-0 aura-blue pointer-events-none"></div>
+<div class="fixed inset-0 aura-violet pointer-events-none"></div>
 
-            <div class="error-message" id="errorMsg">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
-                </svg>
-                <span id="errorText"></span>
-            </div>
+<!-- Login Card -->
+<div class="w-full max-w-md mx-4 relative z-10">
+  <!-- Logo & Header -->
+  <div class="text-center mb-10">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full p-[2px] bg-gradient-to-tr from-primary via-secondary to-primary-container mb-6 float-anim">
+      <div class="w-full h-full bg-[#0e0e0f] rounded-full flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-3xl">admin_panel_settings</span>
+      </div>
+    </div>
+    <h1 class="text-3xl font-headline font-extrabold text-white tracking-tight mb-2">Welcome Back</h1>
+    <p class="text-on-surface-variant font-label text-sm">Sign in to AASW Foundation Admin Panel</p>
+  </div>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <input type="email" id="email" name="email" placeholder="Email" required autocomplete="username">
-                    <label for="email">Email or phone</label>
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
-                    <label for="password">Enter your password</label>
-                </div>
-                
-                <div style="text-align: left; margin-bottom: 24px;">
-                    <br>
-                </div>
-
-                <div class="action-row">
-                    <a href="/" class="btn-link">Return to Website</a>
-                    <button type="submit" class="btn-primary" id="loginBtn">Next</button>
-                </div>
-            </form>
-        </div>
-        
-        <div class="footer-links">
-            <select aria-label="Language selection">
-                <option value="en">English (United States)</option>
-                <option value="hi">हिन्दी (India)</option>
-            </select>
-            <div>
-                <a href="#">Help</a>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-            </div>
-        </div>
+  <!-- Login Form Card -->
+  <div class="glass p-8 md:p-10 rounded-3xl border border-white/5 shadow-[0px_20px_60px_rgba(0,0,0,0.5)]">
+    <!-- Error Message -->
+    <div id="errorMsg" class="hidden mb-6 p-4 rounded-xl bg-error/10 border border-error/20 text-error text-sm flex items-center gap-3">
+      <span class="material-symbols-outlined text-lg">error</span>
+      <span id="errorText"></span>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('errorMsg');
-            const errorText = document.getElementById('errorText');
-            const btn = document.getElementById('loginBtn');
+    <form id="loginForm" class="space-y-6">
+      <div class="space-y-2">
+        <label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Email Address</label>
+        <input type="email" id="email" name="email" required autocomplete="username"
+               class="input-focus w-full bg-surface-container-high border-none rounded-xl text-white py-3.5 px-4 focus:ring-2 focus:ring-primary placeholder:text-outline-variant transition-all"
+               placeholder="admin@aaswfoundation.org"/>
+      </div>
+      <div class="space-y-2">
+        <label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Password</label>
+        <div class="relative">
+          <input type="password" id="password" name="password" required autocomplete="current-password"
+                 class="input-focus w-full bg-surface-container-high border-none rounded-xl text-white py-3.5 px-4 pr-12 focus:ring-2 focus:ring-primary placeholder:text-outline-variant transition-all"
+                 placeholder="Enter your password"/>
+          <button type="button" id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-xl" id="eye-icon">visibility_off</span>
+          </button>
+        </div>
+      </div>
 
-            btn.textContent = 'Signing in...';
-            btn.disabled = true;
+      <button type="submit" id="loginBtn"
+              class="w-full py-4 rounded-xl bg-gradient-to-r from-primary via-primary to-secondary text-on-primary font-bold font-label uppercase tracking-widest text-sm btn-glow transition-all active:scale-[0.98]">
+        Sign In
+      </button>
+    </form>
 
-            try {
-                const res = await fetch('/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+    <div class="mt-8 flex justify-between items-center">
+      <a href="/" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label text-xs uppercase tracking-wider">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Back to Website
+      </a>
+      <div class="flex items-center gap-2 font-label text-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-primary text-lg">lock</span>
+        Secured
+      </div>
+    </div>
+  </div>
 
-                const data = await res.json();
+  <!-- Footer -->
+  <div class="mt-8 text-center">
+    <p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/40">© 2026 AASW Foundation Admin</p>
+  </div>
+</div>
 
-                if (res.ok && data.success) {
-                    window.location.href = data.data.redirect;
-                } else {
-                    errorText.textContent = data.message || "Couldn't sign you in";
-                    errorMsg.classList.add('visible');
-                    btn.textContent = 'Next';
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                errorText.textContent = "Network error. Try again.";
-                errorMsg.classList.add('visible');
-                btn.textContent = 'Next';
-                btn.disabled = false;
-            }
-        });
-    </script>
+<script>
+// Toggle Password Visibility
+document.getElementById('toggle-password')?.addEventListener('click', () => {
+  const pwd = document.getElementById('password');
+  const icon = document.getElementById('eye-icon');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    icon.textContent = 'visibility';
+  } else {
+    pwd.type = 'password';
+    icon.textContent = 'visibility_off';
+  }
+});
+
+// Login
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorMsg = document.getElementById('errorMsg');
+  const errorText = document.getElementById('errorText');
+  const btn = document.getElementById('loginBtn');
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      btn.textContent = 'Redirecting...';
+      window.location.href = data.data.redirect;
+    } else {
+      errorText.textContent = data.message || "Couldn't sign you in";
+      errorMsg.classList.remove('hidden');
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    errorText.textContent = "Network error. Try again.";
+    errorMsg.classList.remove('hidden');
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+  }
+});
+</script>
 </body>
 </html>

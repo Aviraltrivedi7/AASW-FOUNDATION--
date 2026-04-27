@@ -2,62 +2,78 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// Standard Nodemailer configuration using SMTP
-// If env variables are missing, it will log the OTP but won't send an email
+// ─── SMTP TRANSPORTER (port 587 STARTTLS — faster than SSL/465) ───────────────
+// Gmail App Password required: https://myaccount.google.com/apppasswords
+const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 465,
-    secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports (like 587)
-    pool: true, // reuse connections for faster subsequent emails
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465,       // true only for port 465 SSL; false = STARTTLS
+    pool: true,                       // keep connections alive — critical for low latency
     maxConnections: 3,
-    maxMessages: 50,
-    connectionTimeout: 10000, // 10s connection timeout
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    maxMessages: 200,
+    rateDelta: 1000,                  // spread sends if batching (1 per sec)
+    rateLimit: 5,
+    connectionTimeout: 5000,          // fail fast — 5s
+    greetingTimeout: 5000,            // fail fast — 5s
+    socketTimeout: 8000,              // fail fast — 8s
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
+    tls: {
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
+    }
 });
 
-// Verify SMTP connection on startup so the first email is fast
+// ─── WARM UP: verify on startup so first send is instant ──────────────────────
 if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     transporter.verify()
-        .then(() => console.log('[Email] SMTP connection pool ready ✓'))
+        .then(() => {
+            console.log('[Email] SMTP connection pool ready ✓ (port ' + SMTP_PORT + ')');
+        })
         .catch((err) => console.error('[Email] SMTP connection failed:', err.message));
+
+    // ─── KEEPALIVE: ping every 4 minutes to prevent connection drop ───────────
+    // Gmail closes idle SMTP connections after ~5 minutes. This prevents cold restarts.
+    setInterval(() => {
+        transporter.verify()
+            .then(() => console.log('[Email] Pool keepalive ✓'))
+            .catch(() => {}); // silently ignore keepalive failures
+    }, 4 * 60 * 1000);
 }
 
+// ─── SEND OTP ─────────────────────────────────────────────────────────────────
 const sendOTP = async (toEmail, otp) => {
-    // If no email configured, just log to console for development/testing
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
         console.log(`[DEV MODE] Email skipped. OTP for ${toEmail} is: ${otp}`);
         return true;
     }
 
     try {
-        const mailOptions = {
+        const info = await transporter.sendMail({
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
-            subject: 'Your AASW Foundation Verification OTP',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-                    <h2 style="color: #1a73e8;">Welcome to AASW Foundation!</h2>
-                    <p>To complete your registration, please enter the following One-Time Password (OTP) in the signup page. This code is valid for 3 minutes.</p>
-                    <div style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #d93025; background: #fce8e6; padding: 20px; text-align: center; border-radius: 8px; margin: 24px 0;">
-                        ${otp}
-                    </div>
-                    <p>If you did not request this, please ignore this email.</p>
-                    <hr style="border: none; border-top: 1px solid #dadce0; margin: 24px 0;" />
-                    <p style="font-size: 12px; color: #5f6368;">AASW Foundation<br>Empowering Lives · Building Futures</p>
-                </div>
-            `,
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email] OTP sent to ${toEmail}. MessageId: ${info.messageId}`);
+            subject: `${otp} — AASW Foundation Verification Code`,
+            // Plain text fallback (renders instantly in most clients)
+            text: `Your AASW Foundation OTP is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.`,
+            // Minimal HTML for fastest delivery — lighter payload = faster send
+            html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto">
+<h2 style="color:#1a73e8;margin-bottom:4px">AASW Foundation</h2>
+<p style="color:#555;margin-top:0">Your One-Time Password</p>
+<div style="font-size:36px;font-weight:700;letter-spacing:6px;color:#d93025;background:#fce8e6;padding:20px;text-align:center;border-radius:8px;margin:20px 0">${otp}</div>
+<p style="color:#555;font-size:14px">Valid for <strong>5 minutes</strong>. Do not share this code with anyone.</p>
+<hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
+<p style="color:#999;font-size:11px">AASW Foundation · Empowering Lives · Building Futures<br>If you did not request this, ignore this email.</p>
+</div>`,
+            priority: 'high',  // mark as high priority for faster inbox delivery
+        });
+        console.log(`[Email] OTP sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error(`[Email Error] Failed to send OTP to ${toEmail}:`, error);
+        console.error(`[Email Error] OTP send failed for ${toEmail}:`, error.message);
         return false;
     }
 };
@@ -95,46 +111,44 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
     }
 };
 
-const sendNewsletterWelcomeEmail = async (subscriberEmail) => {
+const sendMembershipSuccessEmail = async (toEmail, memberName, pdfBuffer) => {
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-        console.log(`[DEV MODE] Newsletter Welcome skipped for: ${subscriberEmail}`);
+        console.log(`[DEV MODE] Membership success email skipped for ${toEmail}. Cert generated but not emailed.`);
         return true;
     }
 
     try {
         const mailOptions = {
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-            to: subscriberEmail,
-            subject: 'Welcome to the AASW Foundation Community!',
+            to: toEmail,
+            subject: `Welcome to AASW Foundation! Your Membership Certificate is inside 🎉`,
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
-                    <div style="background-color: #1a73e8; padding: 20px; text-align: center;">
-                        <h2 style="color: #ffffff; margin: 0;">Welcome to AASW Foundation!</h2>
-                    </div>
-                    <div style="padding: 30px;">
-                        <p style="font-size: 16px; line-height: 1.5;">Hello,</p>
-                        <p style="font-size: 16px; line-height: 1.5;">Thank you for subscribing to the AASW Foundation newsletter! We are thrilled to have you join our community.</p>
-                        <p style="font-size: 16px; line-height: 1.5;">You will now receive our latest updates, impact stories, and program news delivered straight to your inbox. Together, we can catalyze positive change and build a more equitable India.</p>
-                        <p style="font-size: 16px; line-height: 1.5;">Stay tuned for our next update!</p>
-                        <br>
-                        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 0;">Warm regards,</p>
-                        <p style="font-size: 16px; font-weight: bold; margin-top: 5px;">The AASW Foundation Team</p>
-                    </div>
-                    <div style="background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #777;">
-                        <p style="margin: 0;">AASW Foundation | Empowering Lives, Building Futures</p>
-                        <p style="margin: 5px 0 0 0;">You received this email because you opted in via our website.</p>
-                    </div>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #1a73e8;">Hello ${memberName},</h2>
+                    <p>Thank you for becoming a valued member of the <strong>Aapka Apna Social Welfare (AASW) Foundation</strong>!</p>
+                    <p>Your commitment helps us bridge the digital divide and build a new wave of confident, capable leaders across communities.</p>
+                    <p>Please find your official <strong>Membership Certificate</strong> attached to this email as a PDF.</p>
+                    <br>
+                    <p>Warm Regards,</p>
+                    <p><strong>The AASW Foundation Team</strong></p>
                 </div>
             `,
+            attachments: [
+                {
+                    filename: 'AASW-Membership-Certificate.pdf',
+                    content: Buffer.from(pdfBuffer),
+                    contentType: 'application/pdf'
+                }
+            ]
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email] Newsletter welcome sent to ${subscriberEmail}. MessageId: ${info.messageId}`);
+        console.log(`[Email] Membership Sucess/Cert sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error(`[Email Error] Failed to send newsletter welcome to ${subscriberEmail}:`, error);
+        console.error(`[Email Error] Failed to send membership success email:`, error);
         return false;
     }
 };
 
-module.exports = { sendOTP, sendContactNotification, sendNewsletterWelcomeEmail };
+module.exports = { sendOTP, sendContactNotification, sendMembershipSuccessEmail };

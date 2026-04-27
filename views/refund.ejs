@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AASW Foundation | Refund & Cancellation Policy</title>
+<meta name="description" content="AASW Foundation Refund & Cancellation Policy — Information regarding refund and cancellation of membership fees."/>
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: { extend: {
+    colors: {
+      "primary": "#94aaff", "primary-container": "#869cf0", "secondary": "#cb7bff", "secondary-container": "#6c169f",
+      "tertiary": "#94bdff", "tertiary-container": "#7daffc",
+      "background": "#0e0e0f", "surface": "#0e0e0f",
+      "surface-container-lowest": "#000000", "surface-container-low": "#131314",
+      "surface-container": "#19191b", "surface-container-high": "#201f21", "surface-container-highest": "#262627",
+      "surface-variant": "#262627", "on-surface": "#ffffff", "on-surface-variant": "#adaaab",
+      "on-primary": "#072776", "outline-variant": "#484849", "error": "#ff6e84",
+    },
+    fontFamily: { "headline": ["Manrope"], "body": ["Manrope"], "label": ["Space Grotesk"] }
+  }}
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background-color: #0e0e0f; color: #ffffff; }
+  .aura-purple { background: radial-gradient(circle at center, rgba(203, 123, 255, 0.12) 0%, transparent 70%); }
+  .aura-blue { background: radial-gradient(circle at center, rgba(148, 170, 255, 0.12) 0%, transparent 70%); }
+  .text-gradient { background: linear-gradient(45deg, #94aaff, #cb7bff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(20px); }
+  .btn-glow:hover { box-shadow: 0 0 30px rgba(148, 170, 255, 0.4); }
+  .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+  .mobile-menu.open { transform: translateX(0); }
+</style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary overflow-x-hidden">
+
+<!-- Navigation -->
+<header class="fixed top-0 w-full z-50 bg-[#0e0e0f]/60 backdrop-blur-xl shadow-[0px_20px_40px_rgba(0,0,0,0.4)]">
+  <%- include('partials/navbar') %>
+</header>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="mobile-menu fixed inset-0 z-[70] bg-background/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8">
+  <button id="menu-close" class="absolute top-6 right-6 text-white"><span class="material-symbols-outlined text-3xl">close</span></button>
+  <a href="/" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white"href="/">Home</a>
+  <a href="/team.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white"href="/team.html">Our Team</a>
+  <a href="/governance.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white"href="/governance.html">Governance</a>
+  <a href="/membership.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white"href="/membership.html">Membership</a>
+</div>
+
+<main class="pt-24">
+
+<!-- Hero -->
+<section class="relative py-20 md:py-28 text-center px-6 overflow-hidden">
+  <div class="absolute -top-20 right-0 w-[500px] h-[500px] aura-blue blur-[120px] opacity-30"></div>
+  <div class="absolute bottom-0 -left-20 w-[500px] h-[500px] aura-purple blur-[120px] opacity-20"></div>
+  <div class="relative z-10 max-w-4xl mx-auto fade-up">
+    <span class="font-label text-xs uppercase tracking-[0.3em] text-primary mb-4 block">Policies</span>
+    <h1 class="text-4xl sm:text-5xl md:text-7xl font-headline font-extrabold tracking-tight mb-6 leading-tight">Refund & <span class="text-gradient">Cancellation</span></h1>
+    <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">Our policy on refund and cancellation of membership fees.</p>
+  </div>
+</section>
+
+<!-- Refund Content -->
+<section class="py-16 md:py-24 px-6 md:px-12">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-12 fade-up">
+      <span class="font-label text-xs uppercase tracking-widest text-secondary">policies</span>
+      <h2 class="text-3xl md:text-4xl font-headline font-bold mt-2">Refund & Cancellation Policy</h2>
+      <p class="text-on-surface-variant mt-4 leading-relaxed max-w-3xl">Our policy on refund and cancellation of Membership fees received for AASW Foundation on secure online payment gateway is as under:</p>
+    </div>
+
+    <!-- Policy Notice Card -->
+    <div class="glass p-8 md:p-12 rounded-3xl border border-white/5 fade-up">
+      <div class="flex items-start gap-6">
+        <div class="w-14 h-14 rounded-2xl bg-error/10 flex items-center justify-center border border-error/20 shrink-0">
+          <span class="material-symbols-outlined text-error text-2xl">gavel</span>
+        </div>
+        <div class="space-y-4">
+          <h3 class="text-xl font-headline font-bold text-white">No Refund Policy</h3>
+          <p class="text-on-surface-variant leading-relaxed text-base">
+            Any request for cancellations and refund of online Membership fees once duly placed on the website, shall not be entertained under any circumstances. No cash or refund of money will be allowed after completing the online Membership fees as it is an extremely cumbersome process.
+          </p>
+          <div class="bg-surface-container-high p-6 rounded-xl border border-white/5 mt-4">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-xl mt-0.5">info</span>
+              <p class="text-on-surface-variant text-sm leading-relaxed">
+                We therefore request you to be <span class="text-white font-semibold">sure before you make payment</span> for Membership fees. Please review the membership tier details, benefits, and pricing carefully before proceeding with the payment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div class="bg-surface-container p-8 rounded-xl fade-up">
+        <div class="flex items-center gap-4 mb-4">
+          <span class="material-symbols-outlined text-primary text-2xl">support_agent</span>
+          <h4 class="font-headline font-bold text-white text-lg">Need Help?</h4>
+        </div>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-4">If you have any questions about our refund policy, reach out to our support team.</p>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-lg">mail</span>
+            <span class="text-on-surface-variant text-sm">aaswfoundation06@gmail.com</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-lg">call</span>
+            <span class="text-on-surface-variant text-sm">+91 9984156418</span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-surface-container p-8 rounded-xl fade-up">
+        <div class="flex items-center gap-4 mb-4">
+          <span class="material-symbols-outlined text-secondary text-2xl">verified</span>
+          <h4 class="font-headline font-bold text-white text-lg">Secure Payments</h4>
+        </div>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-4">All transactions are processed through secure payment gateways. Your financial data is never stored on our servers.</p>
+        <div class="flex items-center gap-2 mt-2">
+          <div class="px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/20">
+            <span class="text-primary text-xs font-label font-bold uppercase tracking-wider">Razorpay</span>
+          </div>
+          <div class="px-3 py-1.5 bg-secondary/10 rounded-lg border border-secondary/20">
+            <span class="text-secondary text-xs font-label font-bold uppercase tracking-wider">UPI</span>
+          </div>
+          <div class="px-3 py-1.5 bg-tertiary/10 rounded-lg border border-tertiary/20">
+            <span class="text-tertiary text-xs font-label font-bold uppercase tracking-wider">Bank Transfer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-16 text-center fade-up">
+      <p class="text-on-surface-variant mb-6">Interested in our membership program?</p>
+      <a href="/membership.html" class="inline-block bg-gradient-to-r from-primary to-primary-container text-on-primary px-12 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest btn-glow transition-all">
+        View Membership Plans
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<%- include('partials/footer') %>
+
+<script>
+document.getElementById('menu-toggle')?.addEventListener('click', () => document.getElementById('mobile-menu').classList.add('open'));
+document.getElementById('menu-close')?.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+
+<!-- Toast Container -->
+<div id="toast" class="toast"></div>
+
+<style>
+  /* Toast notification */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 0.75rem; z-index: 100; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .toast.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; backdrop-filter: blur(20px); }
+  .toast.error { background: rgba(255, 110, 132, 0.15); border: 1px solid rgba(255, 110, 132, 0.3); color: #ff6e84; backdrop-filter: blur(20px); }
+</style>
+
+<script>
+// ====== TOAST NOTIFICATION ======
+function showToast(message, type = 'success') {
+  let toast = document.getElementById('toast');
+  if(!toast) return;
+  toast.textContent = message;
+  toast.className = 'toast ' + type + ' show';
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ====== GENERIC FORM HANDLERS ======
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = form.querySelector('input[placeholder*="Doe"]');
+    const emailInput = form.querySelector('input[type="email"]');
+    const msgInput = form.querySelector('textarea');
+    const btn = form.querySelector('button');
+    const originalText = btn ? btn.textContent : 'Sending...';
+    
+    // Contact form check
+    if (nameInput && emailInput && msgInput) {
+        if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+        try {
+          const res = await fetch('/api/v1/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: nameInput.value,
+              email: emailInput.value,
+              subject: 'Contact from Stitch UI',
+              message: msgInput.value
+            })
+          });
+          if (res.ok) {
+            showToast('✓ Message sent successfully!', 'success');
+            form.reset();
+          } else {
+            showToast('Failed to send message', 'error');
+          }
+        } catch (err) {
+          showToast('Network error. Please try again.', 'error');
+        } finally {
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+        }
+    }
+  });
+});
+</script>
+
+</body>
+</html>
