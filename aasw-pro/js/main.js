@@ -152,6 +152,7 @@ function initCounters() {
 
     nums.forEach(el => {
       const target = parseInt(el.dataset.count);
+      if (isNaN(target)) return;
       const suffix = el.dataset.suffix || '';
       const duration = 2000;
       const start = performance.now();
@@ -345,12 +346,13 @@ const translations = {
 };
 
 function initLanguage() {
-  const saved = localStorage.getItem('aasw-lang') || 'en';
+  let saved = 'en';
+  try { saved = localStorage.getItem('aasw-lang') || 'en'; } catch (e) { /* Incognito/blocked */ }
   setLang(saved);
 }
 
 function setLang(lang) {
-  localStorage.setItem('aasw-lang', lang);
+  try { localStorage.setItem('aasw-lang', lang); } catch (e) { console.warn('LocalStorage blocked'); }
   document.body.classList.toggle('lang-hi', lang === 'hi');
 
   document.querySelectorAll('[data-t]').forEach(el => {
@@ -453,7 +455,7 @@ function initContactForm() {
       showFeedback(feedback, lang === 'hi' ? 'कृपया अपना नाम दर्ज करें (कम से कम 2 अक्षर)' : 'Please enter your name (at least 2 characters)', 'error');
       return;
     }
-    if (!email || !email.includes('@')) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       showFeedback(feedback, lang === 'hi' ? 'कृपया एक मान्य ईमेल दर्ज करें' : 'Please enter a valid email address', 'error');
       return;
     }

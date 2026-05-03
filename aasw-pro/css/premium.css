@@ -918,3 +918,24 @@ footer {
         font-size: .8rem;
     }
 }
+
+/* ══ ACCESSIBILITY: REDUCED MOTION ══ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .hero-glow,
+    .dots-pattern {
+        display: none !important;
+    }
+
+    .slider-track {
+        transition: none !important;
+    }
+}

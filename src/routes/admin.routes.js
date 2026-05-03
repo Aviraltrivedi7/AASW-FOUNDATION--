@@ -61,7 +61,7 @@ router.post('/login', async (req, res, next) => {
             maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
-        return res.status(200).json(new ApiResponse(200, { redirect: '/dashboard' }, "Login successful"));
+        return res.status(200).json(new ApiResponse(200, { redirect: '/admin/dashboard' }, "Login successful"));
     } catch (err) {
         next(err);
     }
