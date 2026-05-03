@@ -65,8 +65,7 @@ router.get('/preview-cert', async (req, res) => {
     try {
         const type = req.query.type === 'lifetime' ? 'Lifetime' : '1 Year';
         const name = req.query.name || 'Rahul Sharma';
-        const year = new Date().getFullYear();
-        const id = req.query.id || `AASW-${year}-001`;
+        const id = req.query.id || 'AASW-2025-001';
         const pdfBytes = await generateCertificatePdf(name, id, type);
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'inline; filename="preview-certificate.pdf"');

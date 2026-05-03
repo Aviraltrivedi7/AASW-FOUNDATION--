@@ -113,9 +113,8 @@ async function generateCertificatePdf(memberName, membershipNo = '', membershipT
             let displayId = membershipNo;
             if (!displayId.startsWith('AASW-') && displayId.length > 16) {
                 // Convert raw Razorpay ID to AASW format
-                const year = new Date().getFullYear();
                 const shortId = displayId.slice(-5).toUpperCase();
-                displayId = `AASW-${year}-${shortId}`;
+                displayId = `AASW-2025-${shortId}`;
             }
             
             // Line 1: The ID number

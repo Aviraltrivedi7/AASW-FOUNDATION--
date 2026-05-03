@@ -320,9 +320,8 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
 
     // Generate and email certificate
     try {
-        const year = new Date().getFullYear();
         const shortId = razorpay_payment_id.slice(-5).toUpperCase();
-        const formattedId = `AASW-${year}-${shortId}`;
+        const formattedId = `AASW-2025-${shortId}`;
         const planStr = (planId === 'annual') ? '1 Year' : 'Lifetime';
         const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
         await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
@@ -398,9 +397,8 @@ const downloadCertificate = catchAsync(async (req, res) => {
     }
     
     // Generate PDF
-    const year = new Date().getFullYear();
     const shortId = paymentId.slice(-5).toUpperCase();
-    const formattedId = `AASW-${year}-${shortId}`;
+    const formattedId = `AASW-2025-${shortId}`;
     
     const pdfBuffer = await generateCertificatePdf(memberName, formattedId, planStr);
     
