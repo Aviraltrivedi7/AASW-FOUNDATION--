@@ -260,7 +260,7 @@ async function findMemberByPaymentId(paymentId) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('name, planId').eq('payment_id', paymentId).single();
+        const { data, error } = await insforge.database.from('members').select('name, planId, status, email').eq('payment_id', paymentId).single();
         if (!error && data) {
             // Cache into MongoDB
             if (isMongoConnected()) {
@@ -268,6 +268,36 @@ async function findMemberByPaymentId(paymentId) {
                     .catch(err => console.warn('[Sync] Failed to cache member in MongoDB:', err.message));
             }
             return data;
+        }
+    }
+
+    return null;
+}
+
+async function findMemberByEmail(email) {
+    email = email.trim().toLowerCase();
+
+    // 1. Try MongoDB
+    if (isMongoConnected()) {
+        try {
+            // Get all records for this email (could be multiple if they tried multiple times)
+            const members = await Member.find({ email }).lean();
+            if (members && members.length > 0) {
+                // Return an active one if exists, else just the first one
+                const active = members.find(m => m.status === 'Active');
+                return active || members[0];
+            }
+        } catch (err) {
+            console.error('[DB] MongoDB member lookup by email failed:', err.message);
+        }
+    }
+
+    // 2. Fallback to InsForge
+    if (insforge) {
+        const { data, error } = await insforge.database.from('members').select('*').eq('email', email);
+        if (!error && data && data.length > 0) {
+            const active = data.find(m => m.status === 'Active');
+            return active || data[0];
         }
     }
 
@@ -504,6 +534,7 @@ module.exports = {
     insertMember,
     upsertMember,
     findMemberByPaymentId,
+    findMemberByEmail,
     // Contacts
     insertContact,
     // Site Stats

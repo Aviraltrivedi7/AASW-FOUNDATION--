@@ -163,6 +163,12 @@ const submitPayment = catchAsync(async (req, res) => {
 
     const userData = await validateVerifiedUser(email, req);
 
+    // Check if user already has an active membership
+    const existingMember = await db.findMemberByEmail(email);
+    if (existingMember && existingMember.status === 'Active') {
+        throw new ApiError(400, 'You already have an active membership. Thank you for your support!');
+    }
+
     const membershipData = {
         id: 'MEM-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase(),
         email,
@@ -202,6 +208,12 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
     }
 
     const userData = await validateVerifiedUser(email, req);
+
+    // Prevent duplicate memberships
+    const existingMember = await db.findMemberByEmail(email);
+    if (existingMember && existingMember.status === 'Active') {
+        throw new ApiError(400, 'You already have an active membership. Thank you for your support!');
+    }
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
         throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
