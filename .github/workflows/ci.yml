@@ -1,0 +1,53 @@
+name: CI — Build & Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build pipeline
+        run: npm run build
+
+      - name: Verify no CDN references
+        run: |
+          if grep -r "cdn.tailwindcss.com" aasw-pro/ --include="*.html" | grep -v "dns-prefetch"; then
+            echo "❌ Tailwind CDN script still found in HTML files!"
+            exit 1
+          fi
+          echo "✅ No Tailwind CDN script references found"
+
+      - name: Verify critical files exist
+        run: |
+          test -f aasw-pro/robots.txt && echo "✅ robots.txt exists" || (echo "❌ robots.txt missing" && exit 1)
+          test -f aasw-pro/sitemap.xml && echo "✅ sitemap.xml exists" || (echo "❌ sitemap.xml missing" && exit 1)
+          test -f aasw-pro/css/tailwind-compiled.css && echo "✅ tailwind-compiled.css exists" || (echo "❌ tailwind-compiled.css missing" && exit 1)
+
+      - name: Security check — no exposed secrets
+        run: |
+          if [ -f .env ]; then
+            echo "❌ .env file should not be committed!"
+            exit 1
+          fi
+          if [ -f ADMIN ]; then
+            echo "❌ ADMIN file should not be committed!"
+            exit 1
+          fi
+          echo "✅ No exposed secret files found"

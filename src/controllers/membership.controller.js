@@ -240,9 +240,13 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
 
     const userData = await validateVerifiedUser(email, req);
 
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
+    }
+
     const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_fallback',
-        key_secret: process.env.RAZORPAY_KEY_SECRET || 'secret_fallback'
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET
     });
 
     const options = {
@@ -269,7 +273,7 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
         new ApiResponse(200, {
             orderId: order.id,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_fallback'
+            keyId: process.env.RAZORPAY_KEY_ID
         }, 'Order created successfully')
     );
 });
@@ -284,7 +288,10 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
 
     const userData = await validateVerifiedUser(email, req);
 
-    const secret = process.env.RAZORPAY_KEY_SECRET || 'secret_fallback';
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
+    }
+    const secret = process.env.RAZORPAY_KEY_SECRET;
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -340,7 +347,8 @@ const razorpayWebhook = catchAsync(async (req, res) => {
     // Note: express.raw middleware implies req.body might be a Buffer if configured correctly,
     // but in Express default JSON parsing, we just stringify the parsed object.
     // For perfect HMAC validation, raw body is preferred in production.
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'aasw_webhook_secret_123';
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) return res.status(500).send('Webhook not configured');
     
     const signature = req.headers['x-razorpay-signature'];
     if (!signature) return res.status(400).send('Signature missing');

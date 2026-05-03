@@ -8,7 +8,10 @@ const { ApiResponse } = require('../utils/apiResponse');
 const { ApiError } = require('../utils/apiError');
 const { insforge } = require('../config/insforge');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'aasw_admin_super_secret_for_jwt_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('❌ FATAL: JWT_SECRET environment variable is not set. Admin auth will not work.');
+}
 
 // Serve login page
 router.get('/login', (req, res) => {

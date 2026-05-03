@@ -7,24 +7,8 @@
 <link rel="icon" type="image/png" href="/images/logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: "class",
-  theme: { extend: {
-    colors: {
-      "primary": "#94aaff", "primary-container": "#869cf0", "secondary": "#cb7bff", "secondary-container": "#6c169f",
-      "tertiary": "#94bdff", "tertiary-container": "#7daffc",
-      "background": "#0e0e0f", "surface": "#0e0e0f",
-      "surface-container-lowest": "#000000", "surface-container-low": "#131314",
-      "surface-container": "#19191b", "surface-container-high": "#201f21", "surface-container-highest": "#262627",
-      "surface-variant": "#262627", "on-surface": "#ffffff", "on-surface-variant": "#adaaab",
-      "on-primary": "#072776", "outline-variant": "#484849", "error": "#ff6e84",
-    },
-    fontFamily: { "headline": ["Manrope","sans-serif"], "body": ["Manrope","sans-serif"], "label": ["Space Grotesk","sans-serif"] }
-  }}
-}
-</script>
+<link href="/css/tailwind-compiled.css" rel="stylesheet" />
+
 <style>
   body { background-color: #0e0e0f; color: #ffffff; font-family: 'Manrope', sans-serif; }
   .aura-blue { background: radial-gradient(circle at top left, rgba(148, 170, 255, 0.12) 0%, transparent 50%); }
@@ -36,7 +20,7 @@ tailwind.config = {
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   .float-anim { animation: float 6s ease-in-out infinite; }
 </style>
-    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
+
 </head>
 <body class="min-h-screen flex items-center justify-center overflow-hidden relative">
 

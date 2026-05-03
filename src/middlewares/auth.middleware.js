@@ -45,7 +45,10 @@ async function flushStats() {
 // Middleware to check if admin is logged in
 const isAuthenticated = (req, res, next) => {
     const jwt = require('jsonwebtoken');
-    const JWT_SECRET = process.env.JWT_SECRET || 'aasw_admin_super_secret_for_jwt_2026';
+    const JWT_SECRET = process.env.JWT_SECRET;
+    if (!JWT_SECRET) {
+        return next(new ApiError(500, 'Server misconfiguration: JWT_SECRET not set'));
+    }
 
     // Phase 3 Check (JWT Cookie) — verify actual signature
     if (req.cookies && req.cookies.admin_token) {

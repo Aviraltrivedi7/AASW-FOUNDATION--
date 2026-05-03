@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard.html
+
+Sitemap: https://aaswfoundation.org/sitemap.xml
