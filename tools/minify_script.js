@@ -56,6 +56,8 @@ async function processFiles() {
                 
                 // Update HTML with webp images and minified resources
                 html = html.replace(/\.jpg/g, '.webp');
+                html = html.replace(/\.png/g, '.webp');
+                html = html.replace(/favicon\.webp/g, 'favicon.png');
                 
                 // Update HTML file references
                 html = html.replace(/<link[^>]*href="css\/style\.css"[^>]*>\s*<link[^>]*href="css\/premium\.css"[^>]*>/g, '<link rel="stylesheet" href="css/style.min.css" />');
