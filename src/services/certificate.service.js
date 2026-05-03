@@ -108,10 +108,14 @@ async function generateCertificatePdf(memberName, membershipNo = '', membershipT
             const fontNo = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
             const noSize = 18;
             
-            // Shorten the ID if it's a Razorpay ID (keep last 12 chars max for fitting)
+            // Format the display ID — if it's already AASW-formatted, use as-is.
+            // Only truncate raw Razorpay payment IDs (pay_xxxxx) for cleaner display.
             let displayId = membershipNo;
-            if (displayId.length > 16) {
-                displayId = displayId.slice(-14); // Take last 14 chars
+            if (!displayId.startsWith('AASW-') && displayId.length > 16) {
+                // Convert raw Razorpay ID to AASW format
+                const year = new Date().getFullYear();
+                const shortId = displayId.slice(-5).toUpperCase();
+                displayId = `AASW-${year}-${shortId}`;
             }
             
             // Line 1: The ID number
