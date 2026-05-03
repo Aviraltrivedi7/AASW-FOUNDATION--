@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -8,81 +8,16 @@
 <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <title>Impact Stories | AASW Foundation</title>
 <meta name="description" content="Read inspiring impact stories from real individuals whose lives were transformed by AASW Foundation."/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Space_Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-          tailwind.config = {
-            darkMode: "class",
-            theme: {
-              extend: {
-                "colors": {
-                        "tertiary-fixed": "#80b2fe",
-                        "outline": "#767576",
-                        "surface-container-low": "#131314",
-                        "surface-variant": "#262627",
-                        "on-primary": "#072776",
-                        "on-surface-variant": "#adaaab",
-                        "on-secondary-fixed-variant": "#7725aa",
-                        "surface-tint": "#94aaff",
-                        "surface-container": "#19191b",
-                        "secondary-fixed-dim": "#e2b1ff",
-                        "tertiary-container": "#7daffc",
-                        "on-error": "#490013",
-                        "secondary": "#cb7bff",
-                        "on-tertiary-fixed-variant": "#003970",
-                        "on-secondary": "#360055",
-                        "on-primary-fixed-variant": "#16307f",
-                        "on-tertiary": "#00396f",
-                        "secondary-dim": "#cb7bff",
-                        "surface-container-lowest": "#000000",
-                        "on-tertiary-container": "#002e5d",
-                        "on-primary-fixed": "#000f40",
-                        "tertiary": "#94bdff",
-                        "primary-container": "#869cf0",
-                        "primary-fixed-dim": "#869cf0",
-                        "on-secondary-container": "#eac2ff",
-                        "outline-variant": "#484849",
-                        "error-dim": "#d73357",
-                        "tertiary-fixed-dim": "#72a5f0",
-                        "surface-dim": "#0e0e0f",
-                        "tertiary-dim": "#6fa2ed",
-                        "primary": "#94aaff",
-                        "on-surface": "#ffffff",
-                        "on-primary-container": "#001b60",
-                        "surface": "#0e0e0f",
-                        "error": "#ff6e84",
-                        "on-tertiary-fixed": "#001835",
-                        "surface-container-high": "#201f21",
-                        "surface-bright": "#2c2c2d",
-                        "primary-dim": "#869cf0",
-                        "secondary-container": "#6c169f",
-                        "on-secondary-fixed": "#540081",
-                        "on-background": "#ffffff",
-                        "error-container": "#a70138",
-                        "inverse-surface": "#fcf8f9",
-                        "inverse-primary": "#445aa9",
-                        "surface-container-highest": "#262627",
-                        "primary-fixed": "#94aaff",
-                        "secondary-fixed": "#eac4ff",
-                        "on-error-container": "#ffb2b9",
-                        "inverse-on-surface": "#565556",
-                        "background": "#0e0e0f"
-                },
-                "fontFamily": {
-                        "headline": ["Manrope"],
-                        "body": ["Manrope"],
-                        "label": ["Space Grotesk"]
-                }
-              },
-            },
-          }
-    </script>
+    
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .glass-card, .glass { background: rgba(25, 25, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card, .glass { background: rgba(25, 25, 27, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05);  will-change: transform, backdrop-filter; transform: translateZ(0); }
     </style>
     <script src="/js/i18n.js"></script>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="bg-surface text-on-surface-variant font-body selection:bg-primary/30 flex flex-col min-h-screen">
     <!-- Top Navigation Shell -->
@@ -127,7 +62,7 @@
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
+            <button id="menu-toggle" class="md:hidden text-white">
                 <span class="material-symbols-outlined font-black">menu</span>
             </button>
         </div>
@@ -143,7 +78,7 @@
     background: rgba(14, 14, 15, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-}
+ will-change: transform, backdrop-filter; transform: translateZ(0); }
 .nav-link {
     position: relative;
 }
@@ -182,14 +117,21 @@
 
 <script>
 // Scroll effect
+let tickingScroll = false;
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -207,19 +149,54 @@ window.addEventListener('scroll', () => {
 </script>
 
     <main class="relative overflow-hidden flex-grow flex items-center justify-center pt-24">
-        <!-- Coming Soon -->
-        <section class="max-w-4xl w-full mx-auto px-8 py-24 flex justify-center text-center">
-            <div class="glass-card p-16 rounded-3xl relative overflow-hidden w-full border-secondary/30 shadow-[0_0_50px_rgba(203,123,255,0.1)]">
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-secondary/20 rounded-full filter blur-2xl pointer-events-none"></div>
-                <div class="relative z-10 space-y-6">
-                    <span class="material-symbols-outlined text-6xl text-secondary mb-4 drop-shadow-[0_0_15px_rgba(203,123,255,0.5)]">auto_awesome</span>
-                    <h1 class="text-5xl font-black text-white font-headline tracking-tighter">Success Stories</h1>
-                    <p class="text-lg text-on-surface-variant max-w-lg mx-auto">
-                        All the success stories content will be placed here.
-                    </p>
-                    <button onclick="window.location.href='/'" class="mt-8 px-8 py-4 border border-secondary/30 rounded-full text-secondary font-bold hover:bg-secondary/10 transition-colors">
-                        Return to Homepage
-                    </button>
+        <!-- Impact Overview -->
+        <section class="max-w-7xl w-full mx-auto px-6 py-24">
+            <div class="text-center mb-16">
+                <span class="font-label text-xs uppercase tracking-[0.3em] font-bold text-secondary mb-4 inline-block">Women Empowerment</span>
+                <h1 class="text-5xl font-black text-white font-headline tracking-tighter mb-6">Success Stories & Impact</h1>
+                <p class="text-lg text-on-surface-variant max-w-3xl mx-auto leading-relaxed">
+                    Since our inception, we've trained, mentored, and given leading roles to hundreds of women in rural and semi-urban areas.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Stat Card 1 -->
+                <div class="glass-card p-8 rounded-3xl border-t border-white/10 hover:-translate-y-2 transition-transform duration-300 group">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-4 drop-shadow-[0_0_15px_rgba(148,170,255,0.5)] group-hover:scale-110 transition-transform">group_add</span>
+                    <h3 class="text-4xl font-black text-white font-headline mb-2">800+</h3>
+                    <p class="text-sm text-on-surface-variant font-label uppercase tracking-widest leading-relaxed">Women trained in digital skills, entrepreneurship & eco-practices</p>
+                </div>
+
+                <!-- Stat Card 2 -->
+                <div class="glass-card p-8 rounded-3xl border-t border-white/10 hover:-translate-y-2 transition-transform duration-300 group">
+                    <span class="material-symbols-outlined text-4xl text-secondary mb-4 drop-shadow-[0_0_15px_rgba(203,123,255,0.5)] group-hover:scale-110 transition-transform">storefront</span>
+                    <h3 class="text-4xl font-black text-white font-headline mb-2">300+</h3>
+                    <p class="text-sm text-on-surface-variant font-label uppercase tracking-widest leading-relaxed">Successful small businesses launched or scaled</p>
+                </div>
+
+                <!-- Stat Card 3 -->
+                <div class="glass-card p-8 rounded-3xl border-t border-white/10 hover:-translate-y-2 transition-transform duration-300 group">
+                    <span class="material-symbols-outlined text-4xl text-tertiary mb-4 drop-shadow-[0_0_15px_rgba(168,235,18,0.5)] group-hover:scale-110 transition-transform">eco</span>
+                    <h3 class="text-4xl font-black text-white font-headline mb-2">30+</h3>
+                    <p class="text-sm text-on-surface-variant font-label uppercase tracking-widest leading-relaxed">Eco-friendly projects run by women entrepreneurs</p>
+                </div>
+
+                <!-- Stat Card 4 -->
+                <div class="glass-card p-8 rounded-3xl border-t border-white/10 hover:-translate-y-2 transition-transform duration-300 group">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-4 drop-shadow-[0_0_15px_rgba(148,170,255,0.5)] group-hover:scale-110 transition-transform">location_on</span>
+                    <h3 class="text-4xl font-black text-white font-headline mb-2">5+</h3>
+                    <p class="text-sm text-on-surface-variant font-label uppercase tracking-widest leading-relaxed">Districts operating with expansion in the pipeline</p>
+                </div>
+
+                <!-- Stat Card 5 -->
+                <div class="glass-card p-8 rounded-3xl border-t border-white/10 hover:-translate-y-2 transition-transform duration-300 group lg:col-span-2">
+                    <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <span class="material-symbols-outlined text-6xl text-secondary drop-shadow-[0_0_15px_rgba(203,123,255,0.5)] group-hover:scale-110 transition-transform">handshake</span>
+                        <div>
+                            <h3 class="text-3xl font-black text-white font-headline mb-2">Active Partnerships</h3>
+                            <p class="text-sm text-on-surface-variant font-label uppercase tracking-widest leading-relaxed">Collaborating with schools, colleges, and community organizations to maximize impact</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -302,7 +279,7 @@ window.addEventListener('scroll', () => {
 </div>
 </div>
 <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">Â© 2026 AASW Foundation. The Digital Aura Experience.</p>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">Â© 2025 AASW Foundation. The Digital Aura Experience.</p>
 <div class="flex gap-8 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">
 <a class="hover:text-white transition-colors" href="/privacy.html">Privacy Policy</a>
 <a class="hover:text-white transition-colors" href="/refund.html">Refund Policy</a>

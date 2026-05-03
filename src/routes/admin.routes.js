@@ -91,15 +91,21 @@ router.get('/api/stats', isAuthenticated, async (req, res, next) => {
         // Fetch parallel data from InsForge
         const [
             { data: statsData },
-            { data: contacts, count: contactsCount },
-            { data: subscribers, count: subsCount },
-            { data: memberships, count: memsCount }
+            { data: contacts },
+            { data: subscribers },
+            { data: memberships },
+            { count: contactsCount },
+            { count: subsCount },
+            { count: memsCount }
         ] = await Promise.all([
             insforge.database.from('site_stats').select('*'),
             insforge.database.from('contacts').select('*').order('created_at', { ascending: false }).limit(5),
             insforge.database.from('subscribers').select('*').order('subscribed_at', { ascending: false }).limit(5),
-            insforge.database.from('members').select('*').order('created_at', { ascending: false }).limit(5)
-            // Note: Actual count queries in production could use exact counting
+            insforge.database.from('members').select('*').order('created_at', { ascending: false }).limit(5),
+            // Separate count-only queries for accurate totals
+            insforge.database.from('contacts').select('*', { count: 'exact', head: true }),
+            insforge.database.from('subscribers').select('*', { count: 'exact', head: true }),
+            insforge.database.from('members').select('*', { count: 'exact', head: true })
         ]);
 
         let totalVisitors = 0;
@@ -113,15 +119,12 @@ router.get('/api/stats', isAuthenticated, async (req, res, next) => {
             });
         }
 
-        // Just approximations for overview totals since we didn't do a full count query
-        // Normally, you would use { count: 'exact' } with insforge.database.from().select('*', { count: 'exact', head: true })
-
         const payload = {
             overview: {
                 totalVisitors,
-                totalContacts: contacts ? contacts.length : 0, 
-                totalSubscribers: subscribers ? subscribers.length : 0,
-                totalMemberships: memberships ? memberships.length : 0
+                totalContacts: contactsCount || (contacts ? contacts.length : 0),
+                totalSubscribers: subsCount || (subscribers ? subscribers.length : 0),
+                totalMemberships: memsCount || (memberships ? memberships.length : 0)
             },
             pageViews,
             recentContacts: contacts || [],

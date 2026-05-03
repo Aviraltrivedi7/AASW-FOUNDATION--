@@ -4,83 +4,11 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Our Team | AASW Foundation</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Space_Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "tertiary-fixed": "#80b2fe",
-                    "outline": "#767576",
-                    "surface-container-low": "#131314",
-                    "surface-variant": "#262627",
-                    "on-primary": "#072776",
-                    "on-surface-variant": "#adaaab",
-                    "on-secondary-fixed-variant": "#7725aa",
-                    "surface-tint": "#94aaff",
-                    "surface-container": "#19191b",
-                    "secondary-fixed-dim": "#e2b1ff",
-                    "tertiary-container": "#7daffc",
-                    "on-error": "#490013",
-                    "secondary": "#cb7bff",
-                    "on-tertiary-fixed-variant": "#003970",
-                    "on-secondary": "#360055",
-                    "on-primary-fixed-variant": "#16307f",
-                    "on-tertiary": "#00396f",
-                    "secondary-dim": "#cb7bff",
-                    "surface-container-lowest": "#000000",
-                    "on-tertiary-container": "#002e5d",
-                    "on-primary-fixed": "#000f40",
-                    "tertiary": "#94bdff",
-                    "primary-container": "#869cf0",
-                    "primary-fixed-dim": "#869cf0",
-                    "on-secondary-container": "#eac2ff",
-                    "outline-variant": "#484849",
-                    "error-dim": "#d73357",
-                    "tertiary-fixed-dim": "#72a5f0",
-                    "surface-dim": "#0e0e0f",
-                    "tertiary-dim": "#6fa2ed",
-                    "primary": "#94aaff",
-                    "on-surface": "#ffffff",
-                    "on-primary-container": "#001b60",
-                    "surface": "#0e0e0f",
-                    "error": "#ff6e84",
-                    "on-tertiary-fixed": "#001835",
-                    "surface-container-high": "#201f21",
-                    "surface-bright": "#2c2c2d",
-                    "primary-dim": "#869cf0",
-                    "secondary-container": "#6c169f",
-                    "on-secondary-fixed": "#540081",
-                    "on-background": "#ffffff",
-                    "error-container": "#a70138",
-                    "inverse-surface": "#fcf8f9",
-                    "inverse-primary": "#445aa9",
-                    "surface-container-highest": "#262627",
-                    "primary-fixed": "#94aaff",
-                    "secondary-fixed": "#eac4ff",
-                    "on-error-container": "#ffb2b9",
-                    "inverse-on-surface": "#565556",
-                    "background": "#0e0e0f"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-            },
-            "fontFamily": {
-                    "headline": ["Manrope"],
-                    "body": ["Manrope"],
-                    "label": ["Space Grotesk"]
-            }
-          },
-        },
-      }
-    </script>
+
 <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -95,8 +23,9 @@
             background: rgba(25, 25, 27, 0.6);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+         will-change: transform, backdrop-filter; transform: translateZ(0); }
     </style>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="bg-surface text-on-surface-variant font-body selection:bg-primary/30">
 <!-- Top Navigation Shell -->
@@ -140,7 +69,7 @@
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
+            <button id="menu-toggle" class="md:hidden text-white">
                 <span class="material-symbols-outlined font-black">menu</span>
             </button>
         </div>
@@ -156,7 +85,7 @@
     background: rgba(14, 14, 15, 0.7);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-}
+ will-change: transform, backdrop-filter; transform: translateZ(0); }
 .nav-link {
     position: relative;
 }
@@ -195,14 +124,21 @@
 
 <script>
 // Scroll effect
+let tickingScroll = false;
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -737,7 +673,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 </div>
 <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2026 AASW Foundation. The Digital Aura Experience.</p>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2025 AASW Foundation. The Digital Aura Experience.</p>
 <div class="flex gap-8 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">
 <a class="hover:text-white transition-colors" href="/privacy">Privacy Policy</a>
 <a class="hover:text-white transition-colors" href="/refund">Refund Policy</a>
@@ -769,7 +705,6 @@ function showToast(message, type = 'success') {
 // ====== GENERIC FORM HANDLERS ======
 document.querySelectorAll('form').forEach(form => {
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
     const nameInput = form.querySelector('input[placeholder*="Doe"]');
     const emailInput = form.querySelector('input[type="email"]');
     const msgInput = form.querySelector('textarea');
@@ -778,6 +713,7 @@ document.querySelectorAll('form').forEach(form => {
     
     // Contact form check
     if (nameInput && emailInput && msgInput) {
+        e.preventDefault();
         if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
         try {
           const res = await fetch('/api/v1/contact', {
@@ -786,7 +722,7 @@ document.querySelectorAll('form').forEach(form => {
             body: JSON.stringify({
               name: nameInput.value,
               email: emailInput.value,
-              subject: 'Contact from Stitch UI',
+              subject: 'Website Contact Form',
               message: msgInput.value
             })
           });

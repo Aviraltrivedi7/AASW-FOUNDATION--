@@ -9,7 +9,7 @@
 <title>AASW Foundation | Privacy Policy</title>
 <meta name="description" content="AASW Foundation Privacy Policy — Learn how we collect, use, and protect your personal data."/>
 <link rel="icon" type="image/png" href="/images/logo.png">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -34,7 +34,7 @@ tailwind.config = {
   .aura-purple { background: radial-gradient(circle at center, rgba(203, 123, 255, 0.12) 0%, transparent 70%); }
   .aura-blue { background: radial-gradient(circle at center, rgba(148, 170, 255, 0.12) 0%, transparent 70%); }
   .text-gradient { background: linear-gradient(45deg, #94aaff, #cb7bff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(12px); }
+  .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(12px);  will-change: transform, backdrop-filter; transform: translateZ(0); }
   .btn-glow:hover { box-shadow: 0 0 30px rgba(148, 170, 255, 0.4); }
   .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
   .fade-up.visible { opacity: 1; transform: translateY(0); }
@@ -43,6 +43,7 @@ tailwind.config = {
   .policy-section { border-left: 2px solid rgba(148, 170, 255, 0.15); }
   .policy-section:hover { border-left-color: #94aaff; }
 </style>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="font-body selection:bg-primary selection:text-on-primary overflow-x-hidden">
 
@@ -89,7 +90,7 @@ tailwind.config = {
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
+            <button id="menu-toggle" class="md:hidden text-white">
                 <span class="material-symbols-outlined font-black">menu</span>
             </button>
         </div>
@@ -105,7 +106,7 @@ tailwind.config = {
     background: rgba(14, 14, 15, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-}
+ will-change: transform, backdrop-filter; transform: translateZ(0); }
 .nav-link {
     position: relative;
 }
@@ -144,14 +145,21 @@ tailwind.config = {
 
 <script>
 // Scroll effect
+let tickingScroll = false;
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -356,7 +364,7 @@ window.addEventListener('scroll', () => {
 </div>
 </div>
 <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2026 AASW Foundation. The Digital Aura Experience.</p>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2025 AASW Foundation. The Digital Aura Experience.</p>
 <div class="flex gap-8 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">
 <a class="hover:text-white transition-colors" href="/privacy.html">Privacy Policy</a>
 <a class="hover:text-white transition-colors" href="/refund.html">Refund Policy</a>
@@ -397,7 +405,6 @@ function showToast(message, type = 'success') {
 // ====== GENERIC FORM HANDLERS ======
 document.querySelectorAll('form').forEach(form => {
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
     const nameInput = form.querySelector('input[placeholder*="Doe"]');
     const emailInput = form.querySelector('input[type="email"]');
     const msgInput = form.querySelector('textarea');
@@ -406,6 +413,7 @@ document.querySelectorAll('form').forEach(form => {
     
     // Contact form check
     if (nameInput && emailInput && msgInput) {
+        e.preventDefault();
         if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
         try {
           const res = await fetch('/api/v1/contact', {
@@ -414,7 +422,7 @@ document.querySelectorAll('form').forEach(form => {
             body: JSON.stringify({
               name: nameInput.value,
               email: emailInput.value,
-              subject: 'Contact from Stitch UI',
+              subject: 'Website Contact Form',
               message: msgInput.value
             })
           });

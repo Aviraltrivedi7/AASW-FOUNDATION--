@@ -8,82 +8,10 @@
 <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
 <title>Governance | AASW Foundation</title>
 <meta name="description" content="Review the transparency, ethical commitments, and governance reports of the AASW Foundation."/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Space_Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "outline": "#767576",
-                      "secondary-fixed-dim": "#e2b1ff",
-                      "on-primary-fixed": "#000f40",
-                      "primary-dim": "#869cf0",
-                      "on-error-container": "#ffb2b9",
-                      "surface": "#0e0e0f",
-                      "inverse-primary": "#445aa9",
-                      "tertiary-dim": "#6fa2ed",
-                      "secondary-container": "#6c169f",
-                      "on-secondary-container": "#eac2ff",
-                      "surface-container-highest": "#262627",
-                      "primary-fixed": "#94aaff",
-                      "tertiary-container": "#7daffc",
-                      "inverse-on-surface": "#565556",
-                      "surface-container": "#19191b",
-                      "error": "#ff6e84",
-                      "on-secondary-fixed": "#540081",
-                      "surface-bright": "#2c2c2d",
-                      "on-tertiary": "#00396f",
-                      "outline-variant": "#484849",
-                      "on-background": "#ffffff",
-                      "on-secondary-fixed-variant": "#7725aa",
-                      "tertiary-fixed-dim": "#72a5f0",
-                      "surface-container-lowest": "#000000",
-                      "secondary-dim": "#cb7bff",
-                      "error-container": "#a70138",
-                      "on-primary-container": "#001b60",
-                      "on-primary-fixed-variant": "#16307f",
-                      "error-dim": "#d73357",
-                      "surface-tint": "#94aaff",
-                      "inverse-surface": "#fcf8f9",
-                      "on-tertiary-fixed-variant": "#003970",
-                      "surface-dim": "#0e0e0f",
-                      "primary-fixed-dim": "#869cf0",
-                      "surface-variant": "#262627",
-                      "on-surface": "#ffffff",
-                      "surface-container-low": "#131314",
-                      "on-primary": "#072776",
-                      "primary-container": "#869cf0",
-                      "on-tertiary-fixed": "#001835",
-                      "on-secondary": "#360055",
-                      "on-surface-variant": "#adaaab",
-                      "background": "#0e0e0f",
-                      "on-error": "#490013",
-                      "tertiary-fixed": "#80b2fe",
-                      "surface-container-high": "#201f21",
-                      "secondary-fixed": "#eac4ff",
-                      "secondary": "#cb7bff",
-                      "primary": "#94aaff",
-                      "tertiary": "#94bdff",
-                      "on-tertiary-container": "#002e5d"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "fontFamily": {
-                      "headline": ["Manrope"],
-                      "body": ["Manrope"],
-                      "label": ["Space Grotesk"]
-              }
-            },
-          },
-        }
-    </script>
+
 <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
@@ -97,6 +25,7 @@
             border: 1px solid rgba(148, 170, 255, 0.1);
         }
     </style>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
 <!-- Top Navigation -->
@@ -141,7 +70,7 @@
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
+            <button id="menu-toggle" class="md:hidden text-white">
                 <span class="material-symbols-outlined font-black">menu</span>
             </button>
         </div>
@@ -157,7 +86,7 @@
     background: rgba(14, 14, 15, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-}
+ will-change: transform, backdrop-filter; transform: translateZ(0); }
 .nav-link {
     position: relative;
 }
@@ -196,14 +125,21 @@
 
 <script>
 // Scroll effect
+let tickingScroll = false;
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -247,20 +183,16 @@ window.addEventListener('scroll', () => {
 </div>
 <div class="grid grid-cols-2 gap-y-10">
 <div>
-<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Registration No.</p>
-<p class="text-xl font-headline font-bold">AASW/2024/IND/NGO/8821</p>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Unique Registration No.</p>
+<p class="text-xl font-headline font-bold">ABCCA6275BF20251</p>
 </div>
 <div>
-<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">12A Registration</p>
-<p class="text-xl font-headline font-bold">CERT-4552-AA2</p>
+<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Document Identification No.</p>
+<p class="text-xl font-headline font-bold">ABCCA6275BF2025101</p>
 </div>
-<div>
-<p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">80G Certification</p>
-<p class="text-xl font-headline font-bold">EXEMPT-80G-9921</p>
-</div>
-<div>
+<div class="col-span-2">
 <p class="font-label text-[10px] uppercase tracking-wider text-outline mb-1">Permanent Account (PAN)</p>
-<p class="text-xl font-headline font-bold">AABTA8392F</p>
+<p class="text-xl font-headline font-bold">ABCCA6275B</p>
 </div>
 </div>
 </div>
@@ -497,7 +429,7 @@ window.addEventListener('scroll', () => {
 </div>
 </div>
 <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2026 AASW Foundation. The Digital Aura Experience.</p>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2025 AASW Foundation. The Digital Aura Experience.</p>
 <div class="flex gap-8 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">
 <a class="hover:text-white transition-colors" href="/privacy.html">Privacy Policy</a>
 <a class="hover:text-white transition-colors" href="/refund.html">Refund Policy</a>
@@ -529,7 +461,6 @@ function showToast(message, type = 'success') {
 // ====== GENERIC FORM HANDLERS ======
 document.querySelectorAll('form').forEach(form => {
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
     const nameInput = form.querySelector('input[placeholder*="Doe"]');
     const emailInput = form.querySelector('input[type="email"]');
     const msgInput = form.querySelector('textarea');
@@ -538,6 +469,7 @@ document.querySelectorAll('form').forEach(form => {
     
     // Contact form check
     if (nameInput && emailInput && msgInput) {
+        e.preventDefault();
         if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
         try {
           const res = await fetch('/api/v1/contact', {
@@ -546,7 +478,7 @@ document.querySelectorAll('form').forEach(form => {
             body: JSON.stringify({
               name: nameInput.value,
               email: emailInput.value,
-              subject: 'Contact from Stitch UI',
+              subject: 'Website Contact Form',
               message: msgInput.value
             })
           });

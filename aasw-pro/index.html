@@ -8,89 +8,23 @@
 <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
 <title>AASW Foundation | The Digital Aura Experience</title>
 <meta name="description" content="Aapka Apna Social Welfare Foundation empowers Indian women through digital education, eco-friendly entrepreneurship, and sustainable growth opportunities."/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@300;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "primary-container": "#869cf0",
-                    "outline": "#767576",
-                    "on-secondary": "#360055",
-                    "error-dim": "#d73357",
-                    "on-secondary-fixed": "#540081",
-                    "on-surface": "#ffffff",
-                    "error": "#ff6e84",
-                    "inverse-primary": "#445aa9",
-                    "secondary-fixed": "#eac4ff",
-                    "error-container": "#a70138",
-                    "on-secondary-container": "#eac2ff",
-                    "on-background": "#ffffff",
-                    "tertiary-container": "#7daffc",
-                    "inverse-surface": "#fcf8f9",
-                    "surface-container-lowest": "#000000",
-                    "surface-container-high": "#201f21",
-                    "on-tertiary": "#00396f",
-                    "tertiary-fixed": "#80b2fe",
-                    "on-secondary-fixed-variant": "#7725aa",
-                    "surface-variant": "#262627",
-                    "primary": "#94aaff",
-                    "on-primary-fixed": "#000f40",
-                    "surface-container": "#19191b",
-                    "on-error-container": "#ffb2b9",
-                    "background": "#0e0e0f",
-                    "surface-tint": "#94aaff",
-                    "secondary-dim": "#cb7bff",
-                    "on-error": "#490013",
-                    "inverse-on-surface": "#565556",
-                    "tertiary-dim": "#6fa2ed",
-                    "on-tertiary-fixed": "#001835",
-                    "tertiary-fixed-dim": "#72a5f0",
-                    "on-surface-variant": "#adaaab",
-                    "on-primary": "#072776",
-                    "primary-fixed-dim": "#869cf0",
-                    "surface-container-highest": "#262627",
-                    "secondary-fixed-dim": "#e2b1ff",
-                    "secondary": "#cb7bff",
-                    "on-tertiary-fixed-variant": "#003970",
-                    "on-primary-container": "#001b60",
-                    "on-tertiary-container": "#002e5d",
-                    "tertiary": "#94bdff",
-                    "surface-container-low": "#131314",
-                    "surface": "#0e0e0f",
-                    "on-primary-fixed-variant": "#16307f",
-                    "surface-bright": "#2c2c2d",
-                    "primary-fixed": "#94aaff",
-                    "primary-dim": "#869cf0",
-                    "outline-variant": "#484849",
-                    "secondary-container": "#6c169f",
-                    "surface-dim": "#0e0e0f"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-            },
-            "fontFamily": {
-                    "headline": ["Manrope"],
-                    "body": ["Manrope"],
-                    "label": ["Space Grotesk"]
-            }
-          }
-        }
-      }
-    </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
         body { background-color: #0e0e0f; color: #ffffff; }
-        .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass { background: rgba(38, 38, 39, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);  will-change: transform, backdrop-filter; transform: translateZ(0); }
         .aura-purple { background: radial-gradient(circle at center, rgba(203, 123, 255, 0.15) 0%, transparent 70%); }
         .aura-blue { background: radial-gradient(circle at center, rgba(148, 170, 255, 0.15) 0%, transparent 70%); }
         .text-gradient { background: linear-gradient(45deg, #94aaff, #cb7bff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
     </style>
     <script src="/js/i18n.js"></script>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="font-body selection:bg-primary selection:text-on-primary">
 
@@ -136,7 +70,7 @@
             </a>
             
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
+            <button id="menu-toggle" class="md:hidden text-white">
                 <span class="material-symbols-outlined font-black">menu</span>
             </button>
         </div>
@@ -152,7 +86,7 @@
     background: rgba(14, 14, 15, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-}
+ will-change: transform, backdrop-filter; transform: translateZ(0); }
 .nav-link {
     position: relative;
 }
@@ -191,14 +125,21 @@
 
 <script>
 // Scroll effect
+let tickingScroll = false;
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -234,7 +175,7 @@ window.addEventListener('scroll', () => {
                     Bridging the divide in digital business ownership and building a new wave of confident, capable, and connected women leaders.
                 </p>
 <div class="flex flex-col sm:flex-row gap-4 pt-4">
-<button onclick="window.location.href='/team.html'" class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-10 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest shadow-lg hover:shadow-primary/20 transition-all">
+<button onclick="document.getElementById('aboutModal').classList.remove('hidden'); document.body.style.overflow='hidden';" class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-10 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest shadow-lg hover:shadow-primary/20 transition-all">
                         About Us
                     </button>
 <button onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})" class="glass border border-white/10 text-white px-10 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
@@ -542,6 +483,7 @@ window.addEventListener('scroll', () => {
 <p class="text-on-surface-variant">Have questions or want to partner with us? Reach out through the form below.</p>
 </div>
 <form id="contactForm" class="space-y-6">
+<div id="contactFeedback" class="contact-feedback" style="display:none;"></div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <div class="space-y-2">
 <label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Full Name</label>
@@ -553,13 +495,17 @@ window.addEventListener('scroll', () => {
 </div>
 </div>
 <div class="space-y-2">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Subject</label>
+<input id="contactSubject" class="w-full bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary text-white py-3 px-4" placeholder="How can we help you?" type="text" required/>
+</div>
+<div class="space-y-2">
 <label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Message</label>
 <textarea id="contactMessage" class="w-full bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary text-white py-3 px-4" placeholder="Tell us how we can help..." rows="4" required></textarea>
 </div>
 <!-- Honeypot -->
 <input type="text" id="contactWebsite" name="website" style="display:none" tabindex="-1" autocomplete="off">
 
-<button type="submit" id="contactSubmit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">Send Message</button>
+<button type="submit" id="contactSubmitBtn" class="w-full bg-primary text-on-primary py-4 rounded-xl font-label text-sm font-bold uppercase tracking-widest hover:scale-[1.02] transition-transform">Send Message</button>
 </form>
 </div>
 <div class="flex flex-col justify-center space-y-12">
@@ -674,7 +620,7 @@ window.addEventListener('scroll', () => {
 </div>
 </div>
 <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2026 AASW Foundation. The Digital Aura Experience.</p>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">© 2025 AASW Foundation. The Digital Aura Experience.</p>
 <div class="flex gap-8 font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60">
 <a class="hover:text-white transition-colors" href="/privacy.html">Privacy Policy</a>
 <a class="hover:text-white transition-colors" href="/refund.html">Refund Policy</a>
@@ -710,10 +656,22 @@ if (contactForm) {
     e.preventDefault();
     const nameInput = document.getElementById('contactName');
     const emailInput = document.getElementById('contactEmail');
+    const subjectInput = document.getElementById('contactSubject');
     const msgInput = document.getElementById('contactMessage');
     const websiteInput = document.getElementById('contactWebsite');
-    const btn = document.getElementById('contactSubmit');
+    const btn = document.getElementById('contactSubmitBtn');
     const originalText = btn ? btn.textContent : 'Sending...';
+    
+    // Client-side validation
+    if (!nameInput.value || nameInput.value.length < 2) {
+      return showToast('Please enter your name (at least 2 characters)', 'error');
+    }
+    if (!subjectInput.value || subjectInput.value.length < 3) {
+      return showToast('Please enter a subject (at least 3 characters)', 'error');
+    }
+    if (!msgInput.value || msgInput.value.length < 10) {
+      return showToast('Please enter a message (at least 10 characters)', 'error');
+    }
     
     if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
     try {
@@ -723,7 +681,7 @@ if (contactForm) {
         body: JSON.stringify({
           name: nameInput.value,
           email: emailInput.value,
-          subject: 'Contact from Stitch UI',
+          subject: subjectInput.value,
           message: msgInput.value,
           website: websiteInput ? websiteInput.value : '' // Honeypot
         })
@@ -732,7 +690,8 @@ if (contactForm) {
         showToast('✓ Message sent successfully!', 'success');
         contactForm.reset();
       } else {
-        showToast('Failed to send message', 'error');
+        const data = await res.json();
+        showToast('Failed to send message: ' + (data.message || 'Error'), 'error');
       }
     } catch (err) {
       showToast('Network error. Please try again.', 'error');
@@ -744,4 +703,190 @@ if (contactForm) {
 </script>
 
 <script src="/js/nav-mobile.js"></script>
+
+<!-- About Us Modal -->
+<div id="aboutModal" class="fixed inset-0 z-[200] hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="document.getElementById('aboutModal').classList.add('hidden'); document.body.style.overflow='auto';"></div>
+    
+    <!-- Modal Content -->
+    <div class="absolute inset-x-4 top-10 bottom-10 md:inset-x-20 md:top-12 md:bottom-12 bg-surface-container-highest rounded-[2rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center p-6 md:px-10 md:py-8 border-b border-white/10 bg-surface-container-highest relative z-10">
+            <h2 class="text-xl md:text-3xl font-headline font-extrabold text-white flex items-center gap-4">
+                <div class="hidden sm:flex w-12 h-12 bg-primary/20 rounded-full items-center justify-center border border-primary/30">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                </div>
+                About AASW Foundation
+            </h2>
+            <button onclick="document.getElementById('aboutModal').classList.add('hidden'); document.body.style.overflow='auto';" class="w-12 h-12 shrink-0 rounded-full glass border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-white/10 hover:rotate-90 transition-all">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Scrollable Body -->
+        <div class="p-6 md:p-12 overflow-y-auto custom-scrollbar relative bg-surface-container">
+            <!-- Decorative Glow -->
+            <div class="absolute top-0 right-0 w-96 h-96 aura-purple blur-[100px] opacity-20 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 aura-blue blur-[100px] opacity-10 pointer-events-none"></div>
+            
+            <div class="max-w-4xl mx-auto space-y-16 text-on-surface-variant leading-relaxed">
+                
+                <!-- Introduction -->
+                <div class="space-y-6">
+                    <h3 class="text-3xl font-headline font-black text-white">Fueling Women's Success Through Tech & Enterprise</h3>
+                    <div class="text-lg space-y-4">
+                        <p>The chance for growth, leadership, and groundbreaking ideas belongs to everyone in today's fast-moving world—especially women from disadvantaged communities. Yet, deep-seated barriers still stop countless Indian women from finding their footing in technology, business, and sustainable careers.</p>
+                        <p>Aapka Apna Social Welfare Foundation was founded to change this reality. We're a human-centered organization in the heart of Uttar Pradesh, dedicated to bridging the divide in digital business ownership.</p>
+                        <p>We're building a new wave of confident, capable, and connected women leaders by weaving together hands-on learning, practical skill-building, sincere mentorship, and a commitment to protecting our environment. Our core belief is simple: <strong class="text-primary font-bold">stronger women create a better world—socially, environmentally, and financially.</strong></p>
+                    </div>
+                </div>
+
+                <!-- The Foundation -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-secondary flex items-center gap-3"><span class="material-symbols-outlined">foundation</span> The Foundation</h3>
+                    <div class="glass p-8 rounded-[2rem] border border-secondary/20 space-y-4 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent"></div>
+                        <div class="relative z-10">
+                            <p class="mb-4">Aapka Apna Social Welfare Foundation is a community-driven effort that directly helps women thrive in the digital economy. Based in Uttar Pradesh, our purpose is clear: to tackle the hurdles women face when seeking education, career opportunities, and leadership roles, especially in business and technology.</p>
+                            <p>We don't just aim for inclusion; we work hard to create a space where women naturally step up as leaders. Through focused training, strong support systems, and local programs, we're giving women the tools they need to build lasting careers and make a real difference in their own neighborhoods.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Objective & Aim Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-primary/20 space-y-4 hover:border-primary/40 transition-colors">
+                        <h4 class="text-xl font-bold text-primary flex items-center gap-3"><span class="material-symbols-outlined">target</span> Our Objective</h4>
+                        <p>To encourage women in digital entrepreneurship through educational avenues by providing digital tools, environmental awareness, and business mentoring for promoting inclusive economic growth.</p>
+                    </div>
+                    <div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-tertiary/20 space-y-4 hover:border-tertiary/40 transition-colors">
+                        <h4 class="text-xl font-bold text-tertiary flex items-center gap-3"><span class="material-symbols-outlined">visibility</span> Our Aim</h4>
+                        <p>Digital entrepreneurs exposing women throughout India now imagine them becoming inventors and decision-makers in the near future, using technology and business to create a sustainable, just society and empowered people.</p>
+                    </div>
+                </div>
+
+                <!-- Goals -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">flag</span> Goals</h3>
+                    <ul class="space-y-4 list-none pl-0">
+                        <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"><span class="text-primary font-black">➢</span> Encourage the Indian states to actively support the AASW Foundation's programs and services.</li>
+                        <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"><span class="text-primary font-black">➢</span> By increasing our presence in both rural and urban areas, we can guarantee broad reach and involvement.</li>
+                        <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"><span class="text-primary font-black">➢</span> Give special attention to state-specific initiatives where women members might use creative social solutions.</li>
+                        <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"><span class="text-primary font-black">➢</span> Encourage awareness, self-sufficiency, and confidence in digital technology.</li>
+                        <li class="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors"><span class="text-primary font-black">➢</span> Document and disseminate success stories as inspiration for greater participation by more women in leadership and learning platforms.</li>
+                    </ul>
+                </div>
+
+                <!-- What We Do -->
+                <div class="space-y-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">work</span> What We Do</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5">
+                            <strong class="text-white text-lg block mb-2 text-primary">Digital Skill Development</strong>
+                            <p class="text-sm">Women are trained in entrepreneurship: Digital skills, E-commerce, Social Media Marketing, and Online Operations enable women to start and maintain businesses.</p>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5">
+                            <strong class="text-white text-lg block mb-2 text-secondary">Environmental Awareness</strong>
+                            <p class="text-sm">We provide environmental education with heart, focusing on ecologically conscious solutions and sustainable practices in business.</p>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5">
+                            <strong class="text-white text-lg block mb-2 text-tertiary">Mentorship & Support</strong>
+                            <p class="text-sm">Through our programs, mentors connect aspiring women entrepreneurs with professionals who can help guide them step-by-step in building and scaling their business.</p>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5">
+                            <strong class="text-white text-lg block mb-2 text-primary">Workshops & Seminars</strong>
+                            <p class="text-sm">This includes regular online and offline gatherings for leadership development, financial literacy, technology applications, branding, and digital innovation.</p>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5 sm:col-span-2">
+                            <strong class="text-white text-lg block mb-2 text-secondary">Building the Community</strong>
+                            <p class="text-sm">This growing network enables peer learning, collaboration, and confidence, especially for first-time entrepreneurs from remote locations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Governance -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">account_balance</span> Governance & Central Advisory Council</h3>
+                    <p class="text-lg">The Central Advisory Council acts as an important asset for the Aapka Apna Social Welfare Foundation to shape its strategy, integrity, and impact. The President of the Foundation is the Chair of the Central Advisory Council, and the Secretary acts as the Member Secretary. Thanks are extended from the bottom of our hearts to our members of the Advisory Council for their generosity, leadership, and commitment to the enhancement of our mission.</p>
+                    <div class="glass p-8 rounded-[2rem] border border-white/10 mt-6">
+                        <strong class="text-white text-xl block mb-6 border-b border-white/10 pb-4">Key Functions:</strong>
+                        <ul class="space-y-4">
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> Advises the Governing Board on key programs, outreach, and innovation;</li>
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> Promotion of AASW Foundation initiatives across different states for ensuring visibility in a real sense;</li>
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> Identifying unique local projects in different areas for members to implement tailor-made, community-driven solutions;</li>
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> Generate awareness on various women-related issues and digital inclusion;</li>
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> Facilitate seminars and events through organizational, logistical, and promotional assistance;</li>
+                            <li class="flex gap-4"><span class="text-secondary font-bold">➢</span> To assist in the publication of newsletters, achievements, and case studies to promote the progress of our members.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Impact -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">trending_up</span> Our Impact</h3>
+                    <p class="text-lg">Since our inception, we've trained, mentored, and given leading roles to hundreds of women in rural and semi-urban areas:</p>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <li class="flex items-center gap-4 bg-primary/10 p-5 rounded-2xl border border-primary/20 text-primary font-bold text-lg"><span class="material-symbols-outlined text-3xl">check_circle</span> 800+ women trained</li>
+                        <li class="flex items-center gap-4 bg-secondary/10 p-5 rounded-2xl border border-secondary/20 text-secondary font-bold text-lg"><span class="material-symbols-outlined text-3xl">storefront</span> 300+ businesses launched</li>
+                        <li class="flex items-center gap-4 bg-tertiary/10 p-5 rounded-2xl border border-tertiary/20 text-tertiary font-bold text-lg"><span class="material-symbols-outlined text-3xl">eco</span> 30+ eco-friendly projects</li>
+                        <li class="flex items-center gap-4 bg-white/5 p-5 rounded-2xl border border-white/10 text-white font-bold text-lg"><span class="material-symbols-outlined text-3xl">map</span> Operating in over 5 districts</li>
+                        <li class="flex items-center gap-4 bg-white/5 p-5 rounded-2xl border border-white/10 text-white font-bold text-lg sm:col-span-2"><span class="material-symbols-outlined text-3xl">handshake</span> Active partnerships with schools, colleges, and community organizations</li>
+                    </ul>
+                </div>
+
+                <!-- How We Work -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">engineering</span> How We Work</h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> We use a sustainable and scalable model, marrying local understanding with global thought.</li>
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> Identifying local challenges and potential changemakers</li>
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> Tailored digital training and mentorship offered</li>
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> Following business development and environmental responsibility</li>
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> Build collaboration on a community and advisory leadership basis</li>
+                        <li class="flex gap-4"><span class="text-tertiary font-black">❖</span> Scale successful initiatives on the basis of data, feedback, and promotion at the state level</li>
+                    </ul>
+                </div>
+
+                <!-- Action section -->
+                <div class="space-y-8 pt-12 border-t border-white/10 text-center">
+                    <div class="inline-block px-4 py-1.5 bg-primary/20 rounded-full border border-primary/30 mb-2">
+                        <span class="text-primary font-label text-[10px] uppercase tracking-[0.3em] font-bold">What a great time!</span>
+                    </div>
+                    <h3 class="text-3xl md:text-5xl font-headline font-black text-white leading-tight">Together, we'll create a future where women <span class="text-gradient">lead the digital revolution.</span></h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-10">
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5 hover:border-primary/30 transition-colors">
+                            <h4 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary">volunteer_activism</span> Offer support</h4>
+                            <p class="text-sm mb-4">You can convert into money our mission to extend reach into new districts and regions.</p>
+                            <a href="/membership.html" class="text-primary text-xs font-bold uppercase tracking-widest hover:underline">Support Now →</a>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5 hover:border-secondary/30 transition-colors">
+                            <h4 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-secondary">groups</span> Volunteer</h4>
+                            <p class="text-sm mb-4">Be a part of the experience as a mentor, speaker, or event coordinator—online or on the ground.</p>
+                            <a href="/team.html" class="text-secondary text-xs font-bold uppercase tracking-widest hover:underline">Join Us →</a>
+                        </div>
+                        <div class="bg-surface-container-high p-6 rounded-2xl border border-white/5 hover:border-tertiary/30 transition-colors">
+                            <h4 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-tertiary">share</span> Spread the Word</h4>
+                            <p class="text-sm mb-4">Follow us on platforms, share success stories, and help us build momentum.</p>
+                            <a href="https://www.instagram.com/aaswfoundation" target="_blank" class="text-tertiary text-xs font-bold uppercase tracking-widest hover:underline">Follow Us →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Stories -->
+                <div class="space-y-6 pt-12 pb-8">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3"><span class="material-symbols-outlined">auto_stories</span> Success Stories</h3>
+                    <div class="glass p-12 rounded-[2rem] border border-white/10 text-center italic opacity-70 flex flex-col items-center gap-4">
+                        <span class="material-symbols-outlined text-4xl">history_edu</span>
+                        All the success stories content will be placed here.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 </body></html>

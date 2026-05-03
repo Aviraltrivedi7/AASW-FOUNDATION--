@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>AASW Foundation | Page Not Found</title>
 <link rel="icon" type="image/png" href="/images/logo.png">
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -30,6 +30,7 @@ tailwind.config = {
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
   .float { animation: float 4s ease-in-out infinite; }
 </style>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="font-body min-h-screen flex items-center justify-center overflow-hidden relative">
 
@@ -79,7 +80,6 @@ function showToast(message, type = 'success') {
 // ====== GENERIC FORM HANDLERS ======
 document.querySelectorAll('form').forEach(form => {
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
     const nameInput = form.querySelector('input[placeholder*="Doe"]');
     const emailInput = form.querySelector('input[type="email"]');
     const msgInput = form.querySelector('textarea');
@@ -88,6 +88,7 @@ document.querySelectorAll('form').forEach(form => {
     
     // Contact form check
     if (nameInput && emailInput && msgInput) {
+        e.preventDefault();
         if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
         try {
           const res = await fetch('/api/v1/contact', {
@@ -96,7 +97,7 @@ document.querySelectorAll('form').forEach(form => {
             body: JSON.stringify({
               name: nameInput.value,
               email: emailInput.value,
-              subject: 'Contact from Stitch UI',
+              subject: 'Website Contact Form',
               message: msgInput.value
             })
           });

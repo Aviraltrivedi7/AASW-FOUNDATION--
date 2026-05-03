@@ -84,6 +84,13 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
         return true;
     }
 
+    // Escape HTML to prevent XSS via email injection
+    const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(senderEmail);
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message);
+
     try {
         const mailOptions = {
             from: `"AASW Website" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
@@ -93,10 +100,10 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
                     <h2 style="color: #1a73e8; margin-top: 0;">New Contact Form Message</h2>
-                    <p><strong>Name:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${senderEmail}</p>
-                    <p><strong>Subject:</strong> ${subject}</p>
-                    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #1a73e8; margin: 20px 0; white-space: pre-wrap;">${message}</div>
+                    <p><strong>Name:</strong> ${safeName}</p>
+                    <p><strong>Email:</strong> ${safeEmail}</p>
+                    <p><strong>Subject:</strong> ${safeSubject}</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #1a73e8; margin: 20px 0; white-space: pre-wrap;">${safeMessage}</div>
                     <p style="font-size: 12px; color: #777;">This message was submitted via the AASW Foundation website contact form. You can reply directly to this email to reach the sender.</p>
                 </div>
             `,

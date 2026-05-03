@@ -21,8 +21,8 @@ const { visitorTracker, isAuthenticated } = require('./middlewares/auth.middlewa
 const app = express();
 
 // Set View Engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(process.cwd(), 'views'));
+// Set View Engine
+// EJS has been removed as the frontend is now served statically via the aasw-pro folder
 
 // GLOBAL MIDDLEWARES
 // Gzip compression — reduces response sizes by ~70%, fixes lag/slow loading

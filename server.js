@@ -5,6 +5,20 @@ const os = require("os");
 
 const PORT = process.env.PORT || 3000;
 
+// ─── SECURITY: Warn about missing critical env vars ──────────────────────
+if (cluster.isMaster || !cluster.isMaster) {
+    const missing = [];
+    if (!process.env.JWT_SECRET) missing.push('JWT_SECRET');
+    if (!process.env.RAZORPAY_KEY_ID) missing.push('RAZORPAY_KEY_ID');
+    if (!process.env.RAZORPAY_KEY_SECRET) missing.push('RAZORPAY_KEY_SECRET');
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET) missing.push('RAZORPAY_WEBHOOK_SECRET');
+    if (missing.length > 0 && cluster.isMaster) {
+        console.warn(`\n⚠️  SECURITY WARNING: The following env vars are NOT set and will use INSECURE hardcoded fallbacks:`);
+        missing.forEach(v => console.warn(`   ❌ ${v}`));
+        console.warn(`   Set these in your .env file before deploying to production!\n`);
+    }
+}
+
 // High-Traffic & Crash-Proof Implementation 
 if (cluster.isMaster) {
     const numCPUs = os.cpus().length;

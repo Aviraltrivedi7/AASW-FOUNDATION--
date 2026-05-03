@@ -60,7 +60,7 @@ function isValidEmail(email) {
 
 // POST /api/v1/membership/send-otp
 const requestEmailOTP = catchAsync(async (req, res) => {
-    const { email, name, phone } = req.body;
+    const { email, name, phone, pan } = req.body;
 
     if (!email || !isValidEmail(email)) {
         throw new ApiError(400, 'Please enter a valid email address.');
@@ -73,7 +73,7 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     let dbError = null;
     if (insforge) {
         const { error } = await insforge.database.from('otps').upsert({
-            email, name: name || '', phone: phone || '', otp, expires_at: expiresAt, verified: false
+            email, name: name || '', phone: phone || '', pan: pan || '', otp, expires_at: expiresAt, verified: false
         });
         if (error) {
             dbError = error;
@@ -82,7 +82,7 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     }
 
     if (!insforge || dbError) {
-        fallbackOtpStore[email] = { otp, expires_at: expiresAt, verified: false, name, phone };
+        fallbackOtpStore[email] = { otp, expires_at: expiresAt, verified: false, name, phone, pan: pan || '' };
     }
 
     const devMode = (!process.env.SMTP_USER || !process.env.SMTP_PASS);
@@ -215,7 +215,8 @@ const submitPayment = catchAsync(async (req, res) => {
             email: membershipData.email,
             payment_id: txnId,
             status: 'Pending Verification',
-            planId: planId
+            planId: planId,
+            pan: userData.pan || ''
         }]);
     }
 
@@ -231,7 +232,7 @@ const submitPayment = catchAsync(async (req, res) => {
 
 // POST /api/v1/membership/create-order
 const createRazorpayOrder = catchAsync(async (req, res) => {
-    const { email, planId, amount, planName } = req.body;
+    const { email, planId, amount, planName, pan } = req.body;
 
     if (!email || !planId || !amount) {
         throw new ApiError(400, 'All details are required to create an order.');
@@ -253,7 +254,8 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
             planId,
             planName,
             name: userData.name,
-            phone: userData.phone
+            phone: userData.phone,
+            pan: pan || ''
         }
     };
 
@@ -274,7 +276,7 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
 
 // POST /api/v1/membership/verify-payment
 const verifyRazorpayPayment = catchAsync(async (req, res) => {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email, planId, planName, amount } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email, planId, planName, amount, pan } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !email) {
         throw new ApiError(400, 'Missing payment verification details.');
@@ -303,7 +305,8 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
                 email: email, 
                 payment_id: razorpay_payment_id,
                 status: 'Active',
-                planId: planId
+                planId: planId,
+                pan: pan || userData.pan || ''
             }], { onConflict: 'payment_id' });
             
         if (error) {
@@ -366,7 +369,8 @@ const razorpayWebhook = catchAsync(async (req, res) => {
                     email: notes.email || payment.email, 
                     payment_id: payment.id,
                     status: 'Active',
-                    planId: notes.planId
+                    planId: notes.planId,
+                    pan: notes.pan || ''
                 }], { onConflict: 'payment_id' });
                 if (error) console.error('[Webhook] Member insert error:', error.message);
             }
@@ -382,12 +386,14 @@ const razorpayWebhook = catchAsync(async (req, res) => {
 const downloadCertificate = catchAsync(async (req, res) => {
     const { paymentId } = req.params;
     let memberName = 'Member';
+    let planStr = '1 Year'; // default
     
-    // Attempt to lookup from database to get real name
+    // Single DB query to fetch both name and plan
     if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('name').eq('payment_id', paymentId).single();
-        if (!error && data && data.name) {
-            memberName = data.name;
+        const { data, error } = await insforge.database.from('members').select('name, planId').eq('payment_id', paymentId).single();
+        if (!error && data) {
+            if (data.name) memberName = data.name;
+            if (data.planId === 'lifetime') planStr = 'Lifetime';
         }
     }
     
@@ -395,15 +401,6 @@ const downloadCertificate = catchAsync(async (req, res) => {
     const year = new Date().getFullYear();
     const shortId = paymentId.slice(-5).toUpperCase();
     const formattedId = `AASW-${year}-${shortId}`;
-    
-    // Attempt to lookup plan from database to know if it's Lifetime or Annual
-    let planStr = '1 Year'; // default
-    if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('planId').eq('payment_id', paymentId).single();
-        if (!error && data && data.planId === 'lifetime') {
-            planStr = 'Lifetime';
-        }
-    }
     
     const pdfBuffer = await generateCertificatePdf(memberName, formattedId, planStr);
     

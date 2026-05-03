@@ -10,7 +10,8 @@ const sendOtpSchema = Joi.object({
     name: Joi.string().min(2).required().messages({ 'string.min': 'Name must be at least 2 characters.' }),
     phone: Joi.string().pattern(/^[0-9]{10}$/).required().messages({ 'string.pattern.base': 'Enter a valid 10-digit mobile number.' }),
     email: Joi.string().email().required()
-        .messages({ 'string.email': 'Enter a valid email address.' })
+        .messages({ 'string.email': 'Enter a valid email address.' }),
+    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).optional()
 });
 
 const verifyOtpSchema = Joi.object({
@@ -31,7 +32,8 @@ const createOrderSchema = Joi.object({
     email: Joi.string().email().required(),
     planId: Joi.string().required(),
     planName: Joi.string().required(),
-    amount: Joi.number().required()
+    amount: Joi.number().required(),
+    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).optional()
 });
 
 const verifyPaymentSchema = Joi.object({
@@ -41,7 +43,8 @@ const verifyPaymentSchema = Joi.object({
     amount: Joi.number().required(),
     razorpay_order_id: Joi.string().required(),
     razorpay_payment_id: Joi.string().required(),
-    razorpay_signature: Joi.string().required()
+    razorpay_signature: Joi.string().required(),
+    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).optional()
 });
 
 router.post('/send-otp', validate(sendOtpSchema), requestEmailOTP);

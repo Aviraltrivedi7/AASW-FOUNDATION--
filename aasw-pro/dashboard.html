@@ -4,82 +4,10 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>AASW Admin | The Obsidian Lens</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-tertiary-fixed-variant": "#003970",
-                      "on-primary": "#072776",
-                      "tertiary": "#94bdff",
-                      "surface-container-high": "#201f21",
-                      "on-error-container": "#ffb2b9",
-                      "on-primary-fixed-variant": "#16307f",
-                      "primary": "#94aaff",
-                      "secondary-container": "#6c169f",
-                      "on-tertiary-container": "#002e5d",
-                      "secondary": "#cb7bff",
-                      "surface-container-highest": "#262627",
-                      "outline-variant": "#484849",
-                      "on-secondary": "#360055",
-                      "inverse-primary": "#445aa9",
-                      "on-error": "#490013",
-                      "on-primary-fixed": "#000f40",
-                      "on-background": "#ffffff",
-                      "outline": "#767576",
-                      "surface-dim": "#0e0e0f",
-                      "secondary-fixed": "#eac4ff",
-                      "error-container": "#a70138",
-                      "surface-container-lowest": "#000000",
-                      "on-surface": "#ffffff",
-                      "on-secondary-fixed": "#540081",
-                      "background": "#0e0e0f",
-                      "surface-variant": "#262627",
-                      "error": "#ff6e84",
-                      "secondary-dim": "#cb7bff",
-                      "primary-fixed-dim": "#869cf0",
-                      "primary-container": "#869cf0",
-                      "surface": "#0e0e0f",
-                      "on-secondary-container": "#eac2ff",
-                      "tertiary-fixed-dim": "#72a5f0",
-                      "tertiary-fixed": "#80b2fe",
-                      "on-primary-container": "#001b60",
-                      "on-secondary-fixed-variant": "#7725aa",
-                      "inverse-on-surface": "#565556",
-                      "on-tertiary": "#00396f",
-                      "surface-bright": "#2c2c2d",
-                      "primary-dim": "#869cf0",
-                      "surface-container-low": "#131314",
-                      "on-surface-variant": "#adaaab",
-                      "surface-tint": "#94aaff",
-                      "inverse-surface": "#fcf8f9",
-                      "error-dim": "#d73357",
-                      "primary-fixed": "#94aaff",
-                      "secondary-fixed-dim": "#e2b1ff",
-                      "on-tertiary-fixed": "#001835",
-                      "surface-container": "#19191b",
-                      "tertiary-dim": "#6fa2ed",
-                      "tertiary-container": "#7daffc"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "fontFamily": {
-                      "headline": ["Manrope", "sans-serif"],
-                      "body": ["Manrope", "sans-serif"],
-                      "label": ["Space Grotesk", "sans-serif"]
-              }
-            },
-          },
-        }
-    </script>
+
 <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -102,6 +30,7 @@
             border: 1px solid rgba(148, 170, 255, 0.05);
         }
     </style>
+    <link href="/css/tailwind-compiled.css" rel="stylesheet" />
 </head>
 <body class="min-h-screen">
 <!-- Ambient Aura -->
@@ -123,109 +52,41 @@
 </div>
 </div>
 
-<nav id="main-nav" class="fixed top-0 left-0 w-full z-[100] transition-all duration-500 py-6">
-<div class="max-w-7xl mx-auto px-4 md:px-6">
-    <div class="glass-header rounded-[2.5rem] px-6 py-3 flex justify-between items-center shadow-[0_20_50_rgba(0,0,0,0.3)] border border-white/10 relative overflow-hidden group">
-        <!-- Shine Effect -->
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"></div>
-
-        <!-- Left: Branding -->
-        <div class="flex items-center gap-8">
-            <a href="/" class="flex items-center gap-3 group/logo relative">
-                <div class="absolute -inset-2 bg-primary/20 blur-xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500 rounded-full"></div>
-                <img loading="lazy" src="/images/logo.png" alt="AASW" class="h-14 w-14 object-contain bg-white p-1.5 rounded-full border-2 border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] relative z-10 transition-transform duration-500 group-hover/logo:scale-110">
-                <div class="hidden sm:flex flex-col relative z-10">
-                    <span class="text-white font-headline font-extrabold text-base tracking-wide leading-tight">AASW</span>
-                    <span class="text-primary/80 font-label text-[9px] uppercase tracking-[0.25em] font-bold">Foundation</span>
-                </div>
-            </a>
-            
-            <!-- Desktop Nav Links -->
-            <div class="hidden lg:flex items-center space-x-8 font-label text-[11px] uppercase tracking-[0.25em] font-bold border-l border-white/10 pl-8 h-8">
-                <a class="nav-link text-on-surface-variant hover:text-primary transition-all pb-1" href="/">Home</a>
-                <a class="nav-link text-on-surface-variant hover:text-primary transition-all pb-1" href="/team.html">Team</a>
-                <a class="nav-link text-on-surface-variant hover:text-primary transition-all pb-1" href="/membership.html">Join</a>
-                <a class="nav-link text-on-surface-variant hover:text-primary transition-all pb-1" href="/governance.html">Governance</a>
-                <a class="nav-link text-on-surface-variant hover:text-primary transition-all pb-1" href="/#contact">Contact</a>
-            </div>
-        </div>
-
-        <!-- Right: Actions -->
-        <div class="flex items-center gap-6">
-            <!-- CTA Button -->
-            <button onclick="window.location.href='/membership.html'" class="hidden md:block bg-gradient-to-r from-primary to-secondary text-on-primary px-8 py-2.5 rounded-full font-label text-[11px] font-black uppercase tracking-[0.15em] shadow-[0_0_30px_rgba(148,170,255,0.3)] hover:scale-105 active:scale-95 transition-all">
-                Become a Member
-            </button>
-
-            <!-- Admin Shortcut (Icon Only) -->
-            <a href="/admin/login" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all group/admin">
-                <span class="material-symbols-outlined text-xl group-hover/admin:rotate-12 transition-transform">admin_panel_settings</span>
-            </a>
-            
-            <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-white">
-                <span class="material-symbols-outlined font-black">menu</span>
-            </button>
-        </div>
-    </div>
-</div>
+<!-- Sidebar Navigation Menu -->
+<nav class="space-y-2">
+<a class="flex items-center gap-4 text-white bg-primary/10 px-6 py-3 rounded-lg transition-all" href="/dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-[#adaaab] px-6 py-3 transition-all hover:bg-[#131314] hover:text-white rounded-lg" href="/admin/members">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Members</span>
+</a>
+<a class="flex items-center gap-4 text-[#adaaab] px-6 py-3 transition-all hover:bg-[#131314] hover:text-white rounded-lg" href="/admin/messages">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Messages</span>
+</a>
+<a class="flex items-center gap-4 text-[#adaaab] px-6 py-3 transition-all hover:bg-[#131314] hover:text-white rounded-lg" href="/admin/settings">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label tracking-widest uppercase text-[0.75rem]">Settings</span>
+</a>
 </nav>
 
-<style>
-@keyframes shimmer {
-    100% { transform: translateX(100%); }
-}
-.glass-header {
-    background: rgba(14, 14, 15, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-.nav-link {
-    position: relative;
-}
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1.5px;
-    background: linear-gradient(to right, #94aaff, #cb7bff);
-    transition: width 0.3s ease;
-}
-.nav-link:hover::after {
-    width: 100%;
-}
-.nav-link.active {
-    color: #94aaff !important;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 8px;
-}
-.nav-link.active::after {
-    width: 100%;
-}
-#main-nav.scrolled {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-}
-#main-nav.scrolled .glass-header {
-    background: rgba(14, 14, 15, 0.9);
-    border-radius: 0 0 1.5rem 1.5rem;
-    border-top: none;
-}
-</style>
-
-<script>
-// Scroll effect
+</div>
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('main-nav');
+    if (!tickingScroll) {
+        window.requestAnimationFrame(() => {
+            const nav = document.getElementById('main-nav');
     if (nav && window.scrollY > 20) {
         nav.classList.add('scrolled');
     } else if (nav) {
         nav.classList.remove('scrolled');
     }
-});
+            tickingScroll = false;
+        });
+        tickingScroll = true;
+    }
+}, { passive: true });
 
 // Active link detection
 (function() {
@@ -242,16 +103,6 @@ window.addEventListener('scroll', () => {
 })();
 </script>
 
-</div>
-<div class="mt-auto p-8 border-t border-outline-variant/10">
-<a class="flex items-center gap-4 text-[#adaaab] px-6 py-3 transition-all hover:bg-[#131314] hover:text-white mb-2" href="/">
-<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
-<span class="font-label tracking-widest uppercase text-[0.75rem]">Back to Website</span>
-</a>
-<a class="flex items-center gap-4 text-error px-6 py-3 transition-all hover:bg-error/10 rounded-lg" href="/admin/logout">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-label tracking-widest uppercase text-[0.75rem]">Logout</span>
-</a>
 </div>
 </aside>
 <!-- TopNavBar -->
@@ -514,7 +365,6 @@ function showToast(message, type = 'success') {
 // ====== GENERIC FORM HANDLERS ======
 document.querySelectorAll('form').forEach(form => {
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
     const nameInput = form.querySelector('input[placeholder*="Doe"]');
     const emailInput = form.querySelector('input[type="email"]');
     const msgInput = form.querySelector('textarea');
@@ -523,6 +373,7 @@ document.querySelectorAll('form').forEach(form => {
     
     // Contact form check
     if (nameInput && emailInput && msgInput) {
+        e.preventDefault();
         if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
         try {
           const res = await fetch('/api/v1/contact', {
@@ -531,7 +382,7 @@ document.querySelectorAll('form').forEach(form => {
             body: JSON.stringify({
               name: nameInput.value,
               email: emailInput.value,
-              subject: 'Contact from Stitch UI',
+              subject: 'Website Contact Form',
               message: msgInput.value
             })
           });

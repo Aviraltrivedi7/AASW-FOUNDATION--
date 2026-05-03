@@ -275,7 +275,7 @@ const translations = {
   'f-h3': { en: 'Connect With Us', hi: 'हमसे जुड़ें' },
   'f-addr': { en: 'Ward No 2 Ambedkar Nagar Rura Kanpur Dehat Uttar Pradesh', hi: 'वार्ड नं 2 अंबेडकर नगर रुरा कानपुर देहात उत्तर प्रदेश' },
   'f-hours': { en: 'Mon – Sat: 9:30 AM – 6:00 PM', hi: 'सोम – शनि: 9:30 AM – 6:00 PM' },
-  'f-copy': { en: '© 2026 AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified', hi: '© 2026 AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित' },
+  'f-copy': { en: '© 2025 AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified', hi: '© 2026 AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित' },
   // Refund Policy page
   'ref-banner-h': { en: 'Refund & Cancellation Policy', hi: 'रिफंड और कैंसलेशन पॉलिसी' },
   'ref-banner-p': { en: 'Our policy on refund and cancellation of Membership fees.', hi: 'सदस्यता शुल्क के रिफंड और रद्दीकरण पर हमारी नीति।' },
