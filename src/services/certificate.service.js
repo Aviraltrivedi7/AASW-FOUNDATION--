@@ -24,12 +24,20 @@ async function generateCertificatePdf(memberName, membershipNo = '', membershipT
         
         let templateBytes;
         let isPng = false;
+
+        // Try standard formats first
         if (fs.existsSync(templatePath)) {
             templateBytes = fs.readFileSync(templatePath);
+        } else if (fs.existsSync(path.join(__dirname, '../../aasw-pro/images/certificate-template.png'))) {
+            templateBytes = fs.readFileSync(path.join(__dirname, '../../aasw-pro/images/certificate-template.png'));
+            isPng = true;
         } else {
-            const pngPath = path.join(__dirname, '../../aasw-pro/images/certificate-template.png');
-            if (fs.existsSync(pngPath)) {
-                templateBytes = fs.readFileSync(pngPath);
+            // Check for WebP format (created by image optimizer)
+            const webpPath = path.join(__dirname, '../../aasw-pro/images/certificate-template.webp');
+            if (fs.existsSync(webpPath)) {
+                // Convert WebP to PNG buffer on the fly using sharp
+                const sharp = require('sharp');
+                templateBytes = await sharp(webpPath).png().toBuffer();
                 isPng = true;
             } else {
                 throw new Error("Certificate template not found in aasw-pro/images/");
