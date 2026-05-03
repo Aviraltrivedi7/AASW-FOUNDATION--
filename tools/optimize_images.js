@@ -9,24 +9,36 @@ try {
 const sharp = require('sharp');
 
 async function processImages() {
-    const images = fs.readdirSync('images').filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
+    const path = require('path');
+    const imagesDir = path.join(__dirname, '..', 'aasw-pro', 'images');
+    if (!fs.existsSync(imagesDir)) {
+        console.log('No images directory found at ' + imagesDir);
+        return;
+    }
+    
+    const images = fs.readdirSync(imagesDir).filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
     for (let file of images) {
         const isFavicon = file === 'favicon.png';
         const name = file.substring(0, file.lastIndexOf('.'));
-        const inputPath = 'images/' + file;
+        const inputPath = path.join(imagesDir, file);
 
         if (isFavicon) {
             // Resize and compress favicon
+            const tempPath = path.join(imagesDir, 'favicon-temp.png');
             await sharp(inputPath)
                 .resize(32, 32)
                 .png({ quality: 80, compressionLevel: 9 })
-                .toFile('images/favicon-temp.png');
+                .toFile(tempPath);
             fs.unlinkSync(inputPath);
-            fs.renameSync('images/favicon-temp.png', inputPath);
+            fs.renameSync(tempPath, inputPath);
             console.log('Processed favicon.png');
         } else {
             // Convert to webp
-            const outPath = 'images/' + name + '.webp';
+            const outPath = path.join(imagesDir, name + '.webp');
+            if (fs.existsSync(outPath)) {
+                console.log('Skipping', file, '- already converted');
+                continue;
+            }
             await sharp(inputPath)
                 .webp({ quality: 80 })
                 .toFile(outPath);

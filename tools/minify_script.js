@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { execSync } = require('child_process');
 
 try {
@@ -12,37 +13,72 @@ const CleanCSS = require('clean-css');
 const { minify: minifyJs } = require('terser');
 
 async function processFiles() {
-    // Update HTML with webp images and minified resources
-    let html = fs.readFileSync('index.html', 'utf8');
-    html = html.replace(/\.jpg/g, '.webp');
+    const baseDir = path.join(__dirname, '..', 'aasw-pro');
+    
     // Combine CSS files
-    let css1 = fs.readFileSync('css/style.css', 'utf8');
-    css1 = css1.replace(/\.jpg/g, '.webp');
-    let css2 = fs.existsSync('css/premium.css') ? fs.readFileSync('css/premium.css', 'utf8') : '';
-    css2 = css2.replace(/\.jpg/g, '.webp');
-
-    // Update HTML file references
-    html = html.replace(/<link rel="stylesheet" href="css\/style\.css" \/>\s*<link rel="stylesheet" href="css\/premium\.css" \/>/, '<link rel="stylesheet" href="css/style.min.css" />');
-    html = html.replace(/<script src="js\/main\.js"><\/script>/, '<script src="js/main.min.js"></script>');
+    let css1 = '';
+    const styleCssPath = path.join(baseDir, 'css', 'style.css');
+    if (fs.existsSync(styleCssPath)) {
+        css1 = fs.readFileSync(styleCssPath, 'utf8').replace(/\.jpg/g, '.webp');
+    }
+    
+    let css2 = '';
+    const premiumCssPath = path.join(baseDir, 'css', 'premium.css');
+    if (fs.existsSync(premiumCssPath)) {
+        css2 = fs.readFileSync(premiumCssPath, 'utf8').replace(/\.jpg/g, '.webp');
+    }
 
     // Minify CSS
-    const minifiedCss = new CleanCSS({}).minify(css1 + '\n' + css2).styles;
-    fs.writeFileSync('css/style.min.css', minifiedCss);
+    if (css1 || css2) {
+        const minifiedCss = new CleanCSS({}).minify(css1 + '\n' + css2).styles;
+        fs.writeFileSync(path.join(baseDir, 'css', 'style.min.css'), minifiedCss);
+        console.log('✓ Minified CSS');
+    }
 
     // Minify JS
-    let js = fs.readFileSync('js/main.js', 'utf8');
-    const minifiedJs = await minifyJs(js);
-    fs.writeFileSync('js/main.min.js', minifiedJs.code);
+    const mainJsPath = path.join(baseDir, 'js', 'main.js');
+    if (fs.existsSync(mainJsPath)) {
+        let js = fs.readFileSync(mainJsPath, 'utf8');
+        const minifiedJs = await minifyJs(js);
+        fs.writeFileSync(path.join(baseDir, 'js', 'main.min.js'), minifiedJs.code);
+        console.log('✓ Minified JS');
+    }
 
-    // Minify HTML
-    const resultHtml = await minifyHtml(html, {
-        collapseWhitespace: true,
-        removeComments: true,
-        minifyJS: true,
-        minifyCSS: true
-    });
-    fs.writeFileSync('index.html', resultHtml);
+    // Process HTML files
+    const replaceInHtmlFiles = async (dir) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+            const filePath = path.join(dir, file);
+            if (fs.statSync(filePath).isDirectory() && file !== 'css' && file !== 'js' && file !== 'assets') {
+                await replaceInHtmlFiles(filePath);
+            } else if (filePath.endsWith('.html')) {
+                let html = fs.readFileSync(filePath, 'utf8');
+                
+                // Update HTML with webp images and minified resources
+                html = html.replace(/\.jpg/g, '.webp');
+                
+                // Update HTML file references
+                html = html.replace(/<link[^>]*href="css\/style\.css"[^>]*>\s*<link[^>]*href="css\/premium\.css"[^>]*>/g, '<link rel="stylesheet" href="css/style.min.css" />');
+                html = html.replace(/<script[^>]*src="js\/main\.js"[^>]*><\/script>/g, '<script src="js/main.min.js"></script>');
 
+                // Minify HTML
+                try {
+                    const resultHtml = await minifyHtml(html, {
+                        collapseWhitespace: true,
+                        removeComments: true,
+                        minifyJS: true,
+                        minifyCSS: true
+                    });
+                    fs.writeFileSync(filePath, resultHtml);
+                    console.log(`✓ Minified ${file}`);
+                } catch (err) {
+                    console.error(`Error minifying ${file}:`, err.message);
+                }
+            }
+        }
+    };
+    
+    await replaceInHtmlFiles(baseDir);
     console.log('Minification and combination complete.');
 }
 
