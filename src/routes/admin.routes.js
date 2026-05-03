@@ -6,7 +6,7 @@ const path = require('path');
 const { isAuthenticated } = require('../middlewares/auth.middleware');
 const { ApiResponse } = require('../utils/apiResponse');
 const { ApiError } = require('../utils/apiError');
-const { insforge } = require('../config/insforge');
+const db = require('../services/db.service');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -45,18 +45,15 @@ router.post('/login', async (req, res, next) => {
 
         email = email.trim().toLowerCase();
 
-        if (!insforge) {
-            return res.status(500).json(new ApiError(500, "Database not configured"));
-        }
+        // Use hybrid DB service (MongoDB first, InsForge fallback)
+        const admin = await db.findAdminByEmail(email);
 
-        const { data: admin, error } = await insforge.database.from('admins').select('*').eq('email', email).single();
-
-        if (error || !admin || !bcrypt.compareSync(password, admin.password_hash)) {
+        if (!admin || !bcrypt.compareSync(password, admin.password_hash)) {
             return res.status(401).json(new ApiError(401, "Invalid email or password"));
         }
 
         // Setup session via JWT Cookie
-        const token = jwt.sign({ id: admin.id, email: admin.email, role: 'admin' }, JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: admin.id || admin._id, email: admin.email, role: 'admin' }, JWT_SECRET, { expiresIn: '1d' });
         
         res.cookie('admin_token', token, {
             httpOnly: true,
@@ -86,58 +83,10 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     }
 });
 
-// Protected Stats API
+// Protected Stats API — uses hybrid DB service
 router.get('/api/stats', isAuthenticated, async (req, res, next) => {
     try {
-        if (!insforge) throw new Error("Database not connected");
-
-        // Fetch parallel data from InsForge
-        const [
-            { data: statsData },
-            { data: contacts },
-            { data: subscribers },
-            { data: memberships },
-            { count: contactsCount },
-            { count: subsCount },
-            { count: memsCount }
-        ] = await Promise.all([
-            insforge.database.from('site_stats').select('*'),
-            insforge.database.from('contacts').select('*').order('created_at', { ascending: false }).limit(5),
-            insforge.database.from('subscribers').select('*').order('subscribed_at', { ascending: false }).limit(5),
-            insforge.database.from('members').select('*').order('created_at', { ascending: false }).limit(5),
-            // Separate count-only queries for accurate totals
-            insforge.database.from('contacts').select('*', { count: 'exact', head: true }),
-            insforge.database.from('subscribers').select('*', { count: 'exact', head: true }),
-            insforge.database.from('members').select('*', { count: 'exact', head: true })
-        ]);
-
-        let totalVisitors = 0;
-        let pageViews = {};
-
-        if (statsData) {
-            const vis = statsData.find(r => r.key === 'visitors');
-            if (vis) totalVisitors = vis.value;
-            statsData.filter(r => r.key.startsWith('pv_')).forEach(r => {
-                pageViews[r.key.replace('pv_', '')] = r.value;
-            });
-        }
-
-        const payload = {
-            overview: {
-                totalVisitors,
-                totalContacts: contactsCount || (contacts ? contacts.length : 0),
-                totalSubscribers: subsCount || (subscribers ? subscribers.length : 0),
-                totalMemberships: memsCount || (memberships ? memberships.length : 0)
-            },
-            pageViews,
-            recentContacts: contacts || [],
-            recentSubscribers: subscribers || [],
-            recentMemberships: memberships || [],
-            allContacts: contacts || [],
-            allSubscribers: subscribers || [],
-            allMemberships: memberships || []
-        };
-
+        const payload = await db.getAdminStats();
         res.status(200).json(new ApiResponse(200, payload, "Admin stats retrieved"));
     } catch (error) {
         console.error(error);

@@ -1,7 +1,7 @@
 const { catchAsync } = require("../utils/catchAsync");
 const { ApiResponse } = require("../utils/apiResponse");
 const { sendContactNotification } = require("../utils/email");
-const { insforge } = require("../config/insforge");
+const db = require("../services/db.service");
 
 const submitContact = catchAsync(async (req, res) => {
     const { name, email, subject, message, website } = req.body;
@@ -14,17 +14,16 @@ const submitContact = catchAsync(async (req, res) => {
         );
     }
 
-    // Insert into InsForge
-    if (insforge) {
-        const { error } = await insforge.database.from('contacts').insert([{
+    // Insert via hybrid DB service (MongoDB first, InsForge sync)
+    try {
+        await db.insertContact({
             name: name.trim(),
             email: email.trim().toLowerCase(),
             subject: subject.trim(),
             message: message.trim()
-        }]);
-        if (error) {
-            console.error("[Contact] Database Insert Error:", error);
-        }
+        });
+    } catch (err) {
+        console.error("[Contact] Database Insert Error:", err.message);
     }
 
     // Send email notification in background (fire-and-forget)

@@ -1,5 +1,4 @@
 require("dotenv").config();
-const app = require("./src/app");
 const cluster = require("cluster");
 const os = require("os");
 
@@ -38,9 +37,29 @@ if (cluster.isMaster) {
     });
 
 } else {
-    // Workers share the same TCP connection in load balancer pattern
-    const server = app.listen(PORT, () => {
-        console.log(`⚡ Worker ${process.pid} is active and ready on port ${PORT}`);
+    // Each worker connects to MongoDB independently
+    const { connectMongoDB } = require('./src/config/mongodb');
+    
+    connectMongoDB().then((connected) => {
+        if (connected) {
+            console.log(`[Worker ${process.pid}] MongoDB connected ✓`);
+        } else {
+            console.warn(`[Worker ${process.pid}] MongoDB unavailable — using InsForge as primary`);
+        }
+        
+        // Start Express AFTER MongoDB connection attempt (regardless of success)
+        const app = require("./src/app");
+        const server = app.listen(PORT, () => {
+            console.log(`⚡ Worker ${process.pid} is active and ready on port ${PORT}`);
+        });
+    }).catch(err => {
+        console.error(`[Worker ${process.pid}] MongoDB connection error:`, err.message);
+        
+        // Start Express anyway — InsForge will serve as fallback
+        const app = require("./src/app");
+        const server = app.listen(PORT, () => {
+            console.log(`⚡ Worker ${process.pid} is active (InsForge-only mode) on port ${PORT}`);
+        });
     });
 
     // Graceful error handling so traffic spikes don't bring down the worker

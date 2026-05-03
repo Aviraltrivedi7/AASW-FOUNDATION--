@@ -3,12 +3,9 @@ const { ApiResponse } = require('../utils/apiResponse');
 const { ApiError } = require('../utils/apiError');
 const { sendOTP, sendMembershipSuccessEmail } = require('../utils/email');
 const { generateCertificatePdf } = require('../services/certificate.service');
-const { insforge } = require('../config/insforge');
+const db = require('../services/db.service');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-
-// In-memory fallback if InsForge RLS policies block inserts (which causes 500 errors)
-const fallbackOtpStore = {};
 
 // Membership plans definition
 const MEMBERSHIP_PLANS = [
@@ -69,20 +66,13 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     const otp = generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
 
-    // Use insforge to bypass RLS — inserts via server should never be blocked
-    let dbError = null;
-    if (insforge) {
-        const { error } = await insforge.database.from('otps').upsert({
-            email, name: name || '', phone: phone || '', pan: pan || '', otp, expires_at: expiresAt, verified: false
-        });
-        if (error) {
-            dbError = error;
-            console.warn("[OTP] InsForge upsert failed, using in-memory fallback:", error.message);
-        }
-    }
+    // Use hybrid DB service (MongoDB first, InsForge sync)
+    const result = await db.upsertOtp({
+        email, name: name || '', phone: phone || '', pan: pan || '', otp, expires_at: expiresAt, verified: false
+    });
 
-    if (!insforge || dbError) {
-        fallbackOtpStore[email] = { otp, expires_at: expiresAt, verified: false, name, phone, pan: pan || '' };
+    if (!result.success) {
+        console.warn("[OTP] Database upsert failed:", result.error);
     }
 
     const devMode = (!process.env.SMTP_USER || !process.env.SMTP_PASS);
@@ -113,25 +103,15 @@ const verifyEmailOTP = catchAsync(async (req, res) => {
         throw new ApiError(400, 'Email address and OTP are required.');
     }
 
-    let sessionOTP = null;
-    let fallback = fallbackOtpStore[email];
-
-    if (insforge) {
-        const { data, error } = await insforge.database.from('otps').select('*').eq('email', email).single();
-        if (!error && data) sessionOTP = data;
-    }
-
-    if (!sessionOTP && fallback) {
-        sessionOTP = fallback;
-    }
+    // Find OTP via hybrid service (MongoDB first, InsForge fallback)
+    const sessionOTP = await db.findOtpByEmail(email);
 
     if (!sessionOTP) {
         throw new ApiError(400, 'No OTP found. Please request a new OTP.');
     }
 
     if (new Date() > new Date(sessionOTP.expires_at)) {
-        if (insforge) await insforge.database.from('otps').delete().eq('email', email);
-        if (fallback) delete fallbackOtpStore[email];
+        await db.deleteOtpByEmail(email);
         throw new ApiError(400, 'OTP has expired. Please request a new OTP.');
     }
 
@@ -140,8 +120,7 @@ const verifyEmailOTP = catchAsync(async (req, res) => {
     }
 
     // Mark as verified
-    if (insforge) await insforge.database.from('otps').update({ verified: true }).eq('email', email);
-    if (fallback) fallbackOtpStore[email].verified = true;
+    await db.updateOtpVerified(email);
 
     // Create a temporary cookie as a secondary measure (stateless fallback)
     res.cookie('verified_email', email, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000 });
@@ -158,33 +137,20 @@ const getMembershipPlans = catchAsync(async (req, res) => {
     );
 });
 
-// Helper validation module using stateless OTps
+// Helper validation module using stateless OTPs
 async function validateVerifiedUser(email, req) {
     // Check cookie first
     if (req.cookies && req.cookies.verified_email === email) {
         return { email, verified: true, name: 'Member' };
     }
     
-    let isVerified = false;
-    let userData = {};
-
-    if (insforge) {
-        const { data, error } = await insforge.database.from('otps').select('*').eq('email', email).single();
-        if (!error && data && data.verified) {
-            isVerified = true;
-            userData = data;
-        }
-    }
-
-    if (!isVerified && fallbackOtpStore[email] && fallbackOtpStore[email].verified) {
-        isVerified = true;
-        userData = fallbackOtpStore[email];
+    const otpData = await db.findOtpByEmail(email);
+    
+    if (otpData && otpData.verified) {
+        return otpData;
     }
     
-    if (!isVerified) {
-        throw new ApiError(401, 'Session invalid or email verification required.');
-    }
-    return userData;
+    throw new ApiError(401, 'Session invalid or email verification required.');
 }
 
 // POST /api/v1/membership/submit-payment
@@ -209,21 +175,18 @@ const submitPayment = catchAsync(async (req, res) => {
         date: new Date().toISOString()
     };
 
-    if (insforge) {
-        await insforge.database.from('members').insert([{
-            name: membershipData.name,
-            email: membershipData.email,
-            payment_id: txnId,
-            status: 'Pending Verification',
-            planId: planId,
-            pan: userData.pan || ''
-        }]);
-    }
+    await db.insertMember({
+        name: membershipData.name,
+        email: membershipData.email,
+        payment_id: txnId,
+        status: 'Pending Verification',
+        planId: planId,
+        pan: userData.pan || ''
+    });
 
     // Clear verification after initiating manual submission to prevent reuse
     res.clearCookie('verified_email');
-    if (insforge) await insforge.database.from('otps').delete().eq('email', email);
-    if (fallbackOtpStore[email]) delete fallbackOtpStore[email];
+    await db.deleteOtpByEmail(email);
 
     return res.status(200).json(
         new ApiResponse(200, { membershipId: membershipData.id }, 'Payment submitted for verification.')
@@ -303,27 +266,18 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
         throw new ApiError(400, 'Invalid payment signature.');
     }
 
-    // Insert into InsForge
-    if (insforge) {
-        const { error } = await insforge.database
-            .from('members')
-            .upsert([{ 
-                name: userData.name || 'Member', 
-                email: email, 
-                payment_id: razorpay_payment_id,
-                status: 'Active',
-                planId: planId,
-                pan: pan || userData.pan || ''
-            }], { onConflict: 'payment_id' });
-            
-        if (error) {
-            console.error("[InsForge] Insert Error:", error);
-        }
-    }
+    // Upsert member via hybrid DB service
+    await db.upsertMember({
+        name: userData.name || 'Member', 
+        email: email, 
+        payment_id: razorpay_payment_id,
+        status: 'Active',
+        planId: planId,
+        pan: pan || userData.pan || ''
+    });
 
     res.clearCookie('verified_email');
-    if (insforge) await insforge.database.from('otps').delete().eq('email', email);
-    if (fallbackOtpStore[email]) delete fallbackOtpStore[email];
+    await db.deleteOtpByEmail(email);
 
     // Generate and email certificate
     try {
@@ -370,17 +324,14 @@ const razorpayWebhook = catchAsync(async (req, res) => {
             const payment = payload.payload.payment.entity;
             const notes = payment.notes || {};
             
-            if (insforge) {
-                const { error } = await insforge.database.from('members').upsert([{ 
-                    name: notes.name || 'Member', 
-                    email: notes.email || payment.email, 
-                    payment_id: payment.id,
-                    status: 'Active',
-                    planId: notes.planId,
-                    pan: notes.pan || ''
-                }], { onConflict: 'payment_id' });
-                if (error) console.error('[Webhook] Member insert error:', error.message);
-            }
+            await db.upsertMember({
+                name: notes.name || 'Member', 
+                email: notes.email || payment.email, 
+                payment_id: payment.id,
+                status: 'Active',
+                planId: notes.planId,
+                pan: notes.pan || ''
+            });
         }
     } catch (e) {
         console.error("Webhook processing error", e);
@@ -395,13 +346,11 @@ const downloadCertificate = catchAsync(async (req, res) => {
     let memberName = 'Member';
     let planStr = '1 Year'; // default
     
-    // Single DB query to fetch both name and plan
-    if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('name, planId').eq('payment_id', paymentId).single();
-        if (!error && data) {
-            if (data.name) memberName = data.name;
-            if (data.planId === 'lifetime') planStr = 'Lifetime';
-        }
+    // Fetch member data via hybrid service
+    const data = await db.findMemberByPaymentId(paymentId);
+    if (data) {
+        if (data.name) memberName = data.name;
+        if (data.planId === 'lifetime') planStr = 'Lifetime';
     }
     
     // Generate PDF

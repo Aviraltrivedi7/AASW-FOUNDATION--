@@ -1,6 +1,6 @@
 const path = require('path');
 const { ApiError } = require('../utils/apiError');
-const { insforge } = require('../config/insforge');
+const db = require('../services/db.service');
 
 // In-memory stats buffer + debounced write
 let statsBuffer = { visitors: 0, pageViews: {} };
@@ -8,10 +8,10 @@ let statsWriteTimer = null;
 let initialized = false;
 
 async function fetchInitialStats() {
-    if (!insforge || initialized) return;
+    if (initialized) return;
     try {
-        const { data, error } = await insforge.database.from('site_stats').select('*');
-        if (!error && data) {
+        const data = await db.getSiteStats();
+        if (data && data.length > 0) {
             const vis = data.find(r => r.key === 'visitors');
             if (vis) statsBuffer.visitors = vis.value;
             // Load page views from DB into memory
@@ -24,19 +24,16 @@ async function fetchInitialStats() {
 }
 
 async function flushStats() {
-    if (!insforge || !initialized) return;
+    if (!initialized) return;
     try {
-        // Upsert visitors
-        await insforge.database.from('site_stats').upsert({ key: 'visitors', value: statsBuffer.visitors });
+        const statsArray = [{ key: 'visitors', value: statsBuffer.visitors }];
         
-        // Upsert page views securely
-        const upserts = Object.keys(statsBuffer.pageViews).map(page => ({
-            key: 'pv_' + page,
-            value: statsBuffer.pageViews[page]
-        }));
-        if (upserts.length > 0) {
-            await insforge.database.from('site_stats').upsert(upserts);
-        }
+        // Add page views
+        Object.keys(statsBuffer.pageViews).forEach(page => {
+            statsArray.push({ key: 'pv_' + page, value: statsBuffer.pageViews[page] });
+        });
+
+        await db.upsertSiteStats(statsArray);
     } catch (err) {
         console.error('[Stats] Error writing stats to DB:', err.message);
     }

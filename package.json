@@ -1,4 +1,10 @@
 {
+  "name": "aasw-foundation-website",
+  "version": "1.0.0",
+  "description": "Official website for AASW Foundation — membership, donations, and social impact.",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch-path=./src --watch-path=./server.js server.js",
@@ -14,15 +20,16 @@
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "ejs": "^5.0.2",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.3.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
-    "joi": "^18.0.2",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.9.5",
     "morgan": "^1.10.1",
-    "nodemailer": "^8.0.2",
+    "nodemailer": "^6.10.0",
     "pdf-lib": "^1.17.1",
     "razorpay": "^2.9.6"
   },
@@ -34,3 +41,4 @@
     "terser": "^5.46.0"
   }
 }
+
