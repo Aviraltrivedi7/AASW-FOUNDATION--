@@ -22,7 +22,7 @@
     <a href="/team.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white transition-colors">Our Team</a>
     <a href="/governance.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white transition-colors">Governance</a>
     <a href="/membership.html" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white transition-colors">Membership</a>
-    <a href="/#contact" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white transition-colors">Contact</a>
+    <a class="block py-3 px-4 text-on-surface-variant hover:text-primary transition-colors font-label text-xs uppercase tracking-widest" href="/programs.html">Programs</a><a class="block py-3 px-4 text-on-surface-variant hover:text-primary transition-colors font-label text-xs uppercase tracking-widest" href="/stories.html">Impact</a><a href="/#contact" class="text-2xl font-headline font-bold text-on-surface-variant hover:text-white transition-colors">Contact</a>
     <div class="mt-4">
       <a href="/membership.html" class="bg-gradient-to-r from-primary to-secondary text-on-primary px-10 py-3.5 rounded-full font-label text-xs font-black uppercase tracking-[0.15em] shadow-[0_0_30px_rgba(148,170,255,0.3)] hover:scale-105 active:scale-95 transition-all inline-block">Become a Member</a>
     </div>
