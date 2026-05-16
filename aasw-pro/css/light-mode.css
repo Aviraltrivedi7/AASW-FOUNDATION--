@@ -49,12 +49,12 @@ body.light-mode .glass {
 }
 
 /* ── 4. ALL TEXT COLOR OVERRIDES ── */
-/* White text → dark, EXCEPT over images (hero and cards) */
+/* White text → dark, EXCEPT over goal card images */
 body.light-mode [class*="text-white"] {
   color: #1e293b !important;
 }
-body.light-mode section:first-of-type [class*="text-white"],
-body.light-mode .group\\/img [class*="text-white"] {
+body.light-mode .group\/img [class*="text-white"],
+body.light-mode .group\/img p[class*="text-white"] {
   color: #ffffff !important;
 }
 /* On-surface variant → mid gray */
@@ -111,15 +111,15 @@ body.light-mode [class$="bg-surface"] {
 }
 
 /* ── 6. HERO SECTION OVERLAYS ── */
-/* Keep image solid, let the native dark HTML gradients provide contrast */
+/* True light mode hero: white fade for dark text, image 100% visible on the right */
 body.light-mode section:first-of-type img {
   opacity: 1 !important;
 }
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-r"] {
-  background: linear-gradient(to right, rgba(14,14,15,0.9), rgba(14,14,15,0.5), transparent) !important;
+  background: linear-gradient(to right, #f5f6fa 0%, rgba(245,246,250,0.85) 55%, transparent 100%) !important;
 }
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-t"] {
-  background: linear-gradient(to top, #0e0e0f, transparent) !important;
+  background: linear-gradient(to top, #f5f6fa, transparent) !important;
 }
 
 /* Hero glass pill */
