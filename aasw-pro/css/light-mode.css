@@ -108,13 +108,13 @@ body.light-mode [class$="bg-surface"] {
 
 /* ── 6. HERO SECTION OVERLAYS ── */
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-r"] {
-  background: linear-gradient(to right, rgba(245,246,250,0.95), rgba(245,246,250,0.75), transparent) !important;
+  background: linear-gradient(to right, rgba(245,246,250,0.7), rgba(245,246,250,0.1), transparent) !important;
 }
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-t"] {
   background: linear-gradient(to top, #f5f6fa, transparent) !important;
 }
 body.light-mode section:first-of-type img {
-  opacity: 0.2 !important;
+  opacity: 0.8 !important;
 }
 
 /* Hero glass pill */
