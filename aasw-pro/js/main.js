@@ -495,7 +495,7 @@ function initContactForm() {
         showFeedback(feedback, '✗ ' + errMsg, 'error');
       }
     } catch (err) {
-      console.error('Contact form submission failed:', err);
+      console.warn('Contact form submission failed:', err);
       showFeedback(feedback, lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : '✗ Network error, please try again', 'error');
     }
 

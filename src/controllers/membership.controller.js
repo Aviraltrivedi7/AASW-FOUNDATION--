@@ -255,7 +255,7 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
 
 // POST /api/v1/membership/verify-payment
 const verifyRazorpayPayment = catchAsync(async (req, res) => {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email, planId, planName, amount, pan } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !email) {
         throw new ApiError(400, 'Missing payment verification details.');
@@ -263,7 +263,7 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
 
     const userData = await validateVerifiedUser(email, req);
 
-    if (!process.env.RAZORPAY_KEY_SECRET) {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
         throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
     }
     const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -278,14 +278,34 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
         throw new ApiError(400, 'Invalid payment signature.');
     }
 
+    // Fetch the original order to prevent tampering with planId, pan, or amount
+    const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+    
+    let order;
+    try {
+        order = await razorpay.orders.fetch(razorpay_order_id);
+    } catch (err) {
+        throw new ApiError(500, 'Failed to fetch order details from payment gateway.');
+    }
+
+    if (!order || order.notes.email !== email) {
+        throw new ApiError(400, 'Order details mismatch or invalid order.');
+    }
+
+    const securePlanId = order.notes.planId;
+    const securePan = order.notes.pan || '';
+
     // Upsert member via hybrid DB service
     await db.upsertMember({
         name: userData.name || 'Member', 
         email: email, 
         payment_id: razorpay_payment_id,
         status: 'Active',
-        planId: planId,
-        pan: pan || userData.pan || ''
+        planId: securePlanId,
+        pan: securePan || userData.pan || ''
     });
 
     res.clearCookie('verified_email');
@@ -295,7 +315,7 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     try {
         const shortId = razorpay_payment_id.slice(-5).toUpperCase();
         const formattedId = `AASW-2025-${shortId}`;
-        const planStr = (planId === 'annual') ? '1 Year' : 'Lifetime';
+        const planStr = (securePlanId === 'annual') ? '1 Year' : 'Lifetime';
         const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
         await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
         console.log("[Membership] Successfully emailed certificate to: " + email);
@@ -319,7 +339,7 @@ const razorpayWebhook = catchAsync(async (req, res) => {
     const signature = req.headers['x-razorpay-signature'];
     if (!signature) return res.status(400).send('Signature missing');
 
-    const bodyText = (req.body instanceof Buffer) ? req.body.toString('utf8') : JSON.stringify(req.body);
+    const bodyText = req.rawBody ? req.rawBody.toString('utf8') : ((req.body instanceof Buffer) ? req.body.toString('utf8') : JSON.stringify(req.body));
 
     const expectedSignature = crypto
         .createHmac('sha256', secret)

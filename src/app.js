@@ -53,7 +53,12 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json({ limit: "16kb" }));
+app.use(express.json({ 
+    limit: "16kb",
+    verify: (req, res, buf) => {
+        req.rawBody = buf; // Save raw body for Razorpay webhook signature verification
+    }
+}));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 app.use(visitorTracker);

@@ -70,14 +70,18 @@ async function findAdminByEmail(email) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('admins').select('*').eq('email', email).single();
-        if (!error && data) {
-            // Cache into MongoDB for next time
-            if (isMongoConnected()) {
-                Admin.findOneAndUpdate({ email }, data, { upsert: true, new: true })
-                    .catch(err => console.warn('[Sync] Failed to cache admin in MongoDB:', err.message));
+        try {
+            const { data, error } = await insforge.database.from('admins').select('*').eq('email', email).single();
+            if (!error && data) {
+                // Cache into MongoDB for next time
+                if (isMongoConnected()) {
+                    Admin.findOneAndUpdate({ email }, data, { upsert: true, new: true })
+                        .catch(err => console.warn('[Sync] Failed to cache admin in MongoDB:', err.message));
+                }
+                return data;
             }
-            return data;
+        } catch (err) {
+            console.warn('[DB] InsForge admin fallback failed (cold start?):', err.message);
         }
     }
 
@@ -110,12 +114,17 @@ async function upsertOtp(data) {
 
     // 3. Fallback to InsForge
     if (insforge) {
-        const { error } = await insforge.database.from('otps').upsert(otpData);
-        if (error) {
-            console.error('[DB] InsForge OTP upsert also failed:', error.message);
-            return { success: false, error };
+        try {
+            const { error } = await insforge.database.from('otps').upsert(otpData);
+            if (error) {
+                console.error('[DB] InsForge OTP upsert also failed:', error.message);
+                return { success: false, error };
+            }
+            return { success: true, source: 'insforge' };
+        } catch (err) {
+            console.warn('[DB] InsForge OTP fallback failed (cold start?):', err.message);
+            return { success: false, error: err.message };
         }
-        return { success: true, source: 'insforge' };
     }
 
     return { success: false, error: 'No database available' };
@@ -136,14 +145,18 @@ async function findOtpByEmail(email) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('otps').select('*').eq('email', email).single();
-        if (!error && data) {
-            // Cache into MongoDB
-            if (isMongoConnected()) {
-                Otp.findOneAndUpdate({ email }, data, { upsert: true })
-                    .catch(err => console.warn('[Sync] Failed to cache OTP in MongoDB:', err.message));
+        try {
+            const { data, error } = await insforge.database.from('otps').select('*').eq('email', email).single();
+            if (!error && data) {
+                // Cache into MongoDB
+                if (isMongoConnected()) {
+                    Otp.findOneAndUpdate({ email }, data, { upsert: true })
+                        .catch(err => console.warn('[Sync] Failed to cache OTP in MongoDB:', err.message));
+                }
+                return data;
             }
-            return data;
+        } catch (err) {
+            console.warn('[DB] InsForge OTP lookup fallback failed (cold start?):', err.message);
         }
     }
 
@@ -201,12 +214,17 @@ async function insertMember(data) {
 
     // 3. Fallback to InsForge
     if (insforge) {
-        const { data: result, error } = await insforge.database.from('members').insert([data]);
-        if (error) {
-            console.error('[DB] InsForge member insert also failed:', error.message);
+        try {
+            const { data: result, error } = await insforge.database.from('members').insert([data]);
+            if (error) {
+                console.error('[DB] InsForge member insert also failed:', error.message);
+                throw new Error('Failed to save member data');
+            }
+            return result;
+        } catch (err) {
+            console.error('[DB] InsForge member fallback failed (cold start?):', err.message);
             throw new Error('Failed to save member data');
         }
-        return result;
     }
 
     throw new Error('No database available to save member');
@@ -234,14 +252,19 @@ async function upsertMember(data, conflictField = 'payment_id') {
 
     // 3. Fallback to InsForge
     if (insforge) {
-        const { data: result, error } = await insforge.database
-            .from('members')
-            .upsert([data], { onConflict: conflictField });
-        if (error) {
-            console.error('[DB] InsForge member upsert also failed:', error.message);
+        try {
+            const { data: result, error } = await insforge.database
+                .from('members')
+                .upsert([data], { onConflict: conflictField });
+            if (error) {
+                console.error('[DB] InsForge member upsert also failed:', error.message);
+                throw new Error('Failed to save member data');
+            }
+            return result;
+        } catch (err) {
+            console.error('[DB] InsForge member upsert fallback failed (cold start?):', err.message);
             throw new Error('Failed to save member data');
         }
-        return result;
     }
 
     throw new Error('No database available to save member');
@@ -260,14 +283,18 @@ async function findMemberByPaymentId(paymentId) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('name, planId, status, email').eq('payment_id', paymentId).single();
-        if (!error && data) {
-            // Cache into MongoDB
-            if (isMongoConnected()) {
-                Member.findOneAndUpdate({ payment_id: paymentId }, data, { upsert: true })
-                    .catch(err => console.warn('[Sync] Failed to cache member in MongoDB:', err.message));
+        try {
+            const { data, error } = await insforge.database.from('members').select('name, planId, status, email').eq('payment_id', paymentId).single();
+            if (!error && data) {
+                // Cache into MongoDB
+                if (isMongoConnected()) {
+                    Member.findOneAndUpdate({ payment_id: paymentId }, data, { upsert: true })
+                        .catch(err => console.warn('[Sync] Failed to cache member in MongoDB:', err.message));
+                }
+                return data;
             }
-            return data;
+        } catch (err) {
+            console.warn('[DB] InsForge member lookup fallback failed (cold start?):', err.message);
         }
     }
 
@@ -294,10 +321,14 @@ async function findMemberByEmail(email) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('members').select('*').eq('email', email);
-        if (!error && data && data.length > 0) {
-            const active = data.find(m => m.status === 'Active');
-            return active || data[0];
+        try {
+            const { data, error } = await insforge.database.from('members').select('*').eq('email', email);
+            if (!error && data && data.length > 0) {
+                const active = data.find(m => m.status === 'Active');
+                return active || data[0];
+            }
+        } catch (err) {
+            console.warn('[DB] InsForge member email lookup fallback failed (cold start?):', err.message);
         }
     }
 
@@ -322,9 +353,13 @@ async function insertContact(data) {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { error } = await insforge.database.from('contacts').insert([data]);
-        if (error) {
-            console.error('[DB] InsForge contact insert also failed:', error.message);
+        try {
+            const { error } = await insforge.database.from('contacts').insert([data]);
+            if (error) {
+                console.error('[DB] InsForge contact insert also failed:', error.message);
+            }
+        } catch (err) {
+            console.warn('[DB] InsForge contact fallback failed (cold start?):', err.message);
         }
     }
 }
@@ -346,22 +381,26 @@ async function getSiteStats() {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const { data, error } = await insforge.database.from('site_stats').select('*');
-        if (!error && data && data.length > 0) {
-            // Cache into MongoDB
-            if (isMongoConnected()) {
-                const ops = data.map(row => ({
-                    updateOne: {
-                        filter: { key: row.key },
-                        update: { $set: row },
-                        upsert: true
-                    }
-                }));
-                SiteStat.bulkWrite(ops).catch(err =>
-                    console.warn('[Sync] Failed to cache site_stats in MongoDB:', err.message)
-                );
+        try {
+            const { data, error } = await insforge.database.from('site_stats').select('*');
+            if (!error && data && data.length > 0) {
+                // Cache into MongoDB
+                if (isMongoConnected()) {
+                    const ops = data.map(row => ({
+                        updateOne: {
+                            filter: { key: row.key },
+                            update: { $set: row },
+                            upsert: true
+                        }
+                    }));
+                    SiteStat.bulkWrite(ops).catch(err =>
+                        console.warn('[Sync] Failed to cache site_stats in MongoDB:', err.message)
+                    );
+                }
+                return data;
             }
-            return data;
+        } catch (err) {
+            console.warn('[DB] InsForge site_stats fallback failed (cold start?):', err.message);
         }
     }
 
@@ -455,71 +494,82 @@ async function getAdminStats() {
 
     // 2. Fallback to InsForge
     if (insforge) {
-        const [
-            { data: statsData },
-            { data: contacts },
-            { data: subscribers },
-            { data: memberships },
-            { count: contactsCount },
-            { count: subsCount },
-            { count: memsCount }
-        ] = await Promise.all([
-            insforge.database.from('site_stats').select('*'),
-            insforge.database.from('contacts').select('*').order('created_at', { ascending: false }).limit(5),
-            insforge.database.from('subscribers').select('*').order('subscribed_at', { ascending: false }).limit(5),
-            insforge.database.from('members').select('*').order('created_at', { ascending: false }).limit(5),
-            insforge.database.from('contacts').select('*', { count: 'exact', head: true }),
-            insforge.database.from('subscribers').select('*', { count: 'exact', head: true }),
-            insforge.database.from('members').select('*', { count: 'exact', head: true })
-        ]);
+        try {
+            const [
+                { data: statsData },
+                { data: contacts },
+                { data: subscribers },
+                { data: memberships },
+                { count: contactsCount },
+                { count: subsCount },
+                { count: memsCount }
+            ] = await Promise.all([
+                insforge.database.from('site_stats').select('*'),
+                insforge.database.from('contacts').select('*').order('created_at', { ascending: false }).limit(5),
+                insforge.database.from('subscribers').select('*').order('subscribed_at', { ascending: false }).limit(5),
+                insforge.database.from('members').select('*').order('created_at', { ascending: false }).limit(5),
+                insforge.database.from('contacts').select('*', { count: 'exact', head: true }),
+                insforge.database.from('subscribers').select('*', { count: 'exact', head: true }),
+                insforge.database.from('members').select('*', { count: 'exact', head: true })
+            ]);
 
-        let totalVisitors = 0;
-        let pageViews = {};
+            let totalVisitors = 0;
+            let pageViews = {};
 
-        if (statsData) {
-            const vis = statsData.find(r => r.key === 'visitors');
-            if (vis) totalVisitors = vis.value;
-            statsData.filter(r => r.key.startsWith('pv_')).forEach(r => {
-                pageViews[r.key.replace('pv_', '')] = r.value;
-            });
+            if (statsData) {
+                const vis = statsData.find(r => r.key === 'visitors');
+                if (vis) totalVisitors = vis.value;
+                statsData.filter(r => r.key.startsWith('pv_')).forEach(r => {
+                    pageViews[r.key.replace('pv_', '')] = r.value;
+                });
+            }
+
+            // Cache into MongoDB in background
+            if (isMongoConnected()) {
+                try {
+                    if (contacts && contacts.length) {
+                        const ops = contacts.map(c => ({
+                            updateOne: { filter: { email: c.email, created_at: c.created_at }, update: { $set: c }, upsert: true }
+                        }));
+                        Contact.bulkWrite(ops).catch(() => {});
+                    }
+                    if (memberships && memberships.length) {
+                        const ops = memberships.filter(m => m.payment_id).map(m => ({
+                            updateOne: { filter: { payment_id: m.payment_id }, update: { $set: m }, upsert: true }
+                        }));
+                        if (ops.length) Member.bulkWrite(ops).catch(() => {});
+                    }
+                } catch (e) { /* background cache, ignore */ }
+            }
+
+            return {
+                overview: {
+                    totalVisitors,
+                    totalContacts: contactsCount || (contacts ? contacts.length : 0),
+                    totalSubscribers: subsCount || (subscribers ? subscribers.length : 0),
+                    totalMemberships: memsCount || (memberships ? memberships.length : 0)
+                },
+                pageViews,
+                recentContacts: contacts || [],
+                recentSubscribers: subscribers || [],
+                recentMemberships: memberships || [],
+                allContacts: contacts || [],
+                allSubscribers: subscribers || [],
+                allMemberships: memberships || []
+            };
+        } catch (err) {
+            console.error('[DB] InsForge admin stats fallback failed (cold start?):', err.message);
         }
-
-        // Cache into MongoDB in background
-        if (isMongoConnected()) {
-            try {
-                if (contacts && contacts.length) {
-                    const ops = contacts.map(c => ({
-                        updateOne: { filter: { email: c.email, created_at: c.created_at }, update: { $set: c }, upsert: true }
-                    }));
-                    Contact.bulkWrite(ops).catch(() => {});
-                }
-                if (memberships && memberships.length) {
-                    const ops = memberships.filter(m => m.payment_id).map(m => ({
-                        updateOne: { filter: { payment_id: m.payment_id }, update: { $set: m }, upsert: true }
-                    }));
-                    if (ops.length) Member.bulkWrite(ops).catch(() => {});
-                }
-            } catch (e) { /* background cache, ignore */ }
-        }
-
-        return {
-            overview: {
-                totalVisitors,
-                totalContacts: contactsCount || (contacts ? contacts.length : 0),
-                totalSubscribers: subsCount || (subscribers ? subscribers.length : 0),
-                totalMemberships: memsCount || (memberships ? memberships.length : 0)
-            },
-            pageViews,
-            recentContacts: contacts || [],
-            recentSubscribers: subscribers || [],
-            recentMemberships: memberships || [],
-            allContacts: contacts || [],
-            allSubscribers: subscribers || [],
-            allMemberships: memberships || []
-        };
     }
 
-    throw new Error('No database available');
+    // Return empty stats instead of crashing — both DBs unavailable
+    console.error('[DB] No database available for admin stats — returning empty data');
+    return {
+        overview: { totalVisitors: 0, totalContacts: 0, totalSubscribers: 0, totalMemberships: 0 },
+        pageViews: {},
+        recentContacts: [], recentSubscribers: [], recentMemberships: [],
+        allContacts: [], allSubscribers: [], allMemberships: []
+    };
 }
 
 module.exports = {

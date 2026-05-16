@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Bad response');
             }
         } catch (err) {
-            console.error('API Health check failed:', err);
+            console.warn('API Health check failed:', err);
             if (statusText) statusText.textContent = 'Server Offline';
             if (statusIcon) statusIcon.style.color = '#ff6e84';
             if (uptimeText) {
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (err) {
-            console.error('Failed to fetch dashboard stats', err);
+            console.warn('Failed to fetch dashboard stats', err);
             const errHtml = '<tr><td colspan="6" class="px-7 py-8 text-center text-[#ff6e84] text-sm">Failed to load data</td></tr>';
             ['recentMessagesTbody', 'allMessagesTbody', 'allUsersTbody', 'allMembershipsTbody'].forEach(id => {
                 const el = document.getElementById(id);
