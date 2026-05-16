@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothAnchors();
   initScrollProgress();
   initDynamicYear();
+  initTheme();
 });
 
 /* ═══ HERO SLIDER ═══ */
@@ -541,6 +542,44 @@ function initDropdownTouch() {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.has-dropdown')) {
       dropdowns.forEach(dd => dd.classList.remove('open'));
+    }
+  });
+}
+
+/* ═══ THEME TOGGLE (LIGHT/DARK MODE) ═══ */
+function initTheme() {
+  const toggleBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  if (!toggleBtn) return;
+
+  // Check saved preference or fallback to system preference
+  const savedTheme = localStorage.getItem('aasw-theme');
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+  // Set initial theme
+  if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+    document.body.classList.add('light-mode');
+    document.documentElement.classList.remove('dark');
+    if (themeIcon) themeIcon.textContent = 'dark_mode'; // icon to switch to dark
+  } else {
+    document.body.classList.remove('light-mode');
+    document.documentElement.classList.add('dark');
+    if (themeIcon) themeIcon.textContent = 'light_mode'; // icon to switch to light
+  }
+
+  // Toggle handler
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    
+    if (isLight) {
+      document.documentElement.classList.remove('dark');
+      if (themeIcon) themeIcon.textContent = 'dark_mode';
+      localStorage.setItem('aasw-theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      if (themeIcon) themeIcon.textContent = 'light_mode';
+      localStorage.setItem('aasw-theme', 'dark');
     }
   });
 }

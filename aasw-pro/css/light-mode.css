@@ -1,0 +1,341 @@
+/* ══════════════════════════════════════════════════════
+   AASW FOUNDATION — LIGHT MODE THEME OVERRIDES
+   Applied when <html class="light"> and <body class="light-mode">
+   
+   STRATEGY: Override Tailwind's compiled utility classes directly
+   since they use rgb() values from the config. We target both
+   the class-based and inline-style backgrounds.
+══════════════════════════════════════════════════════ */
+
+/* ── 1. BASE: Body & HTML background ── */
+html.light,
+html.light body,
+body.light-mode {
+  background-color: #f5f6fa !important;
+  color: #1e293b !important;
+}
+
+/* Override the inline <style> block that sets body bg */
+html.light body[class] {
+  background-color: #f5f6fa !important;
+}
+
+/* ── 2. NAVBAR ── */
+body.light-mode .glass-header {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(100, 116, 180, 0.12) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode #main-nav.scrolled .glass-header {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-radius: 0 0 1.5rem 1.5rem;
+}
+body.light-mode .nav-link {
+  color: #475569 !important;
+}
+body.light-mode .nav-link:hover,
+body.light-mode .nav-link.active {
+  color: #3b50a0 !important;
+}
+body.light-mode .nav-link.active::after,
+body.light-mode .nav-link:hover::after {
+  background: linear-gradient(to right, #3b50a0, #7725aa) !important;
+}
+
+/* ── 3. GLASS UTILITY ── */
+body.light-mode .glass {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── 4. ALL TEXT COLOR OVERRIDES ── */
+/* White text → dark */
+body.light-mode [class*="text-white"] {
+  color: #1e293b !important;
+}
+/* On-surface variant → mid gray */
+body.light-mode [class*="text-on-surface-variant"] {
+  color: #64748b !important;
+}
+body.light-mode [class*="text-on-surface"] {
+  color: #1e293b !important;
+}
+
+/* Keep accent colors vibrant */
+body.light-mode .text-gradient {
+  background: linear-gradient(45deg, #3b50a0, #7725aa) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ── 5. SECTION BACKGROUNDS — Tailwind utility overrides ── */
+/* bg-background (#0e0e0f) → light */
+body.light-mode [class*="bg-background"] {
+  background-color: #f5f6fa !important;
+}
+
+/* bg-surface-container-low (#131314) → light */
+body.light-mode [class*="bg-surface-container-low"] {
+  background-color: #eef0f6 !important;
+}
+
+/* bg-surface-container (#19191b) → light */
+body.light-mode [class*="bg-surface-container "],
+body.light-mode [class$="bg-surface-container"] {
+  background-color: #e8eaf2 !important;
+}
+
+/* bg-surface-container-lowest (#000) → white */
+body.light-mode [class*="bg-surface-container-lowest"] {
+  background-color: #ffffff !important;
+}
+
+/* bg-surface-container-high (#201f21) → light */
+body.light-mode [class*="bg-surface-container-high"] {
+  background-color: #e0e2ec !important;
+}
+
+/* bg-surface-container-highest (#262627) → light */
+body.light-mode [class*="bg-surface-container-highest"] {
+  background-color: #d8dae5 !important;
+}
+
+/* bg-surface (#0e0e0f) */
+body.light-mode [class*="bg-surface "],
+body.light-mode [class$="bg-surface"] {
+  background-color: #f5f6fa !important;
+}
+
+/* ── 6. HERO SECTION OVERLAYS ── */
+body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, rgba(245,246,250,0.95), rgba(245,246,250,0.75), transparent) !important;
+}
+body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-t"] {
+  background: linear-gradient(to top, #f5f6fa, transparent) !important;
+}
+body.light-mode section:first-of-type img {
+  opacity: 0.2 !important;
+}
+
+/* Hero glass pill */
+body.light-mode section:first-of-type .glass {
+  background: rgba(59, 80, 160, 0.08) !important;
+  border-color: rgba(59, 80, 160, 0.15) !important;
+}
+
+/* ── 7. STATS / COUNTER STRIP ── */
+body.light-mode section[class*="bg-gradient-to-r"][class*="via-"] {
+  background: linear-gradient(to right, #eef0f6, #dfe3f0, #eef0f6) !important;
+}
+
+/* ── 8. BORDERS ── */
+body.light-mode [class*="border-white\\/5"],
+body.light-mode [class*="border-white\\/10"],
+body.light-mode [class*="border-white/5"],
+body.light-mode [class*="border-white/10"] {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .border-y {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .border-t {
+  border-top-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── 9. CARDS ── */
+body.light-mode .surface-container {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Card icon backgrounds */
+body.light-mode [class*="bg-primary\\/10"],
+body.light-mode [class*="bg-primary/10"] {
+  background-color: rgba(59, 80, 160, 0.08) !important;
+}
+body.light-mode [class*="bg-secondary\\/10"],
+body.light-mode [class*="bg-secondary/10"] {
+  background-color: rgba(119, 37, 170, 0.08) !important;
+}
+body.light-mode [class*="bg-tertiary\\/10"],
+body.light-mode [class*="bg-tertiary/10"] {
+  background-color: rgba(0, 57, 111, 0.08) !important;
+}
+
+/* ── 10. FOOTER ── */
+body.light-mode footer {
+  background-color: #eaecf4 !important;
+  border-top-color: rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode footer h4,
+body.light-mode footer h4[class] {
+  color: #1e293b !important;
+}
+body.light-mode footer a {
+  color: #64748b !important;
+}
+body.light-mode footer a:hover {
+  color: #3b50a0 !important;
+}
+body.light-mode footer p {
+  color: #64748b !important;
+}
+
+/* Footer social circles */
+body.light-mode footer .glass,
+body.light-mode footer [class*="rounded-full"][class*="glass"] {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #475569 !important;
+}
+
+/* ── 11. CONTACT FORM ── */
+body.light-mode input[class*="bg-surface-container-high"],
+body.light-mode textarea[class*="bg-surface-container-high"] {
+  background-color: #f0f2f8 !important;
+  color: #1e293b !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder {
+  color: #94a3b8 !important;
+}
+body.light-mode select {
+  background-color: #f0f2f8 !important;
+  color: #1e293b !important;
+}
+
+/* ── 12. BUTTONS ── */
+/* Keep primary gradient buttons as-is — they look good on light */
+/* Fix glass/outline buttons */
+body.light-mode button.glass,
+body.light-mode a.glass {
+  background: rgba(59, 80, 160, 0.06) !important;
+  color: #1e293b !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Theme toggle */
+body.light-mode #themeToggle {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #475569 !important;
+}
+body.light-mode #themeToggle:hover {
+  color: #3b50a0 !important;
+  background: rgba(59, 80, 160, 0.08) !important;
+}
+
+/* Admin icon */
+body.light-mode a[href="/admin/login"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #475569 !important;
+}
+body.light-mode a[href="/admin/login"]:hover {
+  color: #3b50a0 !important;
+}
+
+/* Hamburger icon */
+body.light-mode #menu-toggle {
+  color: #334155 !important;
+}
+
+/* ── 13. AURA GLOWS ── */
+body.light-mode .aura-purple {
+  background: radial-gradient(circle at center, rgba(119, 37, 170, 0.06) 0%, transparent 70%) !important;
+}
+body.light-mode .aura-blue {
+  background: radial-gradient(circle at center, rgba(59, 80, 160, 0.06) 0%, transparent 70%) !important;
+}
+
+/* ── 14. IMAGE OVERLAYS ── */
+body.light-mode [class*="from-background\\/80"],
+body.light-mode [class*="from-background/80"] {
+  background: linear-gradient(to top, rgba(245,246,250,0.85), transparent) !important;
+}
+body.light-mode [class*="from-background\\/90"],
+body.light-mode [class*="from-background/90"] {
+  background: linear-gradient(to top, rgba(245,246,250,0.92), transparent) !important;
+}
+body.light-mode [class*="bg-gradient-to-t"][class*="from-background"] {
+  background: linear-gradient(to top, #f5f6fa, transparent) !important;
+}
+
+/* ── 15. MISCELLANEOUS ── */
+/* bg-white/5 utility */
+body.light-mode [class*="bg-white\\/5"],
+body.light-mode [class*="bg-white/5"] {
+  background-color: rgba(59, 80, 160, 0.04) !important;
+}
+
+/* Shadows */
+body.light-mode .shadow-2xl {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Scrollbar */
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Selection */
+body.light-mode ::selection {
+  background: #94aaff !important;
+  color: #fff !important;
+}
+
+/* ── 16. MODAL OVERRIDES ── */
+body.light-mode #aboutModal [class*="bg-surface-container-highest"],
+body.light-mode #volunteerModal [class*="bg-surface-container-highest"] {
+  background-color: #ffffff !important;
+}
+body.light-mode #aboutModal [class*="bg-surface-container"],
+body.light-mode #volunteerModal [class*="bg-surface-container"] {
+  background-color: #f5f6fa !important;
+}
+
+body.light-mode #volunteerModal input,
+body.light-mode #volunteerModal textarea,
+body.light-mode #volunteerModal select {
+  background: #f0f2f8 !important;
+  color: #1e293b !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ── 17. MOBILE MENU ── */
+body.light-mode .mobile-nav-menu,
+body.light-mode #mobileMenu,
+body.light-mode [class*="mobile-menu"] {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .mobile-nav-menu a,
+body.light-mode #mobileMenu a {
+  color: #334155 !important;
+}
+
+/* ── 18. TOAST ── */
+body.light-mode .toast.success {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.25) !important;
+}
+body.light-mode .toast.error {
+  background: rgba(255, 110, 132, 0.1) !important;
+  border-color: rgba(255, 110, 132, 0.25) !important;
+}
+
+/* ── 19. TEAM PAGE CARDS ── */
+body.light-mode [class*="rounded-2xl"][class*="bg-surface-container-high"],
+body.light-mode [class*="rounded-3xl"][class*="bg-surface-container-high"] {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ── 20. HOVER STATES ── */
+body.light-mode [class*="hover\\:bg-white\\/5"]:hover {
+  background-color: rgba(59, 80, 160, 0.06) !important;
+}
