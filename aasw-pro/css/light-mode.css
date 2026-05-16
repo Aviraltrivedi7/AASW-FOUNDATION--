@@ -49,9 +49,13 @@ body.light-mode .glass {
 }
 
 /* ── 4. ALL TEXT COLOR OVERRIDES ── */
-/* White text → dark */
+/* White text → dark, EXCEPT over images (hero and cards) */
 body.light-mode [class*="text-white"] {
   color: #1e293b !important;
+}
+body.light-mode section:first-of-type [class*="text-white"],
+body.light-mode .group\\/img [class*="text-white"] {
+  color: #ffffff !important;
 }
 /* On-surface variant → mid gray */
 body.light-mode [class*="text-on-surface-variant"] {
@@ -107,14 +111,15 @@ body.light-mode [class$="bg-surface"] {
 }
 
 /* ── 6. HERO SECTION OVERLAYS ── */
+/* Keep image solid, let the native dark HTML gradients provide contrast */
+body.light-mode section:first-of-type img {
+  opacity: 1 !important;
+}
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-r"] {
-  background: linear-gradient(to right, rgba(245,246,250,0.7), rgba(245,246,250,0.1), transparent) !important;
+  background: linear-gradient(to right, rgba(14,14,15,0.9), rgba(14,14,15,0.5), transparent) !important;
 }
 body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-t"] {
-  background: linear-gradient(to top, #f5f6fa, transparent) !important;
-}
-body.light-mode section:first-of-type img {
-  opacity: 0.8 !important;
+  background: linear-gradient(to top, #0e0e0f, transparent) !important;
 }
 
 /* Hero glass pill */
@@ -250,17 +255,7 @@ body.light-mode .aura-blue {
 }
 
 /* ── 14. IMAGE OVERLAYS ── */
-body.light-mode [class*="from-background\\/80"],
-body.light-mode [class*="from-background/80"] {
-  background: linear-gradient(to top, rgba(245,246,250,0.85), transparent) !important;
-}
-body.light-mode [class*="from-background\\/90"],
-body.light-mode [class*="from-background/90"] {
-  background: linear-gradient(to top, rgba(245,246,250,0.92), transparent) !important;
-}
-body.light-mode [class*="bg-gradient-to-t"][class*="from-background"] {
-  background: linear-gradient(to top, #f5f6fa, transparent) !important;
-}
+/* Removed white overlays: native dark gradients will remain, preserving photo quality */
 
 /* ── 15. MISCELLANEOUS ── */
 /* bg-white/5 utility */
