@@ -58,10 +58,15 @@ body.light-mode .glass-card {
 body.light-mode [class*="text-white"] {
   color: #1e293b !important;
 }
+
+/* Keep text white over images */
 body.light-mode .group\/img [class*="text-white"],
-body.light-mode .group\/img p[class*="text-white"] {
+body.light-mode .group\/img p[class*="text-white"],
+body.light-mode img + div + div [class*="text-white"],
+body.light-mode .force-white {
   color: #ffffff !important;
 }
+
 /* On-surface variant → mid gray */
 body.light-mode [class*="text-on-surface-variant"] {
   color: #64748b !important;
@@ -82,54 +87,48 @@ body.light-mode .text-gradient {
 }
 
 /* ── 5. SECTION BACKGROUNDS — Tailwind utility overrides ── */
-/* bg-background (#0e0e0f) → light */
 body.light-mode [class*="bg-background"] {
   background-color: #f5f6fa !important;
 }
-
-/* bg-surface-container-low (#131314) → light */
 body.light-mode [class*="bg-surface-container-low"] {
   background-color: #eef0f6 !important;
 }
-
-/* bg-surface-container (#19191b) → light */
 body.light-mode [class*="bg-surface-container "],
 body.light-mode [class$="bg-surface-container"] {
   background-color: #e8eaf2 !important;
 }
-
-/* bg-surface-container-lowest (#000) → white */
 body.light-mode [class*="bg-surface-container-lowest"] {
   background-color: #ffffff !important;
 }
-
-/* bg-surface-container-high (#201f21) → light */
 body.light-mode [class*="bg-surface-container-high"] {
   background-color: #e0e2ec !important;
 }
-
-/* bg-surface-container-highest (#262627) → light */
 body.light-mode [class*="bg-surface-container-highest"] {
   background-color: #d8dae5 !important;
 }
-
-/* bg-surface (#0e0e0f) */
 body.light-mode [class*="bg-surface "],
 body.light-mode [class$="bg-surface"] {
   background-color: #f5f6fa !important;
 }
 
 /* ── 6. HERO SECTION OVERLAYS ── */
-/* True light mode hero: white fade for dark text, image 100% visible on the right */
-body.light-mode section:first-of-type img {
-  opacity: 0.6 !important;
-  filter: brightness(1.05) contrast(1.05) !important;
+body.light-mode section:first-of-type .absolute.inset-0.z-0 > div[class*="bg-gradient-to-r"] {
+  background: linear-gradient(to right, #f5f6fa 0%, rgba(245,246,250,0.8) 50%, rgba(245,246,250,0.1) 100%) !important;
 }
-body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-r"] {
-  background: linear-gradient(to right, #f5f6fa 0%, rgba(245,246,250,0.9) 40%, rgba(245,246,250,0.2) 100%) !important;
-}
-body.light-mode section:first-of-type > div:first-child > div[class*="bg-gradient-to-t"] {
+body.light-mode section:first-of-type .absolute.inset-0.z-0 > div[class*="bg-gradient-to-t"] {
   background: linear-gradient(to top, #f5f6fa 0%, transparent 100%) !important;
+}
+body.light-mode section:first-of-type img {
+  opacity: 0.25 !important;
+}
+
+/* Hero text shadows for better contrast */
+body.light-mode section:first-of-type h1 {
+  text-shadow: 0 0 40px rgba(255,255,255,0.8), 0 0 10px rgba(255,255,255,0.8);
+}
+body.light-mode section:first-of-type p {
+  color: #334155 !important;
+  font-weight: 500;
 }
 
 /* Hero glass pill */
@@ -166,7 +165,6 @@ body.light-mode .surface-container {
   border-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Card icon backgrounds */
 body.light-mode [class*="bg-primary\\/10"],
 body.light-mode [class*="bg-primary/10"] {
   background-color: rgba(59, 80, 160, 0.08) !important;
@@ -198,8 +196,6 @@ body.light-mode footer a:hover {
 body.light-mode footer p {
   color: #64748b !important;
 }
-
-/* Footer social circles */
 body.light-mode footer .glass,
 body.light-mode footer [class*="rounded-full"][class*="glass"] {
   background: rgba(255, 255, 255, 0.8) !important;
@@ -209,7 +205,8 @@ body.light-mode footer [class*="rounded-full"][class*="glass"] {
 
 /* ── 11. CONTACT FORM ── */
 body.light-mode input[class*="bg-surface-container-high"],
-body.light-mode textarea[class*="bg-surface-container-high"] {
+body.light-mode textarea[class*="bg-surface-container-high"],
+body.light-mode input[type="email"] {
   background-color: #f0f2f8 !important;
   color: #1e293b !important;
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -224,16 +221,12 @@ body.light-mode select {
 }
 
 /* ── 12. BUTTONS ── */
-/* Keep primary gradient buttons as-is — they look good on light */
-/* Fix glass/outline buttons */
 body.light-mode button.glass,
 body.light-mode a.glass {
   background: rgba(59, 80, 160, 0.06) !important;
   color: #1e293b !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
 }
-
-/* Theme toggle */
 body.light-mode #themeToggle {
   background: rgba(0, 0, 0, 0.04) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
@@ -243,8 +236,6 @@ body.light-mode #themeToggle:hover {
   color: #3b50a0 !important;
   background: rgba(59, 80, 160, 0.08) !important;
 }
-
-/* Team Tab Button Active & Inactive Overrides */
 body.light-mode .team-tab-btn.active {
   background: rgba(59, 80, 160, 0.08) !important;
   border-color: rgba(59, 80, 160, 0.2) !important;
@@ -260,8 +251,6 @@ body.light-mode .team-tab-btn:not(.active) {
 body.light-mode .team-tab-btn:not(.active) span {
   color: #64748b !important;
 }
-
-/* Admin icon */
 body.light-mode a[href="/admin/login"] {
   background: rgba(0, 0, 0, 0.04) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
@@ -270,9 +259,8 @@ body.light-mode a[href="/admin/login"] {
 body.light-mode a[href="/admin/login"]:hover {
   color: #3b50a0 !important;
 }
-
-/* Hamburger icon */
-body.light-mode #menu-toggle {
+body.light-mode #menu-toggle,
+body.light-mode #menu-toggle span {
   color: #334155 !important;
 }
 
@@ -285,32 +273,24 @@ body.light-mode .aura-blue {
 }
 
 /* ── 14. IMAGE OVERLAYS ── */
-/* Removed white overlays: native dark gradients will remain, preserving photo quality */
-body.light-mode [class*="group/img"] > div[class*="bg-gradient-to-t"] {
+body.light-mode img + div[class*="bg-gradient-to-t"] {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%) !important;
 }
 
 /* ── 15. MISCELLANEOUS ── */
-/* bg-white/5 utility */
 body.light-mode [class*="bg-white\\/5"],
 body.light-mode [class*="bg-white/5"] {
   background-color: rgba(59, 80, 160, 0.04) !important;
 }
-
-/* Shadows */
 body.light-mode .shadow-2xl {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
 }
-
-/* Scrollbar */
 body.light-mode ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.12) !important;
 }
 body.light-mode ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2) !important;
 }
-
-/* Selection */
 body.light-mode ::selection {
   background: #94aaff !important;
   color: #fff !important;
@@ -325,7 +305,6 @@ body.light-mode #aboutModal [class*="bg-surface-container"],
 body.light-mode #volunteerModal [class*="bg-surface-container"] {
   background-color: #f5f6fa !important;
 }
-
 body.light-mode #volunteerModal input,
 body.light-mode #volunteerModal textarea,
 body.light-mode #volunteerModal select {
@@ -335,15 +314,15 @@ body.light-mode #volunteerModal select {
 }
 
 /* ── 17. MOBILE MENU ── */
-body.light-mode .mobile-nav-menu,
-body.light-mode #mobileMenu,
-body.light-mode [class*="mobile-menu"] {
+body.light-mode .mobile-menu {
   background: rgba(255, 255, 255, 0.97) !important;
   border-color: rgba(0, 0, 0, 0.06) !important;
 }
-body.light-mode .mobile-nav-menu a,
-body.light-mode #mobileMenu a {
+body.light-mode .mobile-menu a {
   color: #334155 !important;
+}
+body.light-mode .mobile-menu a.text-primary {
+  color: #3b50a0 !important;
 }
 
 /* ── 18. TOAST ── */
@@ -366,4 +345,13 @@ body.light-mode [class*="rounded-3xl"][class*="bg-surface-container-high"] {
 /* ── 20. HOVER STATES ── */
 body.light-mode [class*="hover\\:bg-white\\/5"]:hover {
   background-color: rgba(59, 80, 160, 0.06) !important;
+}
+
+/* ── 21. STAR ICONS FIX ── */
+body.light-mode .material-symbols-outlined {
+  color: inherit;
+}
+body.light-mode .text-amber-400, 
+body.light-mode .text-amber-400 .material-symbols-outlined {
+  color: #fbbf24 !important;
 }
