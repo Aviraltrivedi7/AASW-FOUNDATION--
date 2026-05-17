@@ -63,9 +63,9 @@ module.exports = {
                     "full": "9999px"
             },
             "fontFamily": {
-                    "headline": ["Manrope"],
-                    "body": ["Manrope"],
-                    "label": ["Space Grotesk"]
+                    "headline": ["Manrope", "sans-serif"],
+                    "body": ["Manrope", "sans-serif"],
+                    "label": ["Space Grotesk", "sans-serif"]
             }
           }
         }

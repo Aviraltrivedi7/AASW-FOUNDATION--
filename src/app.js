@@ -90,6 +90,10 @@ app.use(express.static(staticPath, {
         if (filePath.endsWith('.html')) {
             res.setHeader('Cache-Control', 'no-cache, must-revalidate');
         }
+        // Disable aggressive caching for light-mode.css so styling fixes are fetched instantly
+        else if (filePath.endsWith('light-mode.css')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
         // Images, CSS, JS, fonts — aggressive caching
         else if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$/.test(filePath)) {
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');

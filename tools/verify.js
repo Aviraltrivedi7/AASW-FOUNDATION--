@@ -1,0 +1,13 @@
+const fs = require('fs');
+const c = fs.readFileSync('aasw-pro/index.html', 'utf8');
+console.log('Has aboutModal div:', c.includes('id="aboutModal"'));
+console.log('Has close btn:', c.includes('classList.add'));
+console.log('Old junk gone:', !c.includes('Digital entrepreneurs exposing women'));
+console.log('Old junk2 gone:', !c.includes('What a great time'));
+console.log('Old junk3 gone:', !c.includes('history_edu'));
+console.log('Clean modal:', c.includes('About AASW Foundation'));
+console.log('Body close:', c.includes('</body>'));
+console.log('Html close:', c.includes('</html>'));
+console.log('Schema OK:', c.includes('schema.org'));
+console.log('Counter OK:', c.includes('counter'));
+console.log('Size:', c.length);
