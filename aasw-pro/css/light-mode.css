@@ -121,12 +121,14 @@ body.light-mode .text-gradient {
 body.light-mode [class*="bg-background"] {
   background-color: #f5f6fa !important;
 }
+
+/* Base surface containers */
+body.light-mode [class*="bg-surface-container"] {
+  background-color: #e8eaf2 !important;
+}
+
 body.light-mode [class*="bg-surface-container-low"] {
   background-color: #eef0f6 !important;
-}
-body.light-mode [class*="bg-surface-container "]:not([class*="bg-surface-container-"]),
-body.light-mode [class$="bg-surface-container"] {
-  background-color: #e8eaf2 !important;
 }
 body.light-mode [class*="bg-surface-container-lowest"] {
   background-color: #ffffff !important;
@@ -137,8 +139,15 @@ body.light-mode [class*="bg-surface-container-high"] {
 body.light-mode [class*="bg-surface-container-highest"] {
   background-color: #d8dae5 !important;
 }
-body.light-mode [class*="bg-surface "]:not([class*="bg-surface-"]),
-body.light-mode [class$="bg-surface"] {
+
+/* Surface variant */
+body.light-mode [class*="bg-surface-variant"] {
+  background-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Base surface */
+body.light-mode [class*="bg-surface"]:not([class*="bg-surface-"]) {
   background-color: #f5f6fa !important;
 }
 
