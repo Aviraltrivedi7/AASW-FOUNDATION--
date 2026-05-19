@@ -21,27 +21,25 @@ const Subscriber = require('../models/Subscriber');
 const SiteStat = require('../models/SiteStat');
 
 // ─── HELPER: Background sync to InsForge (fire-and-forget) ────────────────
-function syncToInsforge(table, data) {
+async function syncToInsforge(table, data) {
     if (!insforge) return;
     try {
-        insforge.database.from(table).upsert(Array.isArray(data) ? data : [data])
-            .then(({ error }) => {
-                if (error) console.warn(`[Sync] InsForge ${table} sync failed:`, error.message);
-            })
-            .catch(err => console.warn(`[Sync] InsForge ${table} sync error:`, err.message));
+        const { error } = await insforge.database.from(table).upsert(Array.isArray(data) ? data : [data]);
+        if (error) {
+            console.warn(`[Sync] InsForge ${table} sync failed:`, error.message);
+        }
     } catch (err) {
         console.warn(`[Sync] InsForge ${table} sync error:`, err.message);
     }
 }
 
-function syncDeleteToInsforge(table, field, value) {
+async function syncDeleteToInsforge(table, field, value) {
     if (!insforge) return;
     try {
-        insforge.database.from(table).delete().eq(field, value)
-            .then(({ error }) => {
-                if (error) console.warn(`[Sync] InsForge ${table} delete sync failed:`, error.message);
-            })
-            .catch(err => console.warn(`[Sync] InsForge ${table} delete sync error:`, err.message));
+        const { error } = await insforge.database.from(table).delete().eq(field, value);
+        if (error) {
+            console.warn(`[Sync] InsForge ${table} delete sync failed:`, error.message);
+        }
     } catch (err) {
         console.warn(`[Sync] InsForge ${table} delete sync error:`, err.message);
     }
@@ -176,8 +174,14 @@ async function updateOtpVerified(email) {
 
     // Sync to InsForge
     if (insforge) {
-        insforge.database.from('otps').update({ verified: true }).eq('email', email)
-            .catch(err => console.warn('[Sync] InsForge OTP verify sync failed:', err.message));
+        try {
+            const { error } = await insforge.database.from('otps').update({ verified: true }).eq('email', email);
+            if (error) {
+                console.warn('[Sync] InsForge OTP verify sync failed:', error.message);
+            }
+        } catch (err) {
+            console.warn('[Sync] InsForge OTP verify sync error:', err.message);
+        }
     }
 }
 
@@ -429,8 +433,14 @@ async function upsertSiteStats(statsArray) {
 
     // 2. Sync to InsForge in background
     if (insforge) {
-        insforge.database.from('site_stats').upsert(statsArray)
-            .catch(err => console.warn('[Sync] InsForge site_stats sync failed:', err.message));
+        try {
+            const { error } = await insforge.database.from('site_stats').upsert(statsArray);
+            if (error) {
+                console.warn('[Sync] InsForge site_stats sync failed:', error.message);
+            }
+        } catch (err) {
+            console.warn('[Sync] InsForge site_stats sync error:', err.message);
+        }
     }
 }
 

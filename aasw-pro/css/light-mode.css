@@ -22,17 +22,29 @@ html.light body[class] {
 /* ── 2. ACCENT COLOR OVERRIDES (CRITICAL) ── */
 /* Primary #94aaff → darker visible blue */
 body.light-mode .text-primary,
-body.light-mode [class*="text-primary"]:not([class*="text-primary/"]):not([class*="text-primary-"]) {
+body.light-mode .text-primary-fixed {
   color: #1e3a8a !important; /* tailwind blue-900 */
 }
+body.light-mode .hover\:text-primary:hover,
+body.light-mode .group:hover .group-hover\:text-primary {
+  color: #1e3a8a !important;
+}
+
 /* Secondary #cb7bff → darker visible purple */
-body.light-mode .text-secondary,
-body.light-mode [class*="text-secondary"]:not([class*="text-secondary/"]):not([class*="text-secondary-"]) {
+body.light-mode .text-secondary {
   color: #581c87 !important; /* tailwind purple-900 */
 }
+body.light-mode .hover\:text-secondary:hover,
+body.light-mode .group:hover .group-hover\:text-secondary {
+  color: #581c87 !important;
+}
+
 /* Tertiary #94bdff → darker visible blue */
-body.light-mode .text-tertiary,
-body.light-mode [class*="text-tertiary"]:not([class*="text-tertiary/"]):not([class*="text-tertiary-"]) {
+body.light-mode .text-tertiary {
+  color: #1e3a8a !important;
+}
+body.light-mode .hover\:text-tertiary:hover,
+body.light-mode .group:hover .group-hover\:text-tertiary {
   color: #1e3a8a !important;
 }
 
@@ -61,8 +73,8 @@ body.light-mode .nav-link:hover::after {
 body.light-mode .glass-header .text-white {
   color: #1e293b !important;
 }
-body.light-mode .glass-header [class*="text-primary/80"],
-body.light-mode .glass-header [class*="text-primary\\/80"] {
+body.light-mode .glass-header .text-primary\/80,
+body.light-mode .glass-header .text-primary\\/80 {
   color: #2d4a9e !important;
 }
 
@@ -79,33 +91,49 @@ body.light-mode .glass-card {
 
 /* ── 5. TEXT COLOR OVERRIDES ── */
 /* White text → dark ON LIGHT BACKGROUNDS ONLY */
-body.light-mode [class*="text-white"] {
+body.light-mode .text-white {
   color: #0f172a !important;
 }
 
+/* Map white text with opacities accurately to preserve design semantics */
+body.light-mode .text-white\/90, body.light-mode .text-white\\/90 { color: rgba(15, 23, 42, 0.9) !important; }
+body.light-mode .text-white\/80, body.light-mode .text-white\\/80 { color: rgba(15, 23, 42, 0.8) !important; }
+body.light-mode .text-white\/70, body.light-mode .text-white\\/70 { color: rgba(15, 23, 42, 0.7) !important; }
+body.light-mode .text-white\/60, body.light-mode .text-white\\/60 { color: rgba(15, 23, 42, 0.6) !important; }
+body.light-mode .text-white\/50, body.light-mode .text-white\\/50 { color: rgba(15, 23, 42, 0.5) !important; }
+body.light-mode .text-white\/40, body.light-mode .text-white\\/40 { color: rgba(15, 23, 42, 0.4) !important; }
+body.light-mode .text-white\/30, body.light-mode .text-white\\/30 { color: rgba(15, 23, 42, 0.3) !important; }
+body.light-mode .text-white\/20, body.light-mode .text-white\\/20 { color: rgba(15, 23, 42, 0.2) !important; }
+body.light-mode .text-white\/10, body.light-mode .text-white\\/10 { color: rgba(15, 23, 42, 0.1) !important; }
+
 /* KEEP TEXT WHITE on image overlays & gradients */
-body.light-mode .group\/img [class*="text-white"],
+body.light-mode .group\/img .text-white,
 body.light-mode .group\/img p,
-body.light-mode [class*="bg-gradient-to-t"] [class*="text-white"],
-body.light-mode [class*="bg-gradient-to-t"] p,
-body.light-mode [class*="bg-gradient-to-t"] .text-white,
+body.light-mode .bg-gradient-to-t .text-white,
+body.light-mode .bg-gradient-to-t p,
 body.light-mode .absolute p,
-body.light-mode .absolute [class*="text-white"],
 body.light-mode .absolute .text-white,
-body.light-mode img + div [class*="text-white"],
+body.light-mode img + div .text-white,
 body.light-mode img + div p,
 body.light-mode .force-white {
   color: #ffffff !important;
 }
 
 /* On-surface variant → readable gray */
-body.light-mode [class*="text-on-surface-variant"] {
+body.light-mode .text-on-surface-variant {
   color: #475569 !important;
 }
-body.light-mode [class*="text-on-surface"]:not([class*="text-on-surface-variant"]) {
+body.light-mode .text-on-surface-variant\/60,
+body.light-mode .text-on-surface-variant\\/60 {
+  color: rgba(71, 85, 105, 0.6) !important;
+}
+body.light-mode .text-on-surface-variant\/80,
+body.light-mode .text-on-surface-variant\\/80 {
+  color: rgba(71, 85, 105, 0.8) !important;
+}
+body.light-mode .text-on-surface {
   color: #1e293b !important;
 }
-body.light-mode [class*="text-outline"],
 body.light-mode .text-outline {
   color: #64748b !important;
 }
@@ -118,95 +146,114 @@ body.light-mode .text-gradient {
 }
 
 /* ── 6. SECTION BACKGROUNDS — Tailwind utility overrides ── */
-body.light-mode [class*="bg-background"] {
+body.light-mode .bg-background {
   background-color: #f5f6fa !important;
 }
 
 /* Base surface containers */
-body.light-mode [class*="bg-surface-container"] {
+body.light-mode .bg-surface-container {
   background-color: #e8eaf2 !important;
 }
-
-body.light-mode [class*="bg-surface-container-low"] {
+body.light-mode .bg-surface-container-low {
   background-color: #eef0f6 !important;
 }
-body.light-mode [class*="bg-surface-container-lowest"] {
+body.light-mode .bg-surface-container-lowest {
   background-color: #ffffff !important;
 }
-body.light-mode [class*="bg-surface-container-high"] {
+body.light-mode .bg-surface-container-high {
   background-color: #e0e2ec !important;
 }
-body.light-mode [class*="bg-surface-container-highest"] {
+body.light-mode .bg-surface-container-highest {
   background-color: #d8dae5 !important;
 }
 
 /* Surface variant */
-body.light-mode [class*="bg-surface-variant"] {
+body.light-mode .bg-surface-variant {
   background-color: #cbd5e1 !important;
   color: #0f172a !important;
 }
 
 /* Base surface */
-body.light-mode [class*="bg-surface"]:not([class*="bg-surface-"]) {
+body.light-mode .bg-surface {
   background-color: #f5f6fa !important;
 }
 
 /* ── 7. HERO SECTION ── */
-body.light-mode section:first-of-type .absolute.inset-0.z-0 > div[class*="bg-gradient-to-r"] {
+body.light-mode section.homepage-hero .absolute.inset-0.z-0 > div.bg-gradient-to-r {
   background: linear-gradient(to right, rgba(14,14,15,0.9) 0%, rgba(14,14,15,0.6) 40%, rgba(14,14,15,0.2) 100%) !important;
 }
-body.light-mode section:first-of-type .absolute.inset-0.z-0 > div[class*="bg-gradient-to-t"] {
+body.light-mode section.homepage-hero .absolute.inset-0.z-0 > div.bg-gradient-to-t {
   background: linear-gradient(to top, rgba(14,14,15,0.95) 0%, transparent 60%) !important;
 }
-body.light-mode section:first-of-type img {
+body.light-mode section.homepage-hero img {
   opacity: 0.7 !important;
   filter: brightness(0.8) contrast(1.1) !important;
 }
 /* Hero text — keep white because background image is dark */
-body.light-mode section:first-of-type h1 {
+body.light-mode section.homepage-hero h1 {
   color: #ffffff !important;
   -webkit-text-fill-color: initial;
   text-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
-body.light-mode section:first-of-type h1 .text-gradient {
+body.light-mode section.homepage-hero h1 .text-gradient {
   -webkit-text-fill-color: transparent !important;
 }
-body.light-mode section:first-of-type p {
+body.light-mode section.homepage-hero p {
   color: #f8fafc !important;
   font-weight: 500;
   text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 /* Hero glass pill */
-body.light-mode section:first-of-type .glass {
+body.light-mode section.homepage-hero .glass {
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
 }
-body.light-mode section:first-of-type .glass span {
+body.light-mode section.homepage-hero .glass span {
   color: #ffffff !important;
 }
 
+/* Interior Pages Banners — explicitly style as readable dark text on light off-white background */
+body.light-mode section:first-of-type:not(.homepage-hero) h1 {
+  color: #0f172a !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: none !important;
+}
+body.light-mode section:first-of-type:not(.homepage-hero) h1 .text-gradient {
+  -webkit-text-fill-color: transparent !important;
+}
+body.light-mode section:first-of-type:not(.homepage-hero) p {
+  color: #475569 !important;
+  text-shadow: none !important;
+}
+body.light-mode section:first-of-type:not(.homepage-hero) .glass {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+body.light-mode section:first-of-type:not(.homepage-hero) .glass span {
+  color: #0f172a !important;
+}
+
 /* ── 8. STATS / COUNTER STRIP ── */
-body.light-mode section[class*="bg-gradient-to-r"][class*="via-"] {
+body.light-mode section.bg-gradient-to-r.via-primary-fixed {
   background: linear-gradient(to right, #e0e4f0, #d5daf0, #e0e4f0) !important;
 }
 /* Stats labels — make visible */
-body.light-mode section[class*="bg-gradient-to-r"] .text-primary,
-body.light-mode section[class*="bg-gradient-to-r"] [class*="text-primary"],
+body.light-mode section.bg-gradient-to-r.via-primary-fixed .text-primary,
 body.light-mode .text-center .text-primary {
   color: #1e3a8a !important;
 }
 /* Stats numbers */
-body.light-mode section[class*="bg-gradient-to-r"] [class*="text-white"],
-body.light-mode section[class*="bg-gradient-to-r"] .counter,
+body.light-mode section.bg-gradient-to-r.via-primary-fixed .text-white,
+body.light-mode section.bg-gradient-to-r.via-primary-fixed .counter,
 body.light-mode .text-center .counter {
   color: #0f172a !important;
 }
 
 /* ── 9. BORDERS ── */
-body.light-mode [class*="border-white/5"],
-body.light-mode [class*="border-white/10"],
-body.light-mode [class*="border-white\\/5"],
-body.light-mode [class*="border-white\\/10"] {
+body.light-mode .border-white\/5,
+body.light-mode .border-white\\/5,
+body.light-mode .border-white\/10,
+body.light-mode .border-white\\/10 {
   border-color: rgba(0, 0, 0, 0.08) !important;
 }
 body.light-mode .border-y {
@@ -215,7 +262,7 @@ body.light-mode .border-y {
 body.light-mode .border-t {
   border-top-color: rgba(0, 0, 0, 0.06) !important;
 }
-body.light-mode [class*="ring-offset-background"] {
+body.light-mode .ring-offset-background {
   --tw-ring-offset-color: #f5f6fa !important;
 }
 
@@ -224,28 +271,28 @@ body.light-mode .surface-container {
   background-color: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.06) !important;
 }
-body.light-mode [class*="bg-primary/10"],
-body.light-mode [class*="bg-primary\\/10"] {
+body.light-mode .bg-primary\/10,
+body.light-mode .bg-primary\\/10 {
   background-color: rgba(45, 74, 158, 0.08) !important;
 }
-body.light-mode [class*="bg-secondary/10"],
-body.light-mode [class*="bg-secondary\\/10"] {
+body.light-mode .bg-secondary\/10,
+body.light-mode .bg-secondary\\/10 {
   background-color: rgba(124, 46, 168, 0.08) !important;
 }
-body.light-mode [class*="bg-tertiary/10"],
-body.light-mode [class*="bg-tertiary\\/10"] {
+body.light-mode .bg-tertiary\/10,
+body.light-mode .bg-tertiary\\/10 {
   background-color: rgba(26, 95, 168, 0.08) !important;
 }
-body.light-mode [class*="bg-primary/20"],
-body.light-mode [class*="bg-primary\\/20"] {
+body.light-mode .bg-primary\/20,
+body.light-mode .bg-primary\\/20 {
   background-color: rgba(45, 74, 158, 0.12) !important;
 }
-body.light-mode [class*="bg-secondary/20"],
-body.light-mode [class*="bg-secondary\\/20"] {
+body.light-mode .bg-secondary\/20,
+body.light-mode .bg-secondary\\/20 {
   background-color: rgba(124, 46, 168, 0.12) !important;
 }
-body.light-mode [class*="bg-tertiary/20"],
-body.light-mode [class*="bg-tertiary\\/20"] {
+body.light-mode .bg-tertiary\/20,
+body.light-mode .bg-tertiary\\/20 {
   background-color: rgba(26, 95, 168, 0.12) !important;
 }
 
@@ -254,8 +301,7 @@ body.light-mode footer {
   background-color: #eaecf4 !important;
   border-top-color: rgba(0, 0, 0, 0.08) !important;
 }
-body.light-mode footer h4,
-body.light-mode footer h4[class] {
+body.light-mode footer h4 {
   color: #1e293b !important;
 }
 body.light-mode footer a {
@@ -267,38 +313,34 @@ body.light-mode footer a:hover {
 body.light-mode footer p {
   color: #475569 !important;
 }
-body.light-mode footer .text-primary,
-body.light-mode footer [class*="text-primary"] {
+body.light-mode footer .text-primary {
   color: #2d4a9e !important;
 }
-body.light-mode footer .text-secondary,
-body.light-mode footer [class*="text-secondary"] {
+body.light-mode footer .text-secondary {
   color: #7c2ea8 !important;
 }
-body.light-mode footer .text-tertiary,
-body.light-mode footer [class*="text-tertiary"] {
+body.light-mode footer .text-tertiary {
   color: #1a5fa8 !important;
 }
-body.light-mode footer [class*="text-on-surface-variant"] {
+body.light-mode footer .text-on-surface-variant {
   color: #64748b !important;
 }
-body.light-mode footer .glass,
-body.light-mode footer [class*="rounded-full"][class*="glass"] {
+body.light-mode footer .glass {
   background: rgba(255, 255, 255, 0.8) !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   color: #475569 !important;
 }
 /* Footer badges */
-body.light-mode footer [class*="text-primary/60"],
-body.light-mode footer [class*="text-primary\\/60"] {
+body.light-mode footer .text-primary\/60,
+body.light-mode footer .text-primary\\/60 {
   color: #2d4a9e !important;
 }
-body.light-mode footer [class*="text-secondary/60"],
-body.light-mode footer [class*="text-secondary\\/60"] {
+body.light-mode footer .text-secondary\/60,
+body.light-mode footer .text-secondary\\/60 {
   color: #7c2ea8 !important;
 }
-body.light-mode footer [class*="text-on-surface-variant/60"],
-body.light-mode footer [class*="text-on-surface-variant\\/60"] {
+body.light-mode footer .text-on-surface-variant\/60,
+body.light-mode footer .text-on-surface-variant\\/60 {
   color: #94a3b8 !important;
 }
 /* Footer SVG icons */
@@ -333,16 +375,15 @@ body.light-mode a.glass {
   border-color: rgba(0, 0, 0, 0.1) !important;
 }
 /* Primary gradient buttons — keep visible */
-body.light-mode [class*="bg-gradient-to-r"][class*="from-primary"] {
+body.light-mode .bg-gradient-to-r.from-primary {
   background: linear-gradient(to right, #2d4a9e, #7c2ea8) !important;
 }
-body.light-mode [class*="bg-gradient-to-r"][class*="from-primary"] [class*="text-on-primary"],
-body.light-mode [class*="bg-gradient-to-r"][class*="from-primary"][class*="text-on-primary"],
-body.light-mode button[class*="bg-gradient-to-r"] {
+body.light-mode .bg-gradient-to-r.from-primary .text-on-primary,
+body.light-mode button.bg-gradient-to-r {
   color: #ffffff !important;
 }
 /* Submit button */
-body.light-mode button[class*="bg-primary"] {
+body.light-mode button.bg-primary {
   background-color: #2d4a9e !important;
   color: #ffffff !important;
 }
@@ -371,6 +412,13 @@ body.light-mode .team-tab-btn:not(.active) {
 body.light-mode .team-tab-btn:not(.active) span {
   color: #64748b !important;
 }
+body.light-mode .team-tab-btn:not(.active):hover {
+  background: rgba(45, 74, 158, 0.03) !important;
+  border-color: rgba(45, 74, 158, 0.1) !important;
+}
+body.light-mode .team-tab-btn:not(.active):hover span {
+  color: #2d4a9e !important;
+}
 body.light-mode a[href="/admin/login"] {
   background: rgba(0, 0, 0, 0.04) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
@@ -393,24 +441,22 @@ body.light-mode .aura-blue {
 }
 
 /* ── 15. IMAGE OVERLAYS — keep dark for white text ── */
-body.light-mode .group > .absolute.inset-0[class*="bg-gradient-to-t"],
-body.light-mode .group\/img > .absolute.inset-0[class*="bg-gradient-to-t"],
-body.light-mode img ~ div[class*="bg-gradient-to-t"] {
+body.light-mode .group > .absolute.inset-0.bg-gradient-to-t,
+body.light-mode .group\/img > .absolute.inset-0.bg-gradient-to-t,
+body.light-mode img ~ div.bg-gradient-to-t {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%) !important;
 }
 
 /* Text inside image overlays must stay white */
 body.light-mode img ~ div p,
-body.light-mode img ~ div [class*="text-white"],
+body.light-mode img ~ div .text-white,
 body.light-mode .absolute p,
-body.light-mode .absolute [class*="text-white"],
 body.light-mode .absolute .text-white {
   color: #ffffff !important;
 }
 
 /* ── 16. MISCELLANEOUS ── */
-body.light-mode [class*="bg-white/5"],
-body.light-mode [class*="bg-white\\/5"] {
+body.light-mode .bg-white\/5 {
   background-color: rgba(59, 80, 160, 0.04) !important;
 }
 body.light-mode .shadow-2xl {
@@ -428,12 +474,12 @@ body.light-mode ::selection {
 }
 
 /* ── 17. MODAL OVERRIDES ── */
-body.light-mode #aboutModal [class*="bg-surface-container-highest"],
-body.light-mode #volunteerModal [class*="bg-surface-container-highest"] {
+body.light-mode #aboutModal .bg-surface-container-highest,
+body.light-mode #volunteerModal .bg-surface-container-highest {
   background-color: #ffffff !important;
 }
-body.light-mode #aboutModal [class*="bg-surface-container"],
-body.light-mode #volunteerModal [class*="bg-surface-container"] {
+body.light-mode #aboutModal .bg-surface-container,
+body.light-mode #volunteerModal .bg-surface-container {
   background-color: #f5f6fa !important;
 }
 body.light-mode #volunteerModal input,
@@ -479,8 +525,8 @@ body.light-mode .toast.error {
 /* ── 20. TEAM PAGE ── */
 /* Team cards background → white */
 body.light-mode .glass-card,
-body.light-mode [class*="rounded-2xl"][class*="bg-surface-container-high"],
-body.light-mode [class*="rounded-3xl"][class*="bg-surface-container-high"] {
+body.light-mode .rounded-2xl.bg-surface-container-high,
+body.light-mode .rounded-3xl.bg-surface-container-high {
   background-color: #ffffff !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
 }
@@ -494,55 +540,90 @@ body.light-mode .glass-card p {
   color: #475569 !important;
 }
 /* Badge labels in cards */
-body.light-mode .glass-card [class*="text-\\[#cb7bff\\]"],
-body.light-mode .glass-card [class*="text-[#cb7bff]"] {
+body.light-mode .glass-card .text-\[\#cb7bff\] {
   color: #7c2ea8 !important;
 }
-body.light-mode .glass-card [class*="text-\\[#94aaff\\]"],
-body.light-mode .glass-card [class*="text-[#94aaff]"] {
+body.light-mode .glass-card .text-\[\#94aaff\] {
   color: #2d4a9e !important;
 }
 /* Patron card */
-body.light-mode .glass-card [class*="border-\\[#cb7bff\\]"],
-body.light-mode .glass-card [class*="border-[#cb7bff]"] {
+body.light-mode .glass-card.border-\[\#cb7bff\]\/20,
+body.light-mode .glass-card.border-\[\#cb7bff\]\\/20 {
   border-color: rgba(124, 46, 168, 0.3) !important;
 }
+body.light-mode .glass-card.hover\:border-\[\#cb7bff\]\/50:hover,
+body.light-mode .glass-card.hover\:border-\[\#cb7bff\]\\/50:hover {
+  border-color: rgba(124, 46, 168, 0.6) !important;
+}
 /* Central advisory names */
-body.light-mode .group h5[class*="text-white"] {
+body.light-mode .group h5.text-white {
   color: #0f172a !important;
 }
 /* State council cards */
-body.light-mode .glass-card h5[class*="text-white"] {
+body.light-mode .glass-card h5.text-white {
   color: #0f172a !important;
 }
-body.light-mode .glass-card [class*="text-outline"] {
+body.light-mode .glass-card .text-outline {
   color: #64748b !important;
 }
 
 /* ── 21. GOVERNANCE PAGE ── */
 /* Dark bg containers → light */
-body.light-mode [class*="bg-surface-container-high"] {
+body.light-mode .bg-surface-container-high {
   background-color: #e8eaf2 !important;
 }
 /* Registration values text */
-body.light-mode [class*="bg-surface-container-high"] [class*="text-white"],
-body.light-mode [class*="bg-surface-container-high"] h3,
-body.light-mode [class*="bg-surface-container-high"] h4,
-body.light-mode [class*="bg-surface-container-high"] h5 {
+body.light-mode .bg-surface-container-high .text-white,
+body.light-mode .bg-surface-container-high h3,
+body.light-mode .bg-surface-container-high h4,
+body.light-mode .bg-surface-container-high h5 {
   color: #0f172a !important;
 }
-body.light-mode [class*="bg-surface-container-high"] p {
+body.light-mode .bg-surface-container-high p {
   color: #475569 !important;
 }
 /* Level labels */
-body.light-mode [class*="bg-surface-container-high"] .text-primary,
-body.light-mode [class*="bg-surface-container-high"] [class*="text-primary"] {
+body.light-mode .bg-surface-container-high .text-primary {
   color: #2d4a9e !important;
 }
 
 /* ── 22. HOVER STATES ── */
-body.light-mode [class*="hover\\:bg-white\\/5"]:hover {
+body.light-mode .hover\:bg-white\/5:hover {
   background-color: rgba(59, 80, 160, 0.06) !important;
+}
+
+/* Fix active/hover states of operational policy cards & state council lists */
+body.light-mode .hover\:bg-surface-container-high:hover {
+  background-color: #e0e2ec !important;
+}
+body.light-mode .hover\:bg-surface-container-highest:hover {
+  background-color: #d8dae5 !important;
+}
+body.light-mode .hover\:bg-primary\/5:hover,
+body.light-mode .hover\:bg-primary\\/5:hover {
+  background-color: rgba(45, 74, 158, 0.08) !important;
+}
+body.light-mode .hover\:bg-primary\/20:hover,
+body.light-mode .hover\:bg-primary\\/20:hover {
+  background-color: rgba(45, 74, 158, 0.2) !important;
+}
+
+/* Card hover group interactions */
+body.light-mode .group:hover .group-hover\:text-primary {
+  color: #1e3a8a !important;
+}
+body.light-mode .group:hover .group-hover\:text-secondary {
+  color: #581c87 !important;
+}
+body.light-mode .group:hover .group-hover\:bg-primary {
+  background-color: #1e3a8a !important;
+}
+body.light-mode .group:hover .group-hover\:text-on-primary {
+  color: #ffffff !important;
+}
+body.light-mode .group:hover .group-hover\:border-primary\/50,
+body.light-mode .group:hover .group-hover\:border-primary\\/50 {
+  border-color: rgba(45, 74, 158, 0.5) !important;
 }
 
 /* ── 23. STAR ICONS FIX ── */
@@ -555,16 +636,16 @@ body.light-mode .text-amber-400 .material-symbols-outlined {
 }
 
 /* ── 24. METHODOLOGY SECTION NUMBER COLORS ── */
-body.light-mode [class*="text-primary/30"],
-body.light-mode [class*="text-primary\\/30"] {
+body.light-mode .text-primary\/30,
+body.light-mode .text-primary\\/30 {
   color: rgba(45, 74, 158, 0.4) !important;
 }
-body.light-mode [class*="text-secondary/30"],
-body.light-mode [class*="text-secondary\\/30"] {
+body.light-mode .text-secondary\/30,
+body.light-mode .text-secondary\\/30 {
   color: rgba(124, 46, 168, 0.4) !important;
 }
-body.light-mode [class*="text-tertiary/30"],
-body.light-mode [class*="text-tertiary\\/30"] {
+body.light-mode .text-tertiary\/30,
+body.light-mode .text-tertiary\\/30 {
   color: rgba(26, 95, 168, 0.4) !important;
 }
 
@@ -578,34 +659,427 @@ body.light-mode .surface-container p {
 }
 
 /* ── 26. GRADIENT BUTTON TEXT — keep white ── */
-body.light-mode button[class*="bg-gradient-to-r"],
-body.light-mode a[class*="bg-gradient-to-r"] {
+body.light-mode button.bg-gradient-to-r,
+body.light-mode a.bg-gradient-to-r {
   color: #ffffff !important;
 }
-body.light-mode [class*="shadow-\\[0_0_30px"] {
+body.light-mode .shadow-\[0_0_30px_rgba\(148\,170\,255\,0\.3\)\] {
   box-shadow: 0 0 20px rgba(45, 74, 158, 0.2) !important;
 }
 
 /* ── 27. PRIMARY BORDER OVERRIDES ── */
-body.light-mode [class*="border-primary/20"],
-body.light-mode [class*="border-primary\\/20"] {
+body.light-mode .border-primary\/20,
+body.light-mode .border-primary\\/20 {
   border-color: rgba(45, 74, 158, 0.2) !important;
 }
-body.light-mode [class*="border-secondary/20"],
-body.light-mode [class*="border-secondary\\/20"] {
+body.light-mode .border-secondary\/20,
+body.light-mode .border-secondary\\/20 {
   border-color: rgba(124, 46, 168, 0.2) !important;
 }
-body.light-mode [class*="border-tertiary/20"],
-body.light-mode [class*="border-tertiary\\/20"] {
+body.light-mode .border-tertiary\/20,
+body.light-mode .border-tertiary\\/20 {
   border-color: rgba(26, 95, 168, 0.2) !important;
 }
 
 /* ── 28. RING COLORS (Central Advisory photos) ── */
-body.light-mode [class*="ring-primary/20"],
-body.light-mode [class*="ring-primary\\/20"] {
+body.light-mode .ring-primary\/20,
+body.light-mode .ring-primary\\/20 {
   --tw-ring-color: rgba(45, 74, 158, 0.25) !important;
 }
-body.light-mode [class*="ring-secondary/20"],
-body.light-mode [class*="ring-secondary\\/20"] {
+body.light-mode .ring-secondary\/20,
+body.light-mode .ring-secondary\\/20 {
   --tw-ring-color: rgba(124, 46, 168, 0.25) !important;
 }
+
+/* ── 29. GOVERNANCE & GLASS-PANEL LEGIBILITY OVERRIDES ── */
+/* Light Glassmorphism Panel Support */
+body.light-mode .glass-panel {
+  background: rgba(255, 255, 255, 0.75) !important;
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(59, 80, 160, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Force headings and primary/secondary texts inside light glass panels to be dark & readable */
+body.light-mode .glass-panel h2,
+body.light-mode .glass-panel h3,
+body.light-mode .glass-panel h4,
+body.light-mode .glass-panel h5 {
+  color: #0f172a; /* No important so specific styling classes can override naturally */
+}
+
+body.light-mode .glass-panel p:not(.text-outline):not([class*="text-outline"]) {
+  color: #0f172a !important;
+}
+
+/* Specific Level 04 and statutory typography readability fixes */
+body.light-mode .text-primary-fixed {
+  color: #1e3a8a !important;
+}
+
+/* Connectors / structural lines in light mode */
+body.light-mode .w-px.bg-gradient-to-b {
+  background-image: linear-gradient(to bottom, rgba(124, 46, 168, 0.5), rgba(45, 74, 158, 0.5)) !important;
+}
+
+body.light-mode .bg-outline-variant\/40,
+body.light-mode .bg-outline-variant\\/40 {
+  background-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+/* Prevent opaque background loss in utility opacity surfaces */
+body.light-mode .bg-surface-container\/50,
+body.light-mode .bg-surface-container\\/50 {
+  background-color: rgba(232, 234, 242, 0.5) !important;
+}
+
+body.light-mode .bg-primary\/5,
+body.light-mode .bg-primary\\/5 {
+  background-color: rgba(45, 74, 158, 0.05) !important;
+}
+
+/* Rich, readable interior page text gradient override */
+body.light-mode .text-transparent.bg-clip-text {
+  background-image: linear-gradient(to right, #2d4a9e, #7c2ea8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Homepage hero text gradient keep light */
+body.light-mode section.homepage-hero .text-transparent.bg-clip-text,
+body.light-mode section.homepage-hero .text-gradient {
+  background-image: linear-gradient(to right, #94aaff, #cb7bff) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ── 30. ADMIN DASHBOARD OVERRIDES ── */
+/* Keep admin dashboard sidebar dark and its text perfectly light/white in Light Mode */
+body.light-mode aside.fixed,
+body.light-mode aside.w-\[280px\] {
+  background-color: #0a0a0b !important;
+  border-right: 1px solid rgba(148, 170, 255, 0.15) !important;
+  box-shadow: 0px 20px 40px rgba(0,0,0,0.4) !important;
+}
+body.light-mode aside.fixed .text-white,
+body.light-mode aside.w-\[280px\] .text-white {
+  color: #ffffff !important;
+}
+body.light-mode aside.fixed .text-on-surface,
+body.light-mode aside.w-\[280px\] .text-on-surface {
+  color: #ffffff !important;
+}
+body.light-mode aside.fixed .text-on-surface-variant,
+body.light-mode aside.w-\[280px\] .text-on-surface-variant {
+  color: #94a3b8 !important;
+}
+body.light-mode aside.fixed .nav-link,
+body.light-mode aside.w-\[280px\] .nav-link {
+  color: #adaaab !important;
+}
+body.light-mode aside.fixed a.bg-primary\/10,
+body.light-mode aside.fixed a.bg-primary\\/10,
+body.light-mode aside.w-\[280px\] a.bg-primary\/10,
+body.light-mode aside.w-\[280px\] a.bg-primary\\/10 {
+  color: #ffffff !important;
+  background-color: rgba(148, 170, 255, 0.1) !important;
+}
+body.light-mode aside.fixed .hover\:text-white:hover,
+body.light-mode aside.w-\[280px\] .hover\:text-white:hover {
+  color: #ffffff !important;
+}
+body.light-mode aside.fixed .hover\:bg-\[\#131314\]:hover,
+body.light-mode aside.w-\[280px\] .hover\:bg-\[\#131314\]:hover {
+  background-color: #131314 !important;
+}
+
+/* Light Mode Dashboard Header / Topbar */
+body.light-mode header.fixed.top-0.right-0 {
+  background-color: rgba(245, 246, 250, 0.8) !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border-bottom: 1px solid rgba(100, 116, 180, 0.12) !important;
+}
+body.light-mode header.fixed.top-0.right-0 .text-on-surface-variant {
+  color: #475569 !important;
+}
+body.light-mode header.fixed.top-0.right-0 .hover\:text-white:hover {
+  color: #1e293b !important;
+}
+body.light-mode header.fixed.top-0.right-0 .border-l {
+  border-left-color: rgba(100, 116, 180, 0.12) !important;
+}
+
+/* Dashboard graphic elements & charts */
+body.light-mode svg circle[stroke="#19191b"] {
+  stroke: #e2e8f0 !important;
+}
+body.light-mode .divide-y.divide-outline-variant\/10 > * {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── 31. MEMBERSHIP APPLICATION PAGE OVERRIDES ── */
+
+/* Soften aura glows on interior page backgrounds */
+body.light-mode .aura-glow {
+  opacity: 0.04 !important;
+}
+
+/* Base Pricing Card Refinements */
+body.light-mode .bg-surface-container {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(45, 74, 158, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(45, 74, 158, 0.03) !important;
+}
+
+/* Card Outlines & Hover states on pricing section */
+body.light-mode .outline-outline-variant\/15,
+body.light-mode .outline-outline-variant\\/15 {
+  outline: 1px solid rgba(45, 74, 158, 0.1) !important;
+}
+body.light-mode .group:hover.outline-outline-variant\/15,
+body.light-mode .group:hover.outline-outline-variant\\/15,
+body.light-mode .group:hover .outline-outline-variant\/15,
+body.light-mode .group:hover .outline-outline-variant\\/15 {
+  outline-color: rgba(45, 74, 158, 0.25) !important;
+}
+
+/* Popular Lifetime card shadow softening and premium border */
+body.light-mode .border-primary\/30,
+body.light-mode .border-primary\\/30 {
+  border-color: rgba(45, 74, 158, 0.3) !important;
+}
+body.light-mode .shadow-\[0px_20px_40px_rgba\(0\,0\,0\,0\.6\)\] {
+  box-shadow: 0 20px 40px rgba(45, 74, 158, 0.12) !important;
+}
+
+/* Membership Form Card container styling (Premium Glassmorphic Panel) */
+body.light-mode .bg-surface-container\/60,
+body.light-mode .bg-surface-container\\/60 {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(45, 74, 158, 0.1) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Interactive fields (Inputs, Select options, Textareas) overrides */
+body.light-mode input,
+body.light-mode textarea,
+body.light-mode select {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(45, 74, 158, 0.12) !important;
+  box-shadow: inset 0 2px 4px rgba(45, 74, 158, 0.015) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.875rem 1.125rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+body.light-mode input:hover,
+body.light-mode textarea:hover,
+body.light-mode select:hover {
+  border-color: rgba(45, 74, 158, 0.25) !important;
+  background-color: #ffffff !important;
+}
+
+body.light-mode input:focus,
+body.light-mode textarea:focus,
+body.light-mode select:focus {
+  background-color: #ffffff !important;
+  border-color: #2d4a9e !important;
+  box-shadow: 0 0 0 4px rgba(45, 74, 158, 0.15) !important;
+  outline: none !important;
+}
+
+/* Placeholder and selector option enhancements */
+body.light-mode .placeholder\:text-outline-variant::placeholder,
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 0.85 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+body.light-mode select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Secure SSL Payment box and Razorpay badge overrides */
+body.light-mode .bg-surface-container-highest {
+  background-color: #f1f3f9 !important;
+}
+body.light-mode .bg-surface-container-highest.border-\[\#94aaff\]\/20,
+body.light-mode .bg-surface-container-highest.border-\[\#94aaff\]\\/20 {
+  background-color: rgba(45, 74, 158, 0.03) !important;
+  border-color: rgba(45, 74, 158, 0.15) !important;
+}
+body.light-mode .border-\[\#94aaff\]\/20,
+body.light-mode .border-\[\#94aaff\]\\/20 {
+  border-color: rgba(45, 74, 158, 0.15) !important;
+}
+
+/* Razorpay payment button gradient and interactive feedback */
+body.light-mode button[type="submit"].bg-gradient-to-r {
+  background: linear-gradient(135deg, #2d4a9e 0%, #6366f1 50%, #7c2ea8 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px -5px rgba(45, 74, 158, 0.3), 0 8px 10px -6px rgba(124, 46, 168, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+body.light-mode button[type="submit"].bg-gradient-to-r:hover {
+  box-shadow: 0 20px 30px -5px rgba(45, 74, 158, 0.4), 0 12px 15px -6px rgba(124, 46, 168, 0.25) !important;
+  transform: translateY(-2px);
+}
+body.light-mode button[type="submit"].bg-gradient-to-r:active {
+  transform: translateY(1px);
+}
+
+/* Dynamically Spawned verification/success modals overrides */
+body.light-mode .fixed.inset-0.z-\[100\] .bg-surface-container,
+body.light-mode .fixed.inset-0.z-\[200\] .bg-surface-container {
+  background-color: #ffffff !important;
+  border-color: rgba(45, 74, 158, 0.15) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* OTP modal fancy input box readability (CRITICAL BUG FIX) */
+body.light-mode #otp-fancy-input {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(45, 74, 158, 0.2) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+body.light-mode #otp-fancy-input::placeholder {
+  color: rgba(71, 85, 105, 0.3) !important;
+  -webkit-text-fill-color: rgba(71, 85, 105, 0.3) !important;
+}
+body.light-mode #otp-fancy-input:focus {
+  background-color: #ffffff !important;
+  border-color: #2d4a9e !important;
+  box-shadow: 0 0 0 4px rgba(45, 74, 158, 0.15) !important;
+}
+
+/* Cancel and Verify modal buttons styling */
+body.light-mode #otp-cancel {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #475569 !important;
+}
+body.light-mode #otp-cancel:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: #1e293b !important;
+}
+body.light-mode #otp-verify {
+  background: linear-gradient(to right, #2d4a9e, #7c2ea8) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(45, 74, 158, 0.2) !important;
+}
+body.light-mode #otp-verify:hover {
+  box-shadow: 0 6px 16px rgba(45, 74, 158, 0.3) !important;
+}
+
+/* Verification and Success modal badges and dynamic layouts */
+body.light-mode .fixed.inset-0.z-\[100\] .bg-gradient-to-tr.from-primary\/20,
+body.light-mode .fixed.inset-0.z-\[100\] .bg-gradient-to-tr.from-primary\\/20 {
+  background-image: linear-gradient(to top right, rgba(45, 74, 158, 0.1), rgba(124, 46, 168, 0.1)) !important;
+  border-color: rgba(45, 74, 158, 0.25) !important;
+  color: #2d4a9e !important;
+  box-shadow: 0 0 20px rgba(45, 74, 158, 0.1) !important;
+}
+
+body.light-mode .fixed.inset-0.z-\[200\] .bg-gradient-to-tr.from-\[\#22c55e\]\/20,
+body.light-mode .fixed.inset-0.z-\[200\] .bg-gradient-to-tr.from-\[\#22c55e\]\\/20 {
+  background-image: linear-gradient(to top right, rgba(34, 197, 94, 0.15), rgba(74, 222, 128, 0.15)) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.1) !important;
+}
+
+body.light-mode .fixed.inset-0 a.bg-gradient-to-r {
+  color: #ffffff !important;
+  background: linear-gradient(to right, #2d4a9e, #7c2ea8) !important;
+}
+
+body.light-mode .fixed.inset-0 button {
+  color: #475569 !important;
+}
+body.light-mode .fixed.inset-0 button:hover {
+  color: #1e293b !important;
+}
+body.light-mode .fixed.inset-0.z-\[200\] button.text-on-surface-variant:hover {
+  color: #2d4a9e !important;
+}
+
+/* ── 32. POLICY PAGES & WRAPPER HEADERS ── */
+body.light-mode header.fixed.top-0.w-full {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Policy Section Cards (Privacy & Refund legibility) */
+body.light-mode .policy-section {
+  border-left: 2px solid rgba(45, 74, 158, 0.25) !important;
+}
+body.light-mode .policy-section:hover {
+  border-left-color: #2d4a9e !important;
+}
+body.light-mode .policy-section h3 {
+  color: #0f172a !important;
+}
+body.light-mode .policy-section p,
+body.light-mode .policy-section ul,
+body.light-mode .policy-section li {
+  color: #334155 !important;
+}
+
+/* ── 33. GLOBAL OVERRIDES FOR INLINE ARBITRARY COLORS ── */
+body.light-mode .text-\[\#cb7bff\] {
+  color: #7c2ea8 !important;
+}
+body.light-mode .border-\[\#cb7bff\]\/30,
+body.light-mode .border-\[\#cb7bff\]\\/30 {
+  border-color: rgba(124, 46, 168, 0.3) !important;
+}
+body.light-mode .bg-\[\#cb7bff\]\/20,
+body.light-mode .bg-\[\#cb7bff\]\\/20 {
+  background-color: rgba(124, 46, 168, 0.12) !important;
+}
+body.light-mode .bg-\[\#cb7bff\]\/10,
+body.light-mode .bg-\[\#cb7bff\]\\/10 {
+  background-color: rgba(124, 46, 168, 0.06) !important;
+}
+body.light-mode .hover\:bg-\[\#cb7bff\]\/10:hover,
+body.light-mode .hover\:bg-\[\#cb7bff\]\\/10:hover {
+  background-color: rgba(124, 46, 168, 0.08) !important;
+}
+body.light-mode .hover\:bg-white\/5:hover,
+body.light-mode .hover\:bg-white\\/5:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+body.light-mode .hover\:bg-white\/10:hover,
+body.light-mode .hover\:bg-white\\/10:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Primary/Secondary Opacity Border Refinements */
+body.light-mode .border-primary\/30,
+body.light-mode .border-primary\\/30 {
+  border-color: rgba(45, 74, 158, 0.3) !important;
+}
+
+/* ── 34. ECO-TERTIARY STORES PAGE CONTRAST ── */
+body.light-mode .text-tertiary {
+  color: #15803d !important; /* Rich green for eco contrast in Light Mode */
+}
+body.light-mode .drop-shadow-\[0_0_15px_rgba\(168\,235\,18\,0\.5\)\] {
+  color: #15803d !important;
+  filter: drop-shadow(0 4px 6px rgba(21, 128, 61, 0.15)) !important;
+}
+
+
