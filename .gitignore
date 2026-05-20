@@ -13,3 +13,5 @@ ADMIN
 *.pem
 *.key
 secrets/
+scratch/
+

@@ -1,19 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 
-// Load main.js to extract translations
-const mainJsPath = path.join(__dirname, '..', 'aasw-pro', 'js', 'main.js');
-const mainJsContent = fs.readFileSync(mainJsPath, 'utf8');
+// Load i18n.js to extract translations
+const i18nJsPath = path.join(__dirname, '..', 'aasw-pro', 'js', 'i18n.js');
+const i18nJsContent = fs.readFileSync(i18nJsPath, 'utf8');
 
 // Simple regex to extract translation keys
 const translationKeys = [];
-const keyRegex = /'([^']+)':\s*\{\s*en:/g;
+const keyRegex = /"([^"]+)":\s*\{\s*en:/g;
 let match;
-while ((match = keyRegex.exec(mainJsContent)) !== null) {
+while ((match = keyRegex.exec(i18nJsContent)) !== null) {
   translationKeys.push(match[1]);
 }
 
-console.log(`Found ${translationKeys.length} translation keys in main.js.`);
+console.log(`Found ${translationKeys.length} translation keys in i18n.js.`);
 
 // Find all HTML files in aasw-pro
 const htmlDir = path.join(__dirname, '..', 'aasw-pro');
@@ -40,9 +40,9 @@ htmlFiles.forEach(file => {
   }
 });
 
-console.log('\n--- Missing Translation Keys (data-t in HTML but not defined in main.js) ---');
+console.log('\n--- Missing Translation Keys (data-t in HTML but not defined in i18n.js) ---');
 console.log(JSON.stringify(missingKeys, null, 2));
 
-console.log('\n--- Unused Translation Keys (in main.js but not found in any HTML data-t) ---');
+console.log('\n--- Unused Translation Keys (in i18n.js but not found in any HTML data-t) ---');
 const unusedKeys = translationKeys.filter(k => !allDataTKeys.has(k));
 console.log(unusedKeys);

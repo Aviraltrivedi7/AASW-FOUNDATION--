@@ -187,6 +187,7 @@ const TRANSLATIONS = {
   "mem-basic-tag": { en: "Annual Entry", hi: "वार्षिक प्रवेश" },
   "mem-basic": { en: "Basic", hi: "बेसिक" },
   "mem-year": { en: "/ year", hi: "/ वर्ष" },
+  "mem-lifetime": { en: "/ lifetime", hi: "/ आजीवन" },
   "mem-pro-tag": { en: "Advanced Impact", hi: "उन्नत प्रभाव" },
   "mem-pro": { en: "Pro", hi: "प्रो" },
   "mem-popular": { en: "Most Popular", hi: "सबसे लोकप्रिय" },
@@ -222,7 +223,7 @@ const TRANSLATIONS = {
   "mem-f-name": { en: "Full Name *", hi: "पूरा नाम *" },
   "mem-f-email": { en: "Email *", hi: "ईमेल *" },
   "mem-f-phone": { en: "Phone *", hi: "फ़ोन *" },
-
+  "mem-f-pan": { en: "PAN Card Number *", hi: "पैन कार्ड नंबर *" },
   "mem-f-address": { en: "Address *", hi: "पता *" },
   "mem-f-tier": { en: "Membership Tier *", hi: "सदस्यता स्तर *" },
   "mem-f-txn": { en: "Transaction ID (UPI/Bank)", hi: "लेनदेन आईडी (UPI/बैंक)" },

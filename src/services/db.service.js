@@ -369,6 +369,47 @@ async function insertContact(data) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SUBSCRIBER OPERATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Insert newsletter subscriber. MongoDB first, InsForge sync.
+ * Returns null if the email already exists (duplicate).
+ */
+async function insertSubscriber(data) {
+    // 1. Try MongoDB
+    if (isMongoConnected()) {
+        try {
+            // Check if already subscribed
+            const existing = await Subscriber.findOne({ email: data.email }).lean();
+            if (existing) return null;
+
+            const doc = await Subscriber.create(data);
+            syncToInsforge('subscribers', data);
+            return doc;
+        } catch (err) {
+            // Handle duplicate key error (race condition)
+            if (err.code === 11000) return null;
+            console.error('[DB] MongoDB subscriber insert failed:', err.message);
+        }
+    }
+
+    // 2. Fallback to InsForge
+    if (insforge) {
+        try {
+            const { error } = await insforge.database.from('subscribers').insert([data]);
+            if (error) {
+                // Duplicate in InsForge
+                if (error.message && error.message.includes('duplicate')) return null;
+                console.error('[DB] InsForge subscriber insert also failed:', error.message);
+            }
+        } catch (err) {
+            console.warn('[DB] InsForge subscriber fallback failed (cold start?):', err.message);
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SITE STATS OPERATIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -597,6 +638,8 @@ module.exports = {
     findMemberByEmail,
     // Contacts
     insertContact,
+    // Subscribers
+    insertSubscriber,
     // Site Stats
     getSiteStats,
     upsertSiteStats,

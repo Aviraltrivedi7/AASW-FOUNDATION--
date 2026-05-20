@@ -16,7 +16,7 @@ async function processImages() {
         return;
     }
     
-    const images = fs.readdirSync(imagesDir).filter(f => f.endsWith('.jpg') || f.endsWith('.png'));
+    const images = fs.readdirSync(imagesDir).filter(f => /\.(jpe?g|png)$/i.test(f));
     for (let file of images) {
         const isFavicon = file === 'favicon.png';
         const name = file.substring(0, file.lastIndexOf('.'));

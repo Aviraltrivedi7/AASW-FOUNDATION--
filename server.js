@@ -16,6 +16,13 @@ if (cluster.isMaster || !cluster.isMaster) {
         missing.forEach(v => console.warn(`   ❌ ${v}`));
         console.warn(`   Set these in your .env file before deploying to production!\n`);
     }
+
+    if (process.env.RAZORPAY_WEBHOOK_SECRET && 
+        (process.env.RAZORPAY_WEBHOOK_SECRET.includes('dummy') || process.env.RAZORPAY_WEBHOOK_SECRET.includes('replace')) && 
+        cluster.isMaster) {
+        console.warn(`\n⚠️  SECURITY WARNING: Dummy Razorpay webhook secret is active! Replace in production.`);
+        console.warn(`   Current value: ${process.env.RAZORPAY_WEBHOOK_SECRET}\n`);
+    }
 }
 
 // High-Traffic & Crash-Proof Implementation 

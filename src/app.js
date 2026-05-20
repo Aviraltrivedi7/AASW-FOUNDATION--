@@ -13,6 +13,7 @@ const { getTranslator } = require("./utils/lang");
 // Route imports
 const healthRoutes = require("./routes/health.routes");
 const contactRoutes = require("./routes/contact.routes");
+const subscriberRoutes = require("./routes/subscriber.routes");
 const adminRoutes = require("./routes/admin.routes");
 const membershipRoutes = require("./routes/membership.routes");
 const { ApiError } = require("./utils/apiError");
@@ -75,6 +76,7 @@ app.use("/api/", apiLimiter);
 
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/contact", formLimiter, contactRoutes);
+app.use("/api/v1/subscribe", formLimiter, subscriberRoutes);
 app.use("/api/v1/membership", membershipRoutes);
 app.use("/admin", adminRoutes);
 
