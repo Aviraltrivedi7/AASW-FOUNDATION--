@@ -42,7 +42,6 @@ async function processImages() {
             await sharp(inputPath)
                 .webp({ quality: 80 })
                 .toFile(outPath);
-            fs.unlinkSync(inputPath);
             console.log('Converted', file, 'to webp');
         }
     }
