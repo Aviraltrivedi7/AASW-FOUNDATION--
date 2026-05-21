@@ -1151,25 +1151,22 @@ body.light-mode .drop-shadow-\[0_0_15px_rgba\(168\,235\,18\,0\.5\)\] {
 /* ── 35. MEMBERSHIP FORM INPUT OVERRIDES (must be last to win cascade) ── */
 /* The general .bg-surface-container-high rule in section 21 overrides earlier input rules.
    These rules placed at the end ensure form inputs always get white backgrounds. */
-body.light-mode input.bg-surface-container-high,
-body.light-mode textarea.bg-surface-container-high,
-body.light-mode select.bg-surface-container-high,
-body.light-mode form input,
-body.light-mode form textarea,
-body.light-mode form select {
+body.light-mode #membership-form input,
+body.light-mode #membership-form textarea,
+body.light-mode #membership-form select {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border: 1px solid rgba(0, 0, 0, 0.15) !important;
   -webkit-text-fill-color: #0f172a !important;
 }
-body.light-mode form input::placeholder,
-body.light-mode form textarea::placeholder {
+body.light-mode #membership-form input::placeholder,
+body.light-mode #membership-form textarea::placeholder {
   color: #94a3b8 !important;
   -webkit-text-fill-color: #94a3b8 !important;
   opacity: 1 !important;
 }
 /* Form container card — make it clearly visible */
-body.light-mode .bg-surface-container\\/60 {
+body.light-mode #membership-form-wrapper {
   background-color: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
