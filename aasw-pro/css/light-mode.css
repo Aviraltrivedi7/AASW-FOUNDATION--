@@ -405,6 +405,9 @@ body.light-mode footer a:hover svg {
 }
 
 /* ── 12. CONTACT FORM & INPUTS ── */
+body.light-mode input.bg-surface-container-high,
+body.light-mode textarea.bg-surface-container-high,
+body.light-mode select.bg-surface-container-high,
 body.light-mode input,
 body.light-mode textarea,
 body.light-mode select {
