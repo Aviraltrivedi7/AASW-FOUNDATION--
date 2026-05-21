@@ -408,9 +408,9 @@ body.light-mode footer a:hover svg {
 body.light-mode input,
 body.light-mode textarea,
 body.light-mode select {
-  background-color: #f0f2f8 !important;
+  background-color: #ffffff !important;
   color: #0f172a !important; /* Force text typed by user to be visible */
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
   -webkit-text-fill-color: #0f172a !important;
 }
 body.light-mode input::placeholder,
