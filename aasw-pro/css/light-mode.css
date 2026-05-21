@@ -234,19 +234,72 @@ body.light-mode section:first-of-type:not(.homepage-hero) .glass span {
 }
 
 /* ── 8. STATS / COUNTER STRIP ── */
-body.light-mode section.bg-gradient-to-r.via-primary-fixed {
-  background: linear-gradient(to right, #e0e4f0, #d5daf0, #e0e4f0) !important;
+/* The stats section uses: bg-gradient-to-r from-background via-[#0f172a] to-background
+   In light mode we replace the dark navy gradient with a soft premium light gradient */
+body.light-mode section.bg-gradient-to-r.from-background.border-y,
+body.light-mode section.bg-gradient-to-r.via-primary-fixed,
+body.light-mode section.bg-gradient-to-r.via-\[\#0f172a\] {
+  background: linear-gradient(to right, #e8ecf8, #dce2f4, #e8ecf8) !important;
+  border-color: rgba(45, 74, 158, 0.1) !important;
 }
-/* Stats labels — make visible */
+/* Stats counter numbers — high contrast dark text */
+body.light-mode section.bg-gradient-to-r.from-background .counter,
+body.light-mode section.bg-gradient-to-r.via-primary-fixed .counter,
+body.light-mode section.bg-gradient-to-r.via-\[\#0f172a\] .counter,
+body.light-mode .text-center .counter {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+/* Stats counter numbers that also have text-white — override global selector is not enough
+   because these divs are inside a section that was dark, now is light */
+body.light-mode section.bg-gradient-to-r.from-background .text-white.counter,
+body.light-mode section.bg-gradient-to-r.from-background .font-extrabold.text-white {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+/* Stats labels — make visible with vibrant blue */
+body.light-mode section.bg-gradient-to-r.from-background .text-primary,
 body.light-mode section.bg-gradient-to-r.via-primary-fixed .text-primary,
+body.light-mode section.bg-gradient-to-r.via-\[\#0f172a\] .text-primary,
 body.light-mode .text-center .text-primary {
   color: #1e3a8a !important;
 }
-/* Stats numbers */
-body.light-mode section.bg-gradient-to-r.via-primary-fixed .text-white,
-body.light-mode section.bg-gradient-to-r.via-primary-fixed .counter,
-body.light-mode .text-center .counter {
+
+/* ── 8b. NEWSLETTER / STAY CONNECTED SECTION ── */
+/* The newsletter uses: bg-gradient-to-r from-primary/10 via-background to-secondary/10
+   In light mode, make it a clean readable section */
+body.light-mode section.bg-gradient-to-r.from-primary\/10,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 {
+  background: linear-gradient(to right, rgba(45, 74, 158, 0.06), #f5f6fa, rgba(124, 46, 168, 0.06)) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+/* Newsletter heading — readable dark text */
+body.light-mode section.bg-gradient-to-r.from-primary\/10 h2,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 h2 {
   color: #0f172a !important;
+}
+/* Newsletter description text */
+body.light-mode section.bg-gradient-to-r.from-primary\/10 p,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 p {
+  color: #475569 !important;
+}
+/* Newsletter input field — proper light styling */
+body.light-mode section.bg-gradient-to-r.from-primary\/10 input,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 input {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(45, 74, 158, 0.15) !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+body.light-mode section.bg-gradient-to-r.from-primary\/10 input::placeholder,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 input::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+/* Newsletter subscribe button — keep gradient visible */
+body.light-mode section.bg-gradient-to-r.from-primary\/10 button,
+body.light-mode section.bg-gradient-to-r.from-primary\\\/10 button {
+  color: #ffffff !important;
 }
 
 /* ── 9. BORDERS ── */
