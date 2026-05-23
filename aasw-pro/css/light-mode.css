@@ -1174,3 +1174,18 @@ body.light-mode #membership-form-wrapper {
 body.light-mode .bg-surface-container-highest {
   background-color: #f0f2f8 !important;
 }
+
+/* ─── BROWSER AUTOFILL & TYPING COLOR FIXES (CRITICAL) ─── */
+body.light-mode input:-webkit-autofill,
+body.light-mode input:-webkit-autofill:hover,
+body.light-mode input:-webkit-autofill:focus,
+body.light-mode textarea:-webkit-autofill,
+body.light-mode textarea:-webkit-autofill:hover,
+body.light-mode textarea:-webkit-autofill:focus,
+body.light-mode select:-webkit-autofill,
+body.light-mode select:-webkit-autofill:hover,
+body.light-mode select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}

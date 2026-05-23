@@ -2178,3 +2178,33 @@ footer {
   .governance-grid { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: 1fr; }
 }
+
+/* ─── BROWSER AUTOFILL & TYPING COLOR FIXES (CRITICAL) ─── */
+/* In Dark Mode (Default) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #201f21 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* In Light Mode */
+body.light-mode input:-webkit-autofill,
+body.light-mode input:-webkit-autofill:hover,
+body.light-mode input:-webkit-autofill:focus,
+body.light-mode textarea:-webkit-autofill,
+body.light-mode textarea:-webkit-autofill:hover,
+body.light-mode textarea:-webkit-autofill:focus,
+body.light-mode select:-webkit-autofill,
+body.light-mode select:-webkit-autofill:hover,
+body.light-mode select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+}
