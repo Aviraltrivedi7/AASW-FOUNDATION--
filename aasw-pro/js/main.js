@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothAnchors();
   initScrollProgress();
   initDynamicYear();
-  initTheme();
+  initNewsletterForm();
 });
 
 /* ═══ HERO SLIDER ═══ */
@@ -347,40 +347,103 @@ function initDropdownTouch() {
   });
 }
 
-/* ═══ THEME TOGGLE (LIGHT/DARK MODE) ═══ */
-function initTheme() {
-  const toggleBtn = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-  if (!toggleBtn) return;
+/* ═══ NEWSLETTER FORM ═══ */
+function initNewsletterForm() {
+  const form = document.getElementById('newsletterForm');
+  const btn = document.getElementById('newsletterSubmitBtn');
+  const emailInput = document.getElementById('newsletterEmail');
+  if (!form || !btn || !emailInput) return;
 
-  // Check saved preference or fallback to system preference
-  const savedTheme = localStorage.getItem('aasw-theme');
-  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const lang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
+    const email = emailInput.value?.trim();
 
-  // Set initial theme
-  if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
-    document.body.classList.add('light-mode');
-    document.documentElement.classList.remove('dark');
-    if (themeIcon) themeIcon.textContent = 'dark_mode'; // icon to switch to dark
-  } else {
-    document.body.classList.remove('light-mode');
-    document.documentElement.classList.add('dark');
-    if (themeIcon) themeIcon.textContent = 'light_mode'; // icon to switch to light
-  }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast(lang === 'hi' ? 'कृपया एक मान्य ईमेल दर्ज करें।' : 'Please enter a valid email address.', 'error');
+      return;
+    }
 
-  // Toggle handler
-  toggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    
-    if (isLight) {
-      document.documentElement.classList.remove('dark');
-      if (themeIcon) themeIcon.textContent = 'dark_mode';
-      localStorage.setItem('aasw-theme', 'light');
-    } else {
-      document.documentElement.classList.add('dark');
-      if (themeIcon) themeIcon.textContent = 'light_mode';
-      localStorage.setItem('aasw-theme', 'dark');
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.innerHTML = lang === 'hi' ? '<i class="fas fa-spinner fa-spin"></i> सदस्यता ले रहे हैं...' : '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+
+    try {
+      const res = await fetch('/api/v1/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (res.status === 201 || res.status === 200) {
+        form.reset();
+        showToast(lang === 'hi' ? '✓ सदस्यता सफलतापूर्वक पूरी हुई!' : '✓ Successfully subscribed to our newsletter!', 'success');
+      } else {
+        const errMsg = data.message || (lang === 'hi' ? 'कुछ गलत हो गया, फिर प्रयास करें।' : 'Something went wrong, please try again.');
+        showToast('✗ ' + errMsg, 'error');
+      }
+    } catch (err) {
+      console.warn('Newsletter subscription failed:', err);
+      showToast(lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें।' : '✗ Network error, please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
     }
   });
+}
+
+/* ═══ SLEEK TOAST NOTIFICATION SYSTEM ═══ */
+function showToast(message, type = 'success') {
+  let container = document.getElementById('aasw-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'aasw-toast-container';
+    container.className = 'fixed bottom-8 right-8 z-[9999] flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'p-4 rounded-2xl backdrop-blur-xl border shadow-2xl flex items-center gap-3 transform translate-y-4 opacity-0 transition-all duration-500 will-change-transform';
+  
+  if (type === 'success') {
+    toast.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+    toast.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+    toast.style.color = '#10b981';
+  } else {
+    toast.style.backgroundColor = 'rgba(244, 63, 94, 0.1)';
+    toast.style.borderColor = 'rgba(244, 63, 94, 0.2)';
+    toast.style.color = '#f43f5e';
+  }
+
+  const icon = document.createElement('span');
+  icon.className = 'material-symbols-outlined shrink-0';
+  icon.textContent = type === 'success' ? 'check_circle' : 'error';
+  
+  const text = document.createElement('span');
+  text.className = 'font-label text-xs sm:text-sm font-semibold tracking-wide';
+  text.textContent = message;
+
+  toast.appendChild(icon);
+  toast.appendChild(text);
+  container.appendChild(toast);
+
+  // Trigger entrance animation next frame
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  });
+
+  // Remove toast after 4s
+  setTimeout(() => {
+    toast.style.transform = 'translateY(4px)';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+      if (container.children.length === 0) {
+        container.remove();
+      }
+    }, 500);
+  }, 4000);
 }
