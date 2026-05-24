@@ -26,7 +26,7 @@ const TRANSLATIONS = {
   "footer-contact": { en: "Contact", hi: "संपर्क" },
   "footer-privacy": { en: "Privacy Policy", hi: "गोपनीयता नीति" },
   "footer-refund": { en: "Refund Policy", hi: "रिफंड नीति" },
-  "footer-copyright": { en: "© 2025 AASW Foundation. All Rights Reserved.", hi: "© 2026 AASW फाउंडेशन। सर्वाधिकार सुरक्षित।" },
+  "footer-copyright": { en: "© 2025 AASW Foundation. All Rights Reserved.", hi: "© 2025 AASW फाउंडेशन। सर्वाधिकार सुरक्षित।" },
 
   // ═══════════════════════════════════════════
   //  HOMEPAGE — index.html

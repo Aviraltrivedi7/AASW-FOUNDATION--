@@ -222,7 +222,7 @@ function initScrollProgress() {
 
 /* ═══ DYNAMIC YEAR ═══ */
 function initDynamicYear() {
-  const year = new Date().getFullYear();
+  const year = 2025;
   const fCopy = document.querySelector('[data-t="f-copy"]');
   if (fCopy) {
     const isHi = document.body.classList.contains('lang-hi');
