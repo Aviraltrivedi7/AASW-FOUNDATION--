@@ -18,6 +18,7 @@
     "@insforge/sdk": "^1.2.5",
     "@supabase/postgrest-js": "^2.105.1",
     "bcryptjs": "^3.0.3",
+    "clean-css": "^5.3.3",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -26,19 +27,18 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
+    "html-minifier-terser": "^7.2.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.5",
     "morgan": "^1.10.1",
     "nodemailer": "^6.10.0",
     "pdf-lib": "^1.17.1",
-    "razorpay": "^2.9.6"
-  },
-  "devDependencies": {
-    "clean-css": "^5.3.3",
-    "html-minifier-terser": "^7.2.0",
+    "razorpay": "^2.9.6",
     "sharp": "^0.34.5",
     "tailwindcss": "3.4",
     "terser": "^5.46.0"
+  },
+  "devDependencies": {
   }
 }
