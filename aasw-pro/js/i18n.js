@@ -239,6 +239,15 @@ const TRANSLATIONS = {
   "mem-faq-4-q": { en: "Are international members allowed?", hi: "क्या अंतर्राष्ट्रीय सदस्यों की अनुमति है?" },
   "mem-faq-4-a": { en: "Yes! AASW Foundation welcomes international members. Payments can be made via international bank transfer or UPI.", hi: "हाँ! AASW फाउंडेशन अंतर्राष्ट्रीय सदस्यों का स्वागत करता है। भुगतान अंतर्राष्ट्रीय बैंक ट्रांसफर या UPI के माध्यम से किया जा सकता है।" },
 
+  // Featured Lifetime Members
+  "mem-featured-tag": { en: "Wall of Honor", hi: "सम्मान पटल" },
+  "mem-featured-title": { en: "Honor Roll of Lifetime Members", hi: "आजीवन सदस्यों का सम्मान पटल" },
+  "mem-featured-desc": { en: "A tribute to our permanent patrons whose lifetime commitment empowers transformative change across India.", hi: "हमारे स्थायी संरक्षकों को एक श्रद्धांजलि जिनकी आजीवन प्रतिबद्धता पूरे भारत में परिवर्तनकारी बदलाव को सशक्त बनाती है।" },
+  "mem-featured-empty-title": { en: "Be the Pioneer", hi: "प्रथम सदस्य बनें" },
+  "mem-featured-empty": { en: "No lifetime members featured yet. Be the first to join the Honor Roll and make a permanent impact!", hi: "अभी तक कोई आजीवन सदस्य शामिल नहीं हुआ है। सम्मान पटल में शामिल होने वाले पहले व्यक्ति बनें और स्थायी प्रभाव डालें!" },
+  "mem-featured-join-btn": { en: "Join as Lifetime Member", hi: "आजीवन सदस्य के रूप में जुड़ें" },
+  "mem-featured-joined": { en: "Patron Since", hi: "आजीवन सदस्य वर्ष" },
+
   // ═══════════════════════════════════════════
   //  PRIVACY PAGE — privacy.html
   // ═══════════════════════════════════════════

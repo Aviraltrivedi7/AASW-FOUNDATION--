@@ -339,6 +339,46 @@ async function findMemberByEmail(email) {
     return null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FEATURED LIFETIME MEMBERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function getActiveLifetimeMembers() {
+    // 1. Try MongoDB
+    if (isMongoConnected()) {
+        try {
+            const members = await Member.find({ planId: 'lifetime', status: 'Active' })
+                .select('name created_at')
+                .sort({ created_at: -1 })
+                .lean();
+            if (members && members.length > 0) {
+                return members.map(m => ({ name: m.name, created_at: m.created_at }));
+            }
+        } catch (err) {
+            console.error('[DB] MongoDB active lifetime members lookup failed:', err.message);
+        }
+    }
+
+    // 2. Fallback to InsForge
+    if (insforge) {
+        try {
+            const { data, error } = await insforge.database
+                .from('members')
+                .select('name, created_at')
+                .eq('planId', 'lifetime')
+                .eq('status', 'Active')
+                .order('created_at', { ascending: false });
+            if (!error && data) {
+                return data.map(m => ({ name: m.name, created_at: m.created_at }));
+            }
+        } catch (err) {
+            console.warn('[DB] InsForge active lifetime members fallback failed:', err.message);
+        }
+    }
+
+    return [];
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTACT OPERATIONS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -636,6 +676,7 @@ module.exports = {
     upsertMember,
     findMemberByPaymentId,
     findMemberByEmail,
+    getActiveLifetimeMembers,
     // Contacts
     insertContact,
     // Subscribers

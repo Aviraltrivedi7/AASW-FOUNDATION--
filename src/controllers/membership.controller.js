@@ -397,4 +397,12 @@ const downloadCertificate = catchAsync(async (req, res) => {
     res.send(Buffer.from(pdfBuffer));
 });
 
-module.exports = { downloadCertificate, requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment, razorpayWebhook };
+// GET /api/v1/membership/featured
+const getFeaturedMembers = catchAsync(async (req, res) => {
+    const members = await db.getActiveLifetimeMembers();
+    return res.status(200).json(
+        new ApiResponse(200, members, 'Featured lifetime members fetched successfully.')
+    );
+});
+
+module.exports = { getFeaturedMembers, downloadCertificate, requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment, razorpayWebhook };

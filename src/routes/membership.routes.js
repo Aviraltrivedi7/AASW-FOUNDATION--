@@ -1,7 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const { validate } = require('../middlewares/validation.middleware');
-const { requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment, downloadCertificate, razorpayWebhook } = require('../controllers/membership.controller');
+const { getFeaturedMembers, requestEmailOTP, verifyEmailOTP, getMembershipPlans, submitPayment, createRazorpayOrder, verifyRazorpayPayment, downloadCertificate, razorpayWebhook } = require('../controllers/membership.controller');
 const { generateCertificatePdf } = require('../services/certificate.service');
 
 const router = express.Router();
@@ -54,6 +54,7 @@ router.post('/create-order', validate(createOrderSchema), createRazorpayOrder);
 router.post('/verify-payment', validate(verifyPaymentSchema), verifyRazorpayPayment);
 router.get('/plans', getMembershipPlans);
 router.get('/certificate/:paymentId', downloadCertificate);
+router.get('/featured', getFeaturedMembers);
 
 // Webhook payload validated by HMAC, so no Joi schema needed for body payload generically
 router.post('/webhook', express.raw({ type: 'application/json' }), razorpayWebhook);
