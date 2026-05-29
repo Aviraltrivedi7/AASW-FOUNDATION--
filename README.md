@@ -269,7 +269,7 @@ Contributions are welcome! To contribute:
 
 ## 📄 License
 
-© 2026 AASW Foundation. All rights reserved.
+© 2025 AASW Foundation. All rights reserved.
 
 ---
 
