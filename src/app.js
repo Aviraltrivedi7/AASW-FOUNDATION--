@@ -40,21 +40,41 @@ app.use(helmet({
     contentSecurityPolicy: false
 }));
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
+// Hardcoded production domains — these ALWAYS work regardless of env vars
+const PRODUCTION_ORIGINS = [
+    'https://aaswfoundation.com',
+    'https://www.aaswfoundation.com',
+    'https://aaswfoundation.org',
+    'https://www.aaswfoundation.org'
+];
+
+const envOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',').map(item => item.trim())
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
+// Merge: production domains + env-configured origins (deduplicated)
+const allowedOrigins = [...new Set([...PRODUCTION_ORIGINS, ...envOrigins])];
+
+// Handle OPTIONS preflight explicitly — Vercel serverless can sometimes skip middleware for OPTIONS
+app.options('*', (req, res) => {
+    const origin = req.headers.origin;
+    if (origin && (allowedOrigins.includes(origin) || (origin.startsWith('https://aasw-foundation') && origin.endsWith('.vercel.app')))) {
+        res.set('Access-Control-Allow-Origin', origin);
+        res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        res.set('Access-Control-Allow-Credentials', 'true');
+        res.set('Access-Control-Max-Age', '86400');
+    }
+    res.status(204).end();
+});
 
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin) {
             return callback(null, true);
         }
-        // Exact match check
+        // Check against merged allowed list
         if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        // Fail-safe check for production domains (even if ALLOWED_ORIGINS env var is not updated in hosting)
-        if (origin === 'https://aaswfoundation.com' || origin === 'https://www.aaswfoundation.com') {
             return callback(null, true);
         }
         // Robust check for Vercel preview/branch deployments
