@@ -80,19 +80,15 @@ const requestEmailOTP = catchAsync(async (req, res) => {
         ? `[DEV MODE] OTP sent to console. Check your server logs.`
         : `OTP sent to ${email}. Valid for 5 minutes.`;
 
-    // Respond IMMEDIATELY — don't wait for email to send
-    // In dev mode, return OTP to frontend for easy testing
+    // Await email sending on the backend to prevent Vercel serverless function freezing
+    const emailSent = await sendOTP(email, otp);
+    if (!emailSent) {
+        throw new ApiError(500, 'Failed to send verification email. Please check your email configuration.');
+    }
+
     res.status(200).json(
         new ApiResponse(200, { email, devMode, devOtp: devMode ? otp : undefined }, responseMsg)
     );
-
-    // Send email in background (fire-and-forget)
-    sendOTP(email, otp).then(sent => {
-        if (!sent) console.error(`[Membership] Failed to send OTP email to ${email}`);
-        else console.log(`[Membership] OTP sent to ${email}: ${otp}`);
-    }).catch(err => {
-        console.error(`[Membership] Email error for ${email}:`, err.message);
-    });
 });
 
 // POST /api/v1/membership/verify-otp

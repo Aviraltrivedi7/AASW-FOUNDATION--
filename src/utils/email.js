@@ -6,15 +6,18 @@ dotenv.config();
 // Gmail App Password required: https://myaccount.google.com/apppasswords
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const usePool = !isServerless;
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: SMTP_PORT,
     secure: SMTP_PORT === 465,       // true only for port 465 SSL; false = STARTTLS
-    pool: true,                       // keep connections alive — critical for low latency
-    maxConnections: 3,
-    maxMessages: 200,
-    rateDelta: 1000,                  // spread sends if batching (1 per sec)
-    rateLimit: 5,
+    pool: usePool,                    // disabled in serverless to prevent stale/frozen socket hangs
+    maxConnections: usePool ? 3 : undefined,
+    maxMessages: usePool ? 200 : undefined,
+    rateDelta: usePool ? 1000 : undefined,
+    rateLimit: usePool ? 5 : undefined,
     connectionTimeout: 5000,          // fail fast — 5s
     greetingTimeout: 5000,            // fail fast — 5s
     socketTimeout: 8000,              // fail fast — 8s
@@ -28,8 +31,8 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ─── WARM UP: verify on startup so first send is instant ──────────────────────
-if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+// ─── WARM UP & KEEPALIVE: only for persistent servers (like VPS) ───────────────
+if (usePool && process.env.SMTP_USER && process.env.SMTP_PASS) {
     transporter.verify()
         .then(() => {
             console.log('[Email] SMTP connection pool ready ✓ (port ' + SMTP_PORT + ')');
@@ -44,6 +47,7 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
             .catch(() => {}); // silently ignore keepalive failures
     }, 4 * 60 * 1000);
 }
+
 
 // ─── SEND OTP ─────────────────────────────────────────────────────────────────
 const sendOTP = async (toEmail, otp) => {
