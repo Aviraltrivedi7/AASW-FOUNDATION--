@@ -17,6 +17,7 @@
   "dependencies": {
     "@insforge/sdk": "^1.2.5",
     "@supabase/postgrest-js": "^2.105.1",
+    "@vercel/functions": "^3.7.3",
     "bcryptjs": "^3.0.3",
     "clean-css": "^5.3.3",
     "compression": "^1.8.1",
@@ -38,7 +39,5 @@
     "sharp": "^0.34.5",
     "tailwindcss": "3.4",
     "terser": "^5.46.0"
-  },
-  "devDependencies": {
   }
 }

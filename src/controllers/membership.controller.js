@@ -7,6 +7,13 @@ const db = require('../services/db.service');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
+let vercelFunctions;
+try {
+    vercelFunctions = require('@vercel/functions');
+} catch (e) {
+    // ignore
+}
+
 // Membership plans definition
 const MEMBERSHIP_PLANS = [
     {
@@ -80,10 +87,25 @@ const requestEmailOTP = catchAsync(async (req, res) => {
         ? `[DEV MODE] OTP sent to console. Check your server logs.`
         : `OTP sent to ${email}. Valid for 5 minutes.`;
 
-    // Await email sending on the backend to prevent Vercel serverless function freezing
-    const emailSent = await sendOTP(email, otp);
-    if (!emailSent) {
-        throw new ApiError(500, 'Failed to send verification email. Please check your email configuration.');
+    if (!devMode) {
+        const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+        if (isServerless && vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
+            try {
+                vercelFunctions.waitUntil(
+                    sendOTP(email, otp).then(sent => {
+                        if (!sent) console.error(`[Membership] Failed to send OTP email to ${email}`);
+                    }).catch(err => {
+                        console.error(`[Membership] Email send error to ${email}:`, err.message);
+                    })
+                );
+            } catch (err) {
+                console.warn("[Vercel] waitUntil failed, falling back to await:", err.message);
+                await sendOTP(email, otp);
+            }
+        } else {
+            // Local dev / Persistent VPS - fire and forget
+            sendOTP(email, otp).catch(err => console.error('[Local] SMTP send failed:', err.message));
+        }
     }
 
     res.status(200).json(
@@ -307,16 +329,30 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     res.clearCookie('verified_email');
     await db.deleteOtpByEmail(email);
 
-    // Generate and email certificate
-    try {
-        const shortId = razorpay_payment_id.slice(-5).toUpperCase();
-        const formattedId = `AASW-2025-${shortId}`;
-        const planStr = (securePlanId === 'annual') ? '1 Year' : 'Lifetime';
-        const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
-        await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
-        console.log("[Membership] Successfully emailed certificate to: " + email);
-    } catch(err) {
-        console.error("[Membership] Error generating/emailing certificate:", err);
+    // Generate and email certificate in background to speed up payment verification screen
+    const sendCertMail = async () => {
+        try {
+            const shortId = razorpay_payment_id.slice(-5).toUpperCase();
+            const formattedId = `AASW-2025-${shortId}`;
+            const planStr = (securePlanId === 'annual') ? '1 Year' : 'Lifetime';
+            const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
+            await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
+            console.log("[Membership] Successfully emailed certificate to: " + email);
+        } catch(err) {
+            console.error("[Membership] Error generating/emailing certificate:", err);
+        }
+    };
+
+    const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    if (isServerless && vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
+        try {
+            vercelFunctions.waitUntil(sendCertMail());
+        } catch (err) {
+            console.warn("[Vercel] waitUntil failed for cert email:", err.message);
+            sendCertMail().catch(() => {});
+        }
+    } else {
+        sendCertMail().catch(() => {});
     }
 
     return res.status(200).json(
