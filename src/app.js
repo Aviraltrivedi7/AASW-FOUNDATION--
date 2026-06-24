@@ -53,6 +53,10 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
+        // Fail-safe check for production domains (even if ALLOWED_ORIGINS env var is not updated in hosting)
+        if (origin === 'https://aaswfoundation.com' || origin === 'https://www.aaswfoundation.com') {
+            return callback(null, true);
+        }
         // Robust check for Vercel preview/branch deployments
         if (origin.startsWith('https://aasw-foundation') && origin.endsWith('.vercel.app')) {
             return callback(null, true);
