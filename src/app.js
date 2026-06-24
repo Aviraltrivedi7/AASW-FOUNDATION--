@@ -41,15 +41,25 @@ app.use(helmet({
 }));
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
+    ? process.env.ALLOWED_ORIGINS.split(',').map(item => item.trim())
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin) {
             return callback(null, true);
         }
-        callback(new Error(`CORS policy: origin '${origin}' not allowed`));
+        // Exact match check
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        // Robust check for Vercel preview/branch deployments
+        if (origin.startsWith('https://aasw-foundation') && origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+        const corsError = new Error(`CORS policy: origin '${origin}' not allowed`);
+        corsError.statusCode = 403;
+        callback(corsError);
     },
     credentials: true
 }));

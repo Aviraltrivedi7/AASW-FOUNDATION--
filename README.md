@@ -152,7 +152,7 @@ NODE_ENV=production
 JWT_SECRET=<generate-secure-64-char-hex>
 RAZORPAY_KEY_ID=rzp_live_XXXXXXXXXX
 RAZORPAY_KEY_SECRET=<your-live-secret>
-ALLOWED_ORIGINS=https://aaswfoundation.org,https://www.aaswfoundation.org
+ALLOWED_ORIGINS=https://aaswfoundation.com,https://www.aaswfoundation.com
 ```
 
 ### 2. Build optimizations
@@ -173,7 +173,7 @@ pm2 startup
 ```nginx
 server {
     listen 80;
-    server_name aaswfoundation.org www.aaswfoundation.org;
+    server_name aaswfoundation.com www.aaswfoundation.com;
     
     location / {
         proxy_pass http://localhost:3000;

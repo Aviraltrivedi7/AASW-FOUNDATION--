@@ -142,8 +142,8 @@ const schemaMarkup = `
   "@type": "NGO",
   "name": "AASW Foundation",
   "alternateName": "Aapka Apna Social Welfare Foundation",
-  "url": "https://aaswfoundation.org",
-  "logo": "https://aaswfoundation.org/images/logo.webp",
+  "url": "https://aaswfoundation.com",
+  "logo": "https://aaswfoundation.com/images/logo.webp",
   "description": "AASW Foundation empowers Indian women through digital education, eco-friendly entrepreneurship, and sustainable growth opportunities in Uttar Pradesh.",
   "foundingDate": "2021",
   "address": {

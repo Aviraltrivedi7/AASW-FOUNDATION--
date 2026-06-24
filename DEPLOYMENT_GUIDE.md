@@ -8,7 +8,7 @@ Complete step-by-step guide to deploy your website to production.
 
 Before deploying, ensure you have:
 
-- ✅ Domain name registered (e.g., aaswfoundation.org)
+- ✅ Domain name registered (e.g., aaswfoundation.com)
 - ✅ VPS/Cloud server (DigitalOcean, AWS, Linode, etc.)
 - ✅ Razorpay live account with API keys
 - ✅ Gmail account with App Password enabled
@@ -93,7 +93,7 @@ NODE_ENV=production
 JWT_SECRET=<run: openssl rand -hex 64>
 
 # CORS
-ALLOWED_ORIGINS=https://aaswfoundation.org,https://www.aaswfoundation.org
+ALLOWED_ORIGINS=https://aaswfoundation.com,https://www.aaswfoundation.com
 
 # SMTP Email
 CONTACT_EMAIL=aaswfoundation06@gmail.com
@@ -137,7 +137,7 @@ Add this configuration:
 ```nginx
 server {
     listen 80;
-    server_name aaswfoundation.org www.aaswfoundation.org;
+    server_name aaswfoundation.com www.aaswfoundation.com;
 
     # Redirect HTTP to HTTPS (will be enabled after SSL)
     # return 301 https://$server_name$request_uri;
@@ -193,7 +193,7 @@ systemctl reload nginx
 
 ### Step 1: Obtain SSL Certificate
 ```bash
-certbot --nginx -d aaswfoundation.org -d www.aaswfoundation.org
+certbot --nginx -d aaswfoundation.com -d www.aaswfoundation.com
 ```
 
 Follow the prompts:
@@ -263,15 +263,15 @@ curl http://localhost:3000
 
 ### 4. Test Domain
 Open browser and visit:
-- https://aaswfoundation.org
-- https://www.aaswfoundation.org
+- https://aaswfoundation.com
+- https://www.aaswfoundation.com
 
 ### 5. Test Contact Form
 - Fill and submit contact form
 - Check email inbox for notification
 
 ### 6. Test Admin Login
-- Visit: https://aaswfoundation.org/admin/login
+- Visit: https://aaswfoundation.com/admin/login
 - Login with credentials
 - Verify dashboard loads
 
