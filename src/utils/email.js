@@ -3,9 +3,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // ─── SMTP TRANSPORTERS (Dual-port fail-safe fallback) ────────────────────────
-const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
-const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-const usePool = !isServerless;
+const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
+const usePool = true; // Enabled globally so warm serverless containers reuse connection pool
 
 const createTransporter = (port) => {
     return nodemailer.createTransport({
