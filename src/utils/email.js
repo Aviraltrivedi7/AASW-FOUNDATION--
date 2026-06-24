@@ -2,52 +2,78 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// ─── SMTP TRANSPORTER (port 587 STARTTLS — faster than SSL/465) ───────────────
-// Gmail App Password required: https://myaccount.google.com/apppasswords
+// ─── SMTP TRANSPORTERS (Dual-port fail-safe fallback) ────────────────────────
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
-
 const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const usePool = !isServerless;
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: SMTP_PORT,
-    secure: SMTP_PORT === 465,       // true only for port 465 SSL; false = STARTTLS
-    pool: usePool,                    // disabled in serverless to prevent stale/frozen socket hangs
-    maxConnections: usePool ? 3 : undefined,
-    maxMessages: usePool ? 200 : undefined,
-    rateDelta: usePool ? 1000 : undefined,
-    rateLimit: usePool ? 5 : undefined,
-    connectionTimeout: 5000,          // fail fast — 5s
-    greetingTimeout: 5000,            // fail fast — 5s
-    socketTimeout: 8000,              // fail fast — 8s
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    }
-});
+const createTransporter = (port) => {
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: port,
+        secure: port === 465,       // true only for port 465 SSL; false = STARTTLS
+        pool: usePool,              // disabled in serverless to prevent stale/frozen socket hangs
+        maxConnections: usePool ? 3 : undefined,
+        maxMessages: usePool ? 200 : undefined,
+        rateDelta: usePool ? 1000 : undefined,
+        rateLimit: usePool ? 5 : undefined,
+        connectionTimeout: 4000,    // fail fast — 4s
+        greetingTimeout: 4000,      // fail fast — 4s
+        socketTimeout: 6000,        // fail fast — 6s
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2'
+        }
+    });
+};
+
+const transporterPrimary = createTransporter(SMTP_PORT);
+const fallbackPort = SMTP_PORT === 465 ? 587 : 465;
+const transporterFallback = createTransporter(fallbackPort);
 
 // ─── WARM UP & KEEPALIVE: only for persistent servers (like VPS) ───────────────
 if (usePool && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    transporter.verify()
+    transporterPrimary.verify()
         .then(() => {
-            console.log('[Email] SMTP connection pool ready ✓ (port ' + SMTP_PORT + ')');
+            console.log(`[Email] Primary SMTP connection pool ready ✓ (port ${SMTP_PORT})`);
         })
-        .catch((err) => console.error('[Email] SMTP connection failed:', err.message));
+        .catch((err) => console.error(`[Email] Primary SMTP connection check failed:`, err.message));
 
-    // ─── KEEPALIVE: ping every 4 minutes to prevent connection drop ───────────
-    // Gmail closes idle SMTP connections after ~5 minutes. This prevents cold restarts.
+    transporterFallback.verify()
+        .then(() => {
+            console.log(`[Email] Fallback SMTP connection pool ready ✓ (port ${fallbackPort})`);
+        })
+        .catch((err) => console.error(`[Email] Fallback SMTP connection check failed:`, err.message));
+
+    // KEEPALIVE: ping every 4 minutes to prevent connection drop
     setInterval(() => {
-        transporter.verify()
-            .then(() => console.log('[Email] Pool keepalive ✓'))
-            .catch(() => {}); // silently ignore keepalive failures
+        transporterPrimary.verify().catch(() => {});
+        transporterFallback.verify().catch(() => {});
     }, 4 * 60 * 1000);
 }
 
+// ─── SEND MAIL WITH FALLBACK ──────────────────────────────────────────────────
+const sendMailWithFallback = async (mailOptions) => {
+    try {
+        const info = await transporterPrimary.sendMail(mailOptions);
+        return info;
+    } catch (primaryError) {
+        console.warn(`[Email Warning] Primary SMTP (port ${SMTP_PORT}) failed:`, primaryError.message);
+        console.log(`[Email] Retrying via fallback SMTP on port ${fallbackPort}...`);
+        try {
+            const info = await transporterFallback.sendMail(mailOptions);
+            console.log(`[Email] Fallback SMTP succeeded! MessageId: ${info.messageId}`);
+            return info;
+        } catch (fallbackError) {
+            console.error(`[Email Error] Fallback SMTP also failed:`, fallbackError.message);
+            throw new Error(`SMTP failed on both ports. Primary: ${primaryError.message}. Fallback: ${fallbackError.message}`);
+        }
+    }
+};
 
 // ─── SEND OTP ─────────────────────────────────────────────────────────────────
 const sendOTP = async (toEmail, otp) => {
@@ -57,13 +83,11 @@ const sendOTP = async (toEmail, otp) => {
     }
 
     try {
-        const info = await transporter.sendMail({
+        const info = await sendMailWithFallback({
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
             subject: `${otp} — AASW Foundation Verification Code`,
-            // Plain text fallback (renders instantly in most clients)
             text: `Your AASW Foundation OTP is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.`,
-            // Minimal HTML for fastest delivery — lighter payload = faster send
             html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto">
 <h2 style="color:#1a73e8;margin-bottom:4px">AASW Foundation</h2>
 <p style="color:#555;margin-top:0">Your One-Time Password</p>
@@ -72,7 +96,7 @@ const sendOTP = async (toEmail, otp) => {
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
 <p style="color:#999;font-size:11px">AASW Foundation · Empowering Lives · Building Futures<br>If you did not request this, ignore this email.</p>
 </div>`,
-            priority: 'high',  // mark as high priority for faster inbox delivery
+            priority: 'high',
         });
         console.log(`[Email] OTP sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
@@ -88,7 +112,6 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
         return true;
     }
 
-    // Escape HTML to prevent XSS via email injection
     const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(senderEmail);
@@ -98,7 +121,7 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
     try {
         const mailOptions = {
             from: `"AASW Website" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-            to: process.env.SMTP_USER, // Send to the foundation's own email
+            to: process.env.SMTP_USER,
             replyTo: senderEmail,
             subject: `New Web Query: ${subject}`,
             html: `
@@ -113,11 +136,11 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
             `,
         };
 
-        const info = await transporter.sendMail(mailOptions);
+        const info = await sendMailWithFallback(mailOptions);
         console.log(`[Email] Contact notification sent. MessageId: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error(`[Email Error] Failed to send contact notification:`, error);
+        console.error(`[Email Error] Failed to send contact notification:`, error.message);
         return false;
     }
 };
@@ -153,11 +176,11 @@ const sendMembershipSuccessEmail = async (toEmail, memberName, pdfBuffer) => {
             ]
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email] Membership Sucess/Cert sent to ${toEmail} | MsgId: ${info.messageId}`);
+        const info = await sendMailWithFallback(mailOptions);
+        console.log(`[Email] Membership Success/Cert sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error(`[Email Error] Failed to send membership success email:`, error);
+        console.error(`[Email Error] Failed to send membership success email:`, error.message);
         return false;
     }
 };

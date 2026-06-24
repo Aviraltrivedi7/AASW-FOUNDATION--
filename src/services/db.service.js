@@ -172,16 +172,13 @@ async function updateOtpVerified(email) {
         }
     }
 
-    // Sync to InsForge
+    // Sync to InsForge in background
     if (insforge) {
-        try {
-            const { error } = await insforge.database.from('otps').update({ verified: true }).eq('email', email);
-            if (error) {
-                console.warn('[Sync] InsForge OTP verify sync failed:', error.message);
-            }
-        } catch (err) {
-            console.warn('[Sync] InsForge OTP verify sync error:', err.message);
-        }
+        insforge.database.from('otps').update({ verified: true }).eq('email', email)
+            .then(({ error }) => {
+                if (error) console.warn('[Sync] InsForge OTP verify sync failed:', error.message);
+            })
+            .catch(err => console.warn('[Sync] InsForge OTP verify sync error:', err.message));
     }
 }
 
@@ -514,14 +511,11 @@ async function upsertSiteStats(statsArray) {
 
     // 2. Sync to InsForge in background
     if (insforge) {
-        try {
-            const { error } = await insforge.database.from('site_stats').upsert(statsArray);
-            if (error) {
-                console.warn('[Sync] InsForge site_stats sync failed:', error.message);
-            }
-        } catch (err) {
-            console.warn('[Sync] InsForge site_stats sync error:', err.message);
-        }
+        insforge.database.from('site_stats').upsert(statsArray)
+            .then(({ error }) => {
+                if (error) console.warn('[Sync] InsForge site_stats sync failed:', error.message);
+            })
+            .catch(err => console.warn('[Sync] InsForge site_stats sync error:', err.message));
     }
 }
 
