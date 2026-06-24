@@ -4,7 +4,8 @@ dotenv.config();
 
 // ─── SMTP TRANSPORTERS (Dual-port fail-safe fallback) ────────────────────────
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
-const usePool = true; // Enabled globally so warm serverless containers reuse connection pool
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const usePool = !isServerless; // Disabled in serverless to prevent stale/frozen socket hangs
 
 const createTransporter = (port) => {
     return nodemailer.createTransport({
@@ -85,7 +86,7 @@ const sendOTP = async (toEmail, otp) => {
         const info = await sendMailWithFallback({
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
-            subject: `${otp} — AASW Foundation Verification Code`,
+            subject: `AASW Foundation Verification Code — ${otp}`,
             text: `Your AASW Foundation OTP is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.`,
             html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto">
 <h2 style="color:#1a73e8;margin-bottom:4px">AASW Foundation</h2>
@@ -96,6 +97,11 @@ const sendOTP = async (toEmail, otp) => {
 <p style="color:#999;font-size:11px">AASW Foundation · Empowering Lives · Building Futures<br>If you did not request this, ignore this email.</p>
 </div>`,
             priority: 'high',
+            headers: {
+                'X-Priority': '1',
+                'X-MSMail-Priority': 'High',
+                'Importance': 'high'
+            }
         });
         console.log(`[Email] OTP sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
