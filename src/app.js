@@ -104,8 +104,30 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("tiny"));
 }
 
+const { connectMongoDB, isMongoConnected } = require("./config/mongodb");
+
+let dbConnectionPromise = null;
+const ensureDbConnected = async (req, res, next) => {
+    if (isMongoConnected()) {
+        return next();
+    }
+    if (!dbConnectionPromise) {
+        dbConnectionPromise = connectMongoDB().catch(err => {
+            console.error('[Middleware] Database connection failed:', err.message);
+            return false;
+        });
+    }
+    const success = await dbConnectionPromise;
+    if (!success) {
+        dbConnectionPromise = null;
+    }
+    next();
+};
+
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
 const formLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 15, standardHeaders: true, legacyHeaders: false });
+
+app.use("/api/", ensureDbConnected);
 app.use("/api/", apiLimiter);
 
 app.use("/api/v1/health", healthRoutes);
