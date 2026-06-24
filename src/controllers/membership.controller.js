@@ -7,28 +7,7 @@ const db = require('../services/db.service');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
-let vercelFunctions;
-try {
-    vercelFunctions = require('@vercel/functions');
-} catch (e) {
-    // ignore
-}
 
-// ─── Helper: Run work in background (Vercel-safe) ─────────────────────────
-function runInBackground(asyncFn) {
-    const promise = asyncFn().catch(err => {
-        console.error('[Background] Task error:', err.message);
-    });
-
-    if (vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
-        try {
-            vercelFunctions.waitUntil(promise);
-        } catch (e) {
-            // waitUntil not available in this context, promise still runs
-        }
-    }
-    // The promise is already running — fire and forget
-}
 
 // Membership plans definition
 const MEMBERSHIP_PLANS = [
@@ -81,8 +60,10 @@ function isValidEmail(email) {
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/membership/send-otp
 // ─────────────────────────────────────────────────────────────────────────────
-// STRATEGY: Generate OTP → Respond INSTANTLY → DB save + Email in background
-// This ensures the user sees the OTP modal immediately.
+// STRATEGY: Generate OTP → DB save + Email in PARALLEL → Respond
+// Both run simultaneously so total time = max(DB, Email) not DB + Email.
+// We MUST await email before responding because Vercel freezes the container
+// after res.json(), killing any background promises.
 // ─────────────────────────────────────────────────────────────────────────────
 const requestEmailOTP = catchAsync(async (req, res) => {
     const { email, name, phone, pan } = req.body;
@@ -95,7 +76,48 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     const devMode = (!process.env.SMTP_USER || !process.env.SMTP_PASS);
 
-    // ⚡ RESPOND INSTANTLY — don't wait for DB or email
+    // ⚡ Run DB save + Email send in PARALLEL (not sequential)
+    // This cuts total time to max(DB, Email) instead of DB + Email
+    const startTime = Date.now();
+
+    const [dbResult, emailResult] = await Promise.allSettled([
+        // Task 1: Save OTP to database
+        db.upsertOtp({
+            email,
+            name: name || '',
+            phone: phone || '',
+            pan: pan || '',
+            otp,
+            expires_at: expiresAt,
+            verified: false
+        }),
+        // Task 2: Send OTP email (only if not dev mode)
+        devMode
+            ? Promise.resolve(true)
+            : sendOTP(email, otp)
+    ]);
+
+    const elapsed = Date.now() - startTime;
+
+    if (dbResult.status === 'rejected') {
+        console.error(`[OTP] DB save failed for ${email}:`, dbResult.reason?.message || dbResult.reason);
+    }
+
+    let emailSent = true;
+    if (emailResult.status === 'rejected') {
+        console.error(`[OTP] Email send FAILED for ${email}:`, emailResult.reason?.message || emailResult.reason);
+        emailSent = false;
+    } else if (emailResult.value === false) {
+        console.error(`[OTP] Email returned false for ${email} — SMTP error`);
+        emailSent = false;
+    }
+
+    console.log(`[OTP] Parallel tasks done in ${elapsed}ms for ${email} | DB: ${dbResult.status} | Email: ${emailSent ? 'sent' : 'FAILED'}`);
+
+    if (!devMode && !emailSent) {
+        throw new ApiError(500, 'Failed to send verification email. Please try again.');
+    }
+
     res.status(200).json(
         new ApiResponse(200, {
             email,
@@ -106,44 +128,8 @@ const requestEmailOTP = catchAsync(async (req, res) => {
             : `OTP sent to ${email}. Valid for 5 minutes.`
         )
     );
-
-    // ── Everything below runs AFTER the response is already sent ──
-
-    // Save OTP to DB and send email in PARALLEL (not sequential)
-    runInBackground(async () => {
-        const startTime = Date.now();
-
-        const [dbResult, emailResult] = await Promise.allSettled([
-            // Task 1: Save OTP to database
-            db.upsertOtp({
-                email,
-                name: name || '',
-                phone: phone || '',
-                pan: pan || '',
-                otp,
-                expires_at: expiresAt,
-                verified: false
-            }),
-            // Task 2: Send OTP email (only if not dev mode)
-            devMode
-                ? Promise.resolve({ success: true })
-                : sendOTP(email, otp)
-        ]);
-
-        const elapsed = Date.now() - startTime;
-
-        if (dbResult.status === 'rejected') {
-            console.error(`[OTP] DB save failed for ${email}:`, dbResult.reason?.message || dbResult.reason);
-        }
-        if (emailResult.status === 'rejected') {
-            console.error(`[OTP] Email send failed for ${email}:`, emailResult.reason?.message || emailResult.reason);
-        } else if (emailResult.value === false) {
-            console.error(`[OTP] Email returned false for ${email} — SMTP may have failed`);
-        }
-
-        console.log(`[OTP] Background tasks completed in ${elapsed}ms for ${email}`);
-    });
 });
+
 
 // POST /api/v1/membership/verify-otp
 const verifyEmailOTP = catchAsync(async (req, res) => {
@@ -361,24 +347,22 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     res.clearCookie('verified_email');
     await db.deleteOtpByEmail(email);
 
-    // ⚡ Respond FIRST, then generate/email certificate in background
-    res.status(200).json(
+    // Generate and email certificate BEFORE responding (Vercel kills background tasks after response)
+    try {
+        const shortId = razorpay_payment_id.slice(-5).toUpperCase();
+        const formattedId = `AASW-2025-${shortId}`;
+        const planStr = (securePlanId === 'annual') ? '1 Year' : 'Lifetime';
+        const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
+        await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
+        console.log("[Membership] Successfully emailed certificate to: " + email);
+    } catch(err) {
+        console.error("[Membership] Error generating/emailing certificate:", err.message);
+        // Don't throw — payment is already verified, cert email failure shouldn't block success
+    }
+
+    return res.status(200).json(
         new ApiResponse(200, { membershipId: razorpay_payment_id }, 'Payment verified successfully.')
     );
-
-    // Certificate generation + email in background
-    runInBackground(async () => {
-        try {
-            const shortId = razorpay_payment_id.slice(-5).toUpperCase();
-            const formattedId = `AASW-2025-${shortId}`;
-            const planStr = (securePlanId === 'annual') ? '1 Year' : 'Lifetime';
-            const pdfBuffer = await generateCertificatePdf(userData.name || 'Member', formattedId, planStr);
-            await sendMembershipSuccessEmail(email, userData.name || 'Member', pdfBuffer);
-            console.log("[Membership] Successfully emailed certificate to: " + email);
-        } catch(err) {
-            console.error("[Membership] Error generating/emailing certificate:", err);
-        }
-    });
 });
 
 // POST /api/v1/membership/webhook
