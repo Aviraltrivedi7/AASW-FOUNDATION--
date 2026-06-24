@@ -107,22 +107,22 @@ if (process.env.NODE_ENV === "development") {
 const { connectMongoDB, isMongoConnected } = require("./config/mongodb");
 
 let dbConnectionPromise = null;
-const ensureDbConnected = async (req, res, next) => {
+const ensureDbConnected = (req, res, next) => {
     if (isMongoConnected()) {
         return next();
     }
+    // Kick off connection in background — DON'T block the request
+    // The db.service.js layer already falls back to InsForge if MongoDB isn't ready
     if (!dbConnectionPromise) {
         dbConnectionPromise = connectMongoDB().catch(err => {
             console.error('[Middleware] Database connection failed:', err.message);
+            dbConnectionPromise = null;
             return false;
         });
     }
-    const success = await dbConnectionPromise;
-    if (!success) {
-        dbConnectionPromise = null;
-    }
     next();
 };
+
 
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
 const formLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 15, standardHeaders: true, legacyHeaders: false });

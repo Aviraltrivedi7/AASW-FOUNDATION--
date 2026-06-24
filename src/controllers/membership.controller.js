@@ -14,6 +14,22 @@ try {
     // ignore
 }
 
+// ─── Helper: Run work in background (Vercel-safe) ─────────────────────────
+function runInBackground(asyncFn) {
+    const promise = asyncFn().catch(err => {
+        console.error('[Background] Task error:', err.message);
+    });
+
+    if (vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
+        try {
+            vercelFunctions.waitUntil(promise);
+        } catch (e) {
+            // waitUntil not available in this context, promise still runs
+        }
+    }
+    // The promise is already running — fire and forget
+}
+
 // Membership plans definition
 const MEMBERSHIP_PLANS = [
     {
@@ -62,7 +78,12 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/membership/send-otp
+// ─────────────────────────────────────────────────────────────────────────────
+// STRATEGY: Generate OTP → Respond INSTANTLY → DB save + Email in background
+// This ensures the user sees the OTP modal immediately.
+// ─────────────────────────────────────────────────────────────────────────────
 const requestEmailOTP = catchAsync(async (req, res) => {
     const { email, name, phone, pan } = req.body;
 
@@ -71,46 +92,57 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     }
 
     const otp = generateOTP();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
-
-    // Use hybrid DB service (MongoDB first, InsForge sync)
-    const result = await db.upsertOtp({
-        email, name: name || '', phone: phone || '', pan: pan || '', otp, expires_at: expiresAt, verified: false
-    });
-
-    if (!result.success) {
-        console.warn("[OTP] Database upsert failed:", result.error);
-    }
-
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
     const devMode = (!process.env.SMTP_USER || !process.env.SMTP_PASS);
-    const responseMsg = devMode
-        ? `[DEV MODE] OTP sent to console. Check your server logs.`
-        : `OTP sent to ${email}. Valid for 5 minutes.`;
 
-    if (!devMode) {
-        const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-        if (isServerless && vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
-            try {
-                vercelFunctions.waitUntil(
-                    sendOTP(email, otp).then(sent => {
-                        if (!sent) console.error(`[Membership] Failed to send OTP email to ${email}`);
-                    }).catch(err => {
-                        console.error(`[Membership] Email send error to ${email}:`, err.message);
-                    })
-                );
-            } catch (err) {
-                console.warn("[Vercel] waitUntil failed, falling back to await:", err.message);
-                await sendOTP(email, otp);
-            }
-        } else {
-            // Local dev / Persistent VPS - fire and forget
-            sendOTP(email, otp).catch(err => console.error('[Local] SMTP send failed:', err.message));
-        }
-    }
-
+    // ⚡ RESPOND INSTANTLY — don't wait for DB or email
     res.status(200).json(
-        new ApiResponse(200, { email, devMode, devOtp: devMode ? otp : undefined }, responseMsg)
+        new ApiResponse(200, {
+            email,
+            devMode,
+            devOtp: devMode ? otp : undefined
+        }, devMode
+            ? `[DEV MODE] OTP sent to console. Check your server logs.`
+            : `OTP sent to ${email}. Valid for 5 minutes.`
+        )
     );
+
+    // ── Everything below runs AFTER the response is already sent ──
+
+    // Save OTP to DB and send email in PARALLEL (not sequential)
+    runInBackground(async () => {
+        const startTime = Date.now();
+
+        const [dbResult, emailResult] = await Promise.allSettled([
+            // Task 1: Save OTP to database
+            db.upsertOtp({
+                email,
+                name: name || '',
+                phone: phone || '',
+                pan: pan || '',
+                otp,
+                expires_at: expiresAt,
+                verified: false
+            }),
+            // Task 2: Send OTP email (only if not dev mode)
+            devMode
+                ? Promise.resolve({ success: true })
+                : sendOTP(email, otp)
+        ]);
+
+        const elapsed = Date.now() - startTime;
+
+        if (dbResult.status === 'rejected') {
+            console.error(`[OTP] DB save failed for ${email}:`, dbResult.reason?.message || dbResult.reason);
+        }
+        if (emailResult.status === 'rejected') {
+            console.error(`[OTP] Email send failed for ${email}:`, emailResult.reason?.message || emailResult.reason);
+        } else if (emailResult.value === false) {
+            console.error(`[OTP] Email returned false for ${email} — SMTP may have failed`);
+        }
+
+        console.log(`[OTP] Background tasks completed in ${elapsed}ms for ${email}`);
+    });
 });
 
 // POST /api/v1/membership/verify-otp
@@ -329,8 +361,13 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     res.clearCookie('verified_email');
     await db.deleteOtpByEmail(email);
 
-    // Generate and email certificate in background to speed up payment verification screen
-    const sendCertMail = async () => {
+    // ⚡ Respond FIRST, then generate/email certificate in background
+    res.status(200).json(
+        new ApiResponse(200, { membershipId: razorpay_payment_id }, 'Payment verified successfully.')
+    );
+
+    // Certificate generation + email in background
+    runInBackground(async () => {
         try {
             const shortId = razorpay_payment_id.slice(-5).toUpperCase();
             const formattedId = `AASW-2025-${shortId}`;
@@ -341,23 +378,7 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
         } catch(err) {
             console.error("[Membership] Error generating/emailing certificate:", err);
         }
-    };
-
-    const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-    if (isServerless && vercelFunctions && typeof vercelFunctions.waitUntil === 'function') {
-        try {
-            vercelFunctions.waitUntil(sendCertMail());
-        } catch (err) {
-            console.warn("[Vercel] waitUntil failed for cert email:", err.message);
-            sendCertMail().catch(() => {});
-        }
-    } else {
-        sendCertMail().catch(() => {});
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, { membershipId: razorpay_payment_id }, 'Payment verified successfully.')
-    );
+    });
 });
 
 // POST /api/v1/membership/webhook

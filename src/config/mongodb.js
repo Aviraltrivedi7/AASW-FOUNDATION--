@@ -16,9 +16,10 @@ async function connectMongoDB() {
 
     try {
         await mongoose.connect(uri, {
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 45000,
-            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 3000,
+            socketTimeoutMS: 10000,
+            maxPoolSize: 5,
+            connectTimeoutMS: 3000,
         });
 
         isConnected = true;

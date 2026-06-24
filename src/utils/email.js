@@ -2,24 +2,20 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// ─── SMTP TRANSPORTERS (Dual-port fail-safe fallback) ────────────────────────
-const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
-const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-const usePool = !isServerless; // Disabled in serverless to prevent stale/frozen socket hangs
+// ─── ULTRA-FAST LAZY SMTP — transporter created on first use only ────────────
+let _transporter = null;
 
-const createTransporter = (port) => {
-    return nodemailer.createTransport({
+function getTransporter() {
+    if (_transporter) return _transporter;
+
+    _transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: port,
-        secure: port === 465,       // true only for port 465 SSL; false = STARTTLS
-        pool: usePool,              // disabled in serverless to prevent stale/frozen socket hangs
-        maxConnections: usePool ? 3 : undefined,
-        maxMessages: usePool ? 200 : undefined,
-        rateDelta: usePool ? 1000 : undefined,
-        rateLimit: usePool ? 5 : undefined,
-        connectionTimeout: 4000,    // fail fast — 4s
-        greetingTimeout: 4000,      // fail fast — 4s
-        socketTimeout: 6000,        // fail fast — 6s
+        port: 465,
+        secure: true,           // SSL direct — fastest handshake
+        pool: false,            // ALWAYS fresh connections — serverless safe
+        connectionTimeout: 3000, // 3s max — fail fast
+        greetingTimeout: 3000,   // 3s max
+        socketTimeout: 5000,     // 5s max
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
@@ -29,50 +25,15 @@ const createTransporter = (port) => {
             minVersion: 'TLSv1.2'
         }
     });
-};
 
-const transporterPrimary = createTransporter(SMTP_PORT);
-const fallbackPort = SMTP_PORT === 465 ? 587 : 465;
-const transporterFallback = createTransporter(fallbackPort);
-
-// ─── WARM UP & KEEPALIVE: only for persistent servers (like VPS) ───────────────
-if (usePool && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    transporterPrimary.verify()
-        .then(() => {
-            console.log(`[Email] Primary SMTP connection pool ready ✓ (port ${SMTP_PORT})`);
-        })
-        .catch((err) => console.error(`[Email] Primary SMTP connection check failed:`, err.message));
-
-    transporterFallback.verify()
-        .then(() => {
-            console.log(`[Email] Fallback SMTP connection pool ready ✓ (port ${fallbackPort})`);
-        })
-        .catch((err) => console.error(`[Email] Fallback SMTP connection check failed:`, err.message));
-
-    // KEEPALIVE: ping every 4 minutes to prevent connection drop
-    setInterval(() => {
-        transporterPrimary.verify().catch(() => {});
-        transporterFallback.verify().catch(() => {});
-    }, 4 * 60 * 1000);
+    return _transporter;
 }
 
-// ─── SEND MAIL WITH FALLBACK ──────────────────────────────────────────────────
-const sendMailWithFallback = async (mailOptions) => {
-    try {
-        const info = await transporterPrimary.sendMail(mailOptions);
-        return info;
-    } catch (primaryError) {
-        console.warn(`[Email Warning] Primary SMTP (port ${SMTP_PORT}) failed:`, primaryError.message);
-        console.log(`[Email] Retrying via fallback SMTP on port ${fallbackPort}...`);
-        try {
-            const info = await transporterFallback.sendMail(mailOptions);
-            console.log(`[Email] Fallback SMTP succeeded! MessageId: ${info.messageId}`);
-            return info;
-        } catch (fallbackError) {
-            console.error(`[Email Error] Fallback SMTP also failed:`, fallbackError.message);
-            throw new Error(`SMTP failed on both ports. Primary: ${primaryError.message}. Fallback: ${fallbackError.message}`);
-        }
-    }
+// ─── SEND MAIL — single attempt, no fallback (faster) ──────────────────────
+const sendMail = async (mailOptions) => {
+    const transporter = getTransporter();
+    const info = await transporter.sendMail(mailOptions);
+    return info;
 };
 
 // ─── SEND OTP ─────────────────────────────────────────────────────────────────
@@ -83,14 +44,14 @@ const sendOTP = async (toEmail, otp) => {
     }
 
     try {
-        const info = await sendMailWithFallback({
+        const info = await sendMail({
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
-            subject: `AASW Foundation Verification Code — ${otp}`,
-            text: `Your AASW Foundation OTP is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.`,
+            subject: `AASW Foundation — Your Verification Code`,
+            text: `Your AASW Foundation verification code is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.`,
             html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto">
 <h2 style="color:#1a73e8;margin-bottom:4px">AASW Foundation</h2>
-<p style="color:#555;margin-top:0">Your One-Time Password</p>
+<p style="color:#555;margin-top:0">Your Verification Code</p>
 <div style="font-size:36px;font-weight:700;letter-spacing:6px;color:#d93025;background:#fce8e6;padding:20px;text-align:center;border-radius:8px;margin:20px 0">${otp}</div>
 <p style="color:#555;font-size:14px">Valid for <strong>5 minutes</strong>. Do not share this code with anyone.</p>
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
@@ -141,7 +102,7 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
             `,
         };
 
-        const info = await sendMailWithFallback(mailOptions);
+        const info = await sendMail(mailOptions);
         console.log(`[Email] Contact notification sent. MessageId: ${info.messageId}`);
         return true;
     } catch (error) {
@@ -181,7 +142,7 @@ const sendMembershipSuccessEmail = async (toEmail, memberName, pdfBuffer) => {
             ]
         };
 
-        const info = await sendMailWithFallback(mailOptions);
+        const info = await sendMail(mailOptions);
         console.log(`[Email] Membership Success/Cert sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
     } catch (error) {
