@@ -162,3 +162,5 @@ const sendMembershipSuccessEmail = async (toEmail, memberName, pdfBuffer) => {
 };
 
 module.exports = { sendOTP, sendContactNotification, sendMembershipSuccessEmail };
+// Trigger new deployment for env vars.
+
