@@ -104,10 +104,13 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     }
 
     let emailSent = true;
+    let emailErrorMsg = '';
     if (emailResult.status === 'rejected') {
-        console.error(`[OTP] Email send FAILED for ${email}:`, emailResult.reason?.message || emailResult.reason);
+        emailErrorMsg = emailResult.reason?.message || String(emailResult.reason);
+        console.error(`[OTP] Email send FAILED for ${email}:`, emailErrorMsg);
         emailSent = false;
     } else if (emailResult.value === false) {
+        emailErrorMsg = 'SMTP returned false';
         console.error(`[OTP] Email returned false for ${email} — SMTP error`);
         emailSent = false;
     }
@@ -115,7 +118,7 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     console.log(`[OTP] Parallel tasks done in ${elapsed}ms for ${email} | DB: ${dbResult.status} | Email: ${emailSent ? 'sent' : 'FAILED'}`);
 
     if (!devMode && !emailSent) {
-        throw new ApiError(500, 'Failed to send verification email. Please try again.');
+        throw new ApiError(500, `Failed to send verification email: ${emailErrorMsg}. Please try again.`);
     }
 
     res.status(200).json(

@@ -2,20 +2,16 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// ─── ULTRA-FAST LAZY SMTP — transporter created on first use only ────────────
-let _transporter = null;
-
-function getTransporter() {
-    if (_transporter) return _transporter;
-
-    _transporter = nodemailer.createTransport({
+// Create transporter helper for specific port
+function createTransporter(port, secure) {
+    return nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: 465,
-        secure: true,           // SSL direct — fastest handshake
-        pool: false,            // ALWAYS fresh connections — serverless safe
-        connectionTimeout: 3000, // 3s max — fail fast
-        greetingTimeout: 3000,   // 3s max
-        socketTimeout: 5000,     // 5s max
+        port: port,
+        secure: secure,
+        pool: false,            // fresh connection per mail for serverless
+        connectionTimeout: 8000, // 8s max
+        greetingTimeout: 8000,   // 8s max
+        socketTimeout: 10000,    // 10s max
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
@@ -25,15 +21,30 @@ function getTransporter() {
             minVersion: 'TLSv1.2'
         }
     });
-
-    return _transporter;
 }
 
-// ─── SEND MAIL — single attempt, no fallback (faster) ──────────────────────
+// ─── SEND MAIL WITH FALLBACK ──────────────────────────────────────────────────
 const sendMail = async (mailOptions) => {
-    const transporter = getTransporter();
-    const info = await transporter.sendMail(mailOptions);
-    return info;
+    // 1. Try port 465 (SSL) first
+    try {
+        console.log(`[Email] Attempting delivery on port 465 (SSL)...`);
+        const transporter465 = createTransporter(465, true);
+        const info = await transporter465.sendMail(mailOptions);
+        console.log(`[Email] Port 465 succeeded! MsgId: ${info.messageId}`);
+        return info;
+    } catch (err465) {
+        console.warn(`[Email Warning] Port 465 failed: ${err465.message}. Retrying via port 587 (STARTTLS)...`);
+        // 2. Fallback to port 587
+        try {
+            const transporter587 = createTransporter(587, false);
+            const info = await transporter587.sendMail(mailOptions);
+            console.log(`[Email] Port 587 fallback succeeded! MsgId: ${info.messageId}`);
+            return info;
+        } catch (err587) {
+            console.error(`[Email Error] Both SMTP ports failed. Port 465: ${err465.message} | Port 587: ${err587.message}`);
+            throw new Error(`SMTP failed on both ports. Port 465: ${err465.message} | Port 587: ${err587.message}`);
+        }
+    }
 };
 
 // ─── SEND OTP ─────────────────────────────────────────────────────────────────
@@ -44,7 +55,7 @@ const sendOTP = async (toEmail, otp) => {
     }
 
     try {
-        const info = await sendMail({
+        await sendMail({
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
             subject: `AASW Foundation — Your Verification Code`,
@@ -64,11 +75,10 @@ const sendOTP = async (toEmail, otp) => {
                 'Importance': 'high'
             }
         });
-        console.log(`[Email] OTP sent to ${toEmail} | MsgId: ${info.messageId}`);
         return true;
     } catch (error) {
         console.error(`[Email Error] OTP send failed for ${toEmail}:`, error.message);
-        return false;
+        throw error; // Re-throw so controller catches it and prints details
     }
 };
 
