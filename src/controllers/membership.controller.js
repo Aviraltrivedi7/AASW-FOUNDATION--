@@ -118,7 +118,10 @@ const requestEmailOTP = catchAsync(async (req, res) => {
     console.log(`[OTP] Parallel tasks done in ${elapsed}ms for ${email} | DB: ${dbResult.status} | Email: ${emailSent ? 'sent' : 'FAILED'}`);
 
     if (!devMode && !emailSent) {
-        throw new ApiError(500, `Failed to send verification email: ${emailErrorMsg}. Please try again.`);
+        const u = process.env.SMTP_USER || '';
+        const p = process.env.SMTP_PASS || '';
+        const debug = `[Vercel Env Debug: user='${u}', len=${p.length}, mask='${p ? p[0] + '...' + p.slice(-1) : 'none'}']`;
+        throw new ApiError(500, `Failed to send verification email ${debug}: ${emailErrorMsg}. Please try again.`);
     }
 
     res.status(200).json(
