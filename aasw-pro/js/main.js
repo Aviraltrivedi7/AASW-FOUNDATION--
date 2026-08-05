@@ -1,0 +1,439 @@
+/* ================================================================
+   AASW FOUNDATION — SODES.IN STYLE JAVASCRIPT
+   Features: Slider · Navbar · Scroll Reveal · Counters ·
+             Language Toggle · Newsletter · Back to Top
+================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initSlider();
+  initNavbar();
+  initMobileNav();
+  initDropdownTouch();
+  initScrollReveal();
+  initCounters();
+  initBackToTop();
+  initContactForm();
+  initSmoothAnchors();
+  initScrollProgress();
+  initDynamicYear();
+  initNewsletterForm();
+});
+
+/* ═══ HERO SLIDER ═══ */
+function initSlider() {
+  const track = document.getElementById('sliderTrack');
+  const slides = track?.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.slider-dots .dot');
+  const prevBtn = document.getElementById('sliderPrev');
+  const nextBtn = document.getElementById('sliderNext');
+  if (!track || !slides?.length) return;
+
+  let current = 0;
+  const total = slides.length;
+  let autoSlideTimer;
+
+  function goToSlide(index) {
+    current = (index + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  function nextSlide() { goToSlide(current + 1); }
+  function prevSlide() { goToSlide(current - 1); }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(nextSlide, 5000);
+  }
+
+  function stopAutoSlide() {
+    clearInterval(autoSlideTimer);
+  }
+
+  prevBtn?.addEventListener('click', () => { prevSlide(); startAutoSlide(); });
+  nextBtn?.addEventListener('click', () => { nextSlide(); startAutoSlide(); });
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { goToSlide(i); startAutoSlide(); });
+  });
+
+  // Touch/swipe support
+  let startX = 0;
+  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; stopAutoSlide(); }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+    startAutoSlide();
+  }, { passive: true });
+
+  startAutoSlide();
+}
+
+/* ═══ NAVBAR SCROLL BEHAVIOR ═══ */
+function initNavbar() {
+  const nav = document.getElementById('mainNav');
+  const brandBar = document.querySelector('.top-brand-bar');
+  if (!nav) return;
+
+  let lastScroll = 0;
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        // Add scrolled class for visual shrink/shadow
+        nav.classList.toggle('scrolled', scrollY > 60);
+        // Optionally hide brand bar on scroll down, show on scroll up
+        if (brandBar) {
+          brandBar.style.boxShadow = scrollY > 10 ? '0 2px 12px rgba(0,0,0,0.08)' : 'none';
+        }
+        lastScroll = scrollY;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+/* ═══ MOBILE NAV ═══ */
+function initMobileNav() {
+  const hamburger = document.getElementById('hamburger');
+  const overlay = document.getElementById('mobileOverlay');
+  if (!hamburger || !overlay) return;
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    overlay.classList.toggle('open');
+    document.body.style.overflow = overlay.classList.contains('open') ? 'hidden' : '';
+  });
+
+  overlay.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => closeMobileNav());
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeMobileNav();
+  });
+}
+
+window.closeMobileNav = function () {
+  document.getElementById('mobileOverlay')?.classList.remove('open');
+  document.getElementById('hamburger')?.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+/* ═══ SCROLL REVEAL ═══ */
+function initScrollReveal() {
+  const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  if (!elements.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  elements.forEach(el => observer.observe(el));
+}
+
+/* ═══ COUNTER ANIMATION ═══ */
+function initCounters() {
+  const nums = document.querySelectorAll('.counter-num');
+  if (!nums.length) return;
+  let animated = false;
+
+  function animateCounters() {
+    if (animated) return;
+    const first = nums[0].getBoundingClientRect();
+    if (first.top > window.innerHeight) return;
+    animated = true;
+
+    nums.forEach(el => {
+      const target = parseInt(el.dataset.count);
+      if (isNaN(target)) return;
+      const suffix = el.dataset.suffix || '';
+      const duration = 2000;
+      const start = performance.now();
+
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(target * ease).toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    });
+  }
+
+  window.addEventListener('scroll', animateCounters, { passive: true });
+  animateCounters();
+}
+
+/* ═══ BILINGUAL LANGUAGE TOGGLE ═══ */
+/* i18n is now handled entirely by /js/i18n.js — see that file for
+   the TRANSLATIONS dictionary, setLang(), applyTranslations(), etc.
+   Removed ~200 lines of duplicate translation data from here. */
+
+
+/* ═══ BACK TO TOP ═══ */
+function initBackToTop() {
+  const btn = document.getElementById('btt');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 500);
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ═══ SMOOTH ANCHORS ═══ */
+function initSmoothAnchors() {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const id = this.getAttribute('href');
+      if (id === '#') return;
+      const target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      const offset = 130; // brand bar + nav height
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+}
+
+/* ═══ SCROLL PROGRESS ═══ */
+function initScrollProgress() {
+  const bar = document.createElement('div');
+  bar.id = 'scroll-progress';
+  document.body.appendChild(bar);
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight * 100) : 0;
+    bar.style.width = pct + '%';
+  }, { passive: true });
+}
+
+/* ═══ DYNAMIC YEAR ═══ */
+function initDynamicYear() {
+  const year = 2025;
+  const fCopy = document.querySelector('[data-t="f-copy"]');
+  if (fCopy) {
+    const isHi = document.body.classList.contains('lang-hi');
+    fCopy.textContent = isHi
+      ? `© ${year} AASW फाउंडेशन। सर्वाधिकार सुरक्षित। | पंजीकृत गैर-लाभकारी · 80G और 12A प्रमाणित`
+      : `© ${year} AASW Foundation. All rights reserved. | Registered Non-Profit · 80G & 12A Certified`;
+  }
+  // Also update any static copyright elements
+  document.querySelectorAll('.footer-year, [data-year]').forEach(el => {
+    el.textContent = year;
+  });
+}
+
+/* ═══ CONTACT FORM ═══ */
+function initContactForm() {
+  const form = document.getElementById('contactForm');
+  const btn = document.getElementById('contactSubmitBtn');
+  if (!form || !btn) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const lang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
+
+    const name = document.getElementById('contactName')?.value?.trim();
+    const email = document.getElementById('contactEmail')?.value?.trim();
+    const subject = document.getElementById('contactSubject')?.value?.trim();
+    const message = document.getElementById('contactMessage')?.value?.trim();
+
+    // Client-side validation
+    if (!name || name.length < 2) {
+      showToast(lang === 'hi' ? 'कृपया अपना नाम दर्ज करें (कम से कम 2 अक्षर)' : 'Please enter your name (at least 2 characters)', 'error');
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast(lang === 'hi' ? 'कृपया एक मान्य ईमेल दर्ज करें' : 'Please enter a valid email address', 'error');
+      return;
+    }
+    if (!subject || subject.length < 3) {
+      showToast(lang === 'hi' ? 'कृपया विषय दर्ज करें (कम से कम 3 अक्षर)' : 'Please enter a subject (at least 3 characters)', 'error');
+      return;
+    }
+    if (!message || message.length < 10) {
+      showToast(lang === 'hi' ? 'कृपया संदेश दर्ज करें (कम से कम 10 अक्षर)' : 'Please enter a message (at least 10 characters)', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = lang === 'hi' ? '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं...' : '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+      const res = await fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          message,
+          website: document.getElementById('contactWebsite')?.value || ''
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok || res.status === 201 || res.status === 200) {
+        form.reset();
+        showToast(lang === 'hi' ? '✓ आपका संदेश सफलतापूर्वक भेजा गया!' : '✓ Your message has been sent successfully!', 'success');
+      } else {
+        const errMsg = data.message || (lang === 'hi' ? 'कुछ गलत हो गया' : 'Something went wrong');
+        showToast('✗ ' + errMsg, 'error');
+      }
+    } catch (err) {
+      console.warn('Contact form submission failed:', err);
+      showToast(lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : '✗ Network error, please try again', 'error');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = lang === 'hi' ? '<i class="fas fa-paper-plane"></i> संदेश भेजें' : '<i class="fas fa-paper-plane"></i> Send Message';
+  });
+}
+
+
+/* ═══ DROPDOWN TOUCH SUPPORT ═══ */
+function initDropdownTouch() {
+  // On touch devices, toggle dropdown open/close on tap
+  const dropdowns = document.querySelectorAll('.has-dropdown');
+  if (!dropdowns.length) return;
+
+  dropdowns.forEach(dd => {
+    const link = dd.querySelector('.nav-link');
+    if (!link) return;
+
+    link.addEventListener('click', (e) => {
+      // Only intercept on touch devices / narrow screens
+      if (window.innerWidth > 768) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Close other open dropdowns
+      dropdowns.forEach(other => {
+        if (other !== dd) other.classList.remove('open');
+      });
+
+      dd.classList.toggle('open');
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.has-dropdown')) {
+      dropdowns.forEach(dd => dd.classList.remove('open'));
+    }
+  });
+}
+
+/* ═══ NEWSLETTER FORM ═══ */
+function initNewsletterForm() {
+  const form = document.getElementById('newsletterForm');
+  const btn = document.getElementById('newsletterSubmitBtn');
+  const emailInput = document.getElementById('newsletterEmail');
+  if (!form || !btn || !emailInput) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const lang = document.body.classList.contains('lang-hi') ? 'hi' : 'en';
+    const email = emailInput.value?.trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast(lang === 'hi' ? 'कृपया एक मान्य ईमेल दर्ज करें।' : 'Please enter a valid email address.', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.innerHTML = lang === 'hi' ? '<i class="fas fa-spinner fa-spin"></i> सदस्यता ले रहे हैं...' : '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+
+    try {
+      const res = await fetch('/api/v1/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (res.status === 201 || res.status === 200) {
+        form.reset();
+        showToast(lang === 'hi' ? '✓ सदस्यता सफलतापूर्वक पूरी हुई!' : '✓ Successfully subscribed to our newsletter!', 'success');
+      } else {
+        const errMsg = data.message || (lang === 'hi' ? 'कुछ गलत हो गया, फिर प्रयास करें।' : 'Something went wrong, please try again.');
+        showToast('✗ ' + errMsg, 'error');
+      }
+    } catch (err) {
+      console.warn('Newsletter subscription failed:', err);
+      showToast(lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें।' : '✗ Network error, please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+}
+
+/* ═══ SLEEK TOAST NOTIFICATION SYSTEM ═══ */
+function showToast(message, type = 'success') {
+  let container = document.getElementById('aasw-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'aasw-toast-container';
+    container.className = 'fixed bottom-8 right-8 z-[9999] flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'p-4 rounded-2xl backdrop-blur-xl border shadow-2xl flex items-center gap-3 transform translate-y-4 opacity-0 transition-all duration-500 will-change-transform';
+  
+  if (type === 'success') {
+    toast.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+    toast.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+    toast.style.color = '#10b981';
+  } else {
+    toast.style.backgroundColor = 'rgba(244, 63, 94, 0.1)';
+    toast.style.borderColor = 'rgba(244, 63, 94, 0.2)';
+    toast.style.color = '#f43f5e';
+  }
+
+  const icon = document.createElement('span');
+  icon.className = 'material-symbols-outlined shrink-0';
+  icon.textContent = type === 'success' ? 'check_circle' : 'error';
+  
+  const text = document.createElement('span');
+  text.className = 'font-label text-xs sm:text-sm font-semibold tracking-wide';
+  text.textContent = message;
+
+  toast.appendChild(icon);
+  toast.appendChild(text);
+  container.appendChild(toast);
+
+  // Trigger entrance animation next frame
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  });
+
+  // Remove toast after 4s
+  setTimeout(() => {
+    toast.style.transform = 'translateY(4px)';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+      if (container.children.length === 0) {
+        container.remove();
+      }
+    }, 500);
+  }, 4000);
+}
