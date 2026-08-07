@@ -40,6 +40,18 @@ const memberSchema = new mongoose.Schema({
     planId: {
         type: String
     },
+    planName: {
+        type: String,
+        default: ''
+    },
+    amount: {
+        type: Number,
+        default: 0
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
     status: {
         type: String,
         default: 'Pending Verification'

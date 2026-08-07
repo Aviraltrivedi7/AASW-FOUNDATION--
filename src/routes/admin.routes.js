@@ -10,7 +10,7 @@ const db = require('../services/db.service');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-    console.error('❌ FATAL: JWT_SECRET environment variable is not set. Admin auth will not work.');
+    console.error(' FATAL: JWT_SECRET environment variable is not set. Admin auth will not work.');
 }
 
 // Serve login page
@@ -107,6 +107,9 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
     }
 });
 
+const { generateCertificatePdf } = require('../services/certificate.service');
+const { sendMembershipSuccessEmail } = require('../utils/email');
+
 // Protected Stats API — uses hybrid DB service
 router.get('/api/stats', isAuthenticated, async (req, res, next) => {
     try {
@@ -115,6 +118,50 @@ router.get('/api/stats', isAuthenticated, async (req, res, next) => {
     } catch (error) {
         console.error(error);
         next(new ApiError(500, "Error retrieving admin dashboard stats"));
+    }
+});
+
+// GET /admin/api/members — List all members for admin
+router.get('/api/members', isAuthenticated, async (req, res, next) => {
+    try {
+        const stats = await db.getAdminStats();
+        res.status(200).json(new ApiResponse(200, stats.allMemberships || [], "Members retrieved"));
+    } catch (error) {
+        console.error(error);
+        next(new ApiError(500, "Error retrieving members list"));
+    }
+});
+
+// PUT /admin/api/members/:paymentId/verify — Verify & Approve Pending Member
+router.put('/api/members/:paymentId/verify', isAuthenticated, async (req, res, next) => {
+    try {
+        const { paymentId } = req.params;
+        const member = await db.findMemberByPaymentId(paymentId);
+        
+        if (!member) {
+            return res.status(404).json(new ApiError(404, "Member not found"));
+        }
+
+        await db.updateMemberStatus(paymentId, 'Active');
+
+        // Generate certificate & send email
+        try {
+            const shortId = paymentId.slice(-5).toUpperCase();
+            const currentYear = new Date().getFullYear();
+            const formattedId = `AASW-${currentYear}-${shortId}`;
+            const planStr = (member.planId === 'annual') ? '1 Year' : 'Lifetime';
+            
+            const pdfBuffer = await generateCertificatePdf(member.name || 'Member', formattedId, planStr);
+            await sendMembershipSuccessEmail(member.email, member.name || 'Member', pdfBuffer);
+            console.log(`[Admin] Verified and sent certificate to: ${member.email}`);
+        } catch (e) {
+            console.error('[Admin] Error generating/emailing certificate during manual verification:', e.message);
+        }
+
+        res.status(200).json(new ApiResponse(200, { paymentId, status: 'Active' }, "Member verified and certificate issued successfully!"));
+    } catch (error) {
+        console.error(error);
+        next(new ApiError(500, "Error verifying member"));
     }
 });
 

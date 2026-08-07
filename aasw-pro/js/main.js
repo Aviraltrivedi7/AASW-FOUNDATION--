@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollProgress();
   initDynamicYear();
   initNewsletterForm();
+  initHonorRoll();
 });
 
 /* ═══ HERO SLIDER ═══ */
@@ -140,35 +141,44 @@ function initScrollReveal() {
 
 /* ═══ COUNTER ANIMATION ═══ */
 function initCounters() {
-  const nums = document.querySelectorAll('.counter-num');
+  const nums = document.querySelectorAll('.counter-num, .counter');
   if (!nums.length) return;
-  let animated = false;
 
-  function animateCounters() {
-    if (animated) return;
-    const first = nums[0].getBoundingClientRect();
-    if (first.top > window.innerHeight) return;
-    animated = true;
+  const animateElement = (el) => {
+    const target = parseInt(el.dataset.count || el.dataset.target);
+    if (isNaN(target)) return;
+    const suffix = el.dataset.suffix !== undefined ? el.dataset.suffix : '+';
+    const duration = 1800;
+    const start = performance.now();
 
-    nums.forEach(el => {
-      const target = parseInt(el.dataset.count);
-      if (isNaN(target)) return;
-      const suffix = el.dataset.suffix || '';
-      const duration = 2000;
-      const start = performance.now();
-
-      function update(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.floor(target * ease).toLocaleString() + suffix;
-        if (progress < 1) requestAnimationFrame(update);
+    function update(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(target * ease);
+      el.textContent = current.toLocaleString() + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = target.toLocaleString() + suffix;
       }
-      requestAnimationFrame(update);
-    });
-  }
+    }
+    requestAnimationFrame(update);
+  };
 
-  window.addEventListener('scroll', animateCounters, { passive: true });
-  animateCounters();
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateElement(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px 50px 0px' });
+
+    nums.forEach(el => observer.observe(el));
+  } else {
+    nums.forEach(el => animateElement(el));
+  }
 }
 
 /* ═══ BILINGUAL LANGUAGE TOGGLE ═══ */
@@ -288,14 +298,14 @@ function initContactForm() {
 
       if (res.ok || res.status === 201 || res.status === 200) {
         form.reset();
-        showToast(lang === 'hi' ? '✓ आपका संदेश सफलतापूर्वक भेजा गया!' : '✓ Your message has been sent successfully!', 'success');
+        showToast(lang === 'hi' ? 'आपका संदेश सफलतापूर्वक भेजा गया!' : 'Your message has been sent successfully!', 'success');
       } else {
         const errMsg = data.message || (lang === 'hi' ? 'कुछ गलत हो गया' : 'Something went wrong');
-        showToast('✗ ' + errMsg, 'error');
+        showToast(errMsg, 'error');
       }
     } catch (err) {
       console.warn('Contact form submission failed:', err);
-      showToast(lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : '✗ Network error, please try again', 'error');
+      showToast(lang === 'hi' ? 'नेटवर्क त्रुटि, कृपया पुनः प्रयास करें' : 'Network error, please try again', 'error');
     }
 
     btn.disabled = false;
@@ -369,14 +379,14 @@ function initNewsletterForm() {
 
       if (res.status === 201 || res.status === 200) {
         form.reset();
-        showToast(lang === 'hi' ? '✓ सदस्यता सफलतापूर्वक पूरी हुई!' : '✓ Successfully subscribed to our newsletter!', 'success');
+        showToast(lang === 'hi' ? 'सदस्यता सफलतापूर्वक पूरी हुई!' : 'Successfully subscribed to our newsletter!', 'success');
       } else {
         const errMsg = data.message || (lang === 'hi' ? 'कुछ गलत हो गया, फिर प्रयास करें।' : 'Something went wrong, please try again.');
-        showToast('✗ ' + errMsg, 'error');
+        showToast(errMsg, 'error');
       }
     } catch (err) {
       console.warn('Newsletter subscription failed:', err);
-      showToast(lang === 'hi' ? '✗ नेटवर्क त्रुटि, कृपया पुनः प्रयास करें।' : '✗ Network error, please try again.', 'error');
+      showToast(lang === 'hi' ? 'नेटवर्क त्रुटि, कृपया पुनः प्रयास करें।' : 'Network error, please try again.', 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = originalText;
@@ -437,3 +447,226 @@ function showToast(message, type = 'success') {
     }, 500);
   }, 4000);
 }
+
+/* ═══ HONOR ROLL / ACTIVE MEMBERS (ROBUST — never wipes names) ═══ */
+let _honorRollRendered = false; // track if we already rendered members
+
+async function _fetchMembersWithTimeout(timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch('/api/v1/membership/featured', { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    return Array.isArray(json.data) ? json.data : (json.data?.members || []);
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
+}
+
+function _renderHonorGrid(grid, allMembers) {
+  _honorRollRendered = true;
+
+  // Save to sessionStorage so instant on page reload
+  try { sessionStorage.setItem('_honorMembers', JSON.stringify(allMembers)); } catch(e) {}
+
+  if (!allMembers || allMembers.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full text-center py-12 px-6 bg-surface-container/40 rounded-2xl border border-white/5">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-3xl">verified_user</span>
+        </div>
+        <h3 class="text-xl font-headline font-bold text-white mb-2">Be the First Member!</h3>
+        <p class="text-on-surface-variant text-sm max-w-md mx-auto">Join AASW Foundation today and have your name featured on our official Honor Roll.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Add filter buttons
+  let filterContainer = document.getElementById('honor-roll-filters');
+  if (!filterContainer && grid.parentElement) {
+    filterContainer = document.createElement('div');
+    filterContainer.id = 'honor-roll-filters';
+    filterContainer.className = 'flex flex-wrap justify-center gap-3 mb-10';
+    grid.parentElement.insertBefore(filterContainer, grid);
+  }
+
+  const renderGrid = (filterType = 'all') => {
+    let filtered = allMembers;
+    if (filterType === 'annual') filtered = allMembers.filter(m => m.planId !== 'lifetime');
+    if (filterType === 'lifetime') filtered = allMembers.filter(m => m.planId === 'lifetime');
+
+    const annualCount = allMembers.filter(m => m.planId !== 'lifetime').length;
+    const lifetimeCount = allMembers.filter(m => m.planId === 'lifetime').length;
+
+    if (filterContainer) {
+      filterContainer.innerHTML = `
+        <button data-filter="all" class="honor-filter-btn px-6 py-2.5 rounded-full font-label text-xs font-bold uppercase tracking-wider leading-normal transition-all border ${filterType === 'all' ? 'bg-primary text-on-primary border-primary shadow-[0_0_20px_rgba(148,170,255,0.4)]' : 'bg-surface-container text-on-surface-variant border-white/10 hover:border-white/20'}">
+          All Members (${allMembers.length})
+        </button>
+        <button data-filter="annual" class="honor-filter-btn px-6 py-2.5 rounded-full font-label text-xs font-bold uppercase tracking-wider leading-normal transition-all border ${filterType === 'annual' ? 'bg-blue-600 text-white border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-surface-container text-on-surface-variant border-white/10 hover:border-white/20'}">
+          1 Year Subscriptions (${annualCount})
+        </button>
+        <button data-filter="lifetime" class="honor-filter-btn px-6 py-2.5 rounded-full font-label text-xs font-bold uppercase tracking-wider leading-normal transition-all border ${filterType === 'lifetime' ? 'bg-amber-600 text-white border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-surface-container text-on-surface-variant border-white/10 hover:border-white/20'}">
+          Lifetime Membership (${lifetimeCount})
+        </button>
+      `;
+      filterContainer.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => renderGrid(btn.getAttribute('data-filter'));
+      });
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="col-span-full text-center py-12 text-on-surface-variant text-sm bg-surface-container/30 rounded-2xl border border-white/5">
+          No ${filterType === 'lifetime' ? 'Lifetime' : '1-Year'} members found yet.
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(m => {
+      const isLifetime = m.planId === 'lifetime' || (m.planName && m.planName.toLowerCase().includes('lifetime')) || m.amount >= 10000;
+      const badgeLabel = isLifetime ? 'Lifetime Member' : '1 Year Member';
+      const badgeClass = isLifetime
+        ? 'honor-badge-lifetime bg-gradient-to-r from-amber-500/25 via-yellow-500/25 to-amber-600/25 text-amber-300 border-amber-500/50 shadow-[0_0_18px_rgba(245,158,11,0.3)]'
+        : 'honor-badge-annual bg-gradient-to-r from-blue-500/25 via-indigo-500/25 to-cyan-500/25 text-blue-300 border-blue-500/50 shadow-[0_0_18px_rgba(59,130,246,0.3)]';
+      const cardBorder = isLifetime ? 'border-amber-500/40 hover:border-amber-400 hover:shadow-[0_10px_30px_rgba(245,158,11,0.2)]' : 'border-blue-500/40 hover:border-blue-400 hover:shadow-[0_10px_30px_rgba(59,130,246,0.2)]';
+      const memberDate = m.created_at ? new Date(m.created_at).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'August 2026';
+
+      return `
+        <div class="bg-surface-container/80 backdrop-blur-2xl p-6 rounded-2xl border ${cardBorder} transition-all duration-300 hover:-translate-y-1.5 group flex flex-col justify-between shadow-xl relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-32 h-32 ${isLifetime ? 'bg-amber-500/15' : 'bg-blue-500/15'} rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500"></div>
+          
+          <div class="mb-4 relative z-10">
+            <h4 class="font-headline font-extrabold text-white text-base sm:text-lg leading-snug tracking-tight break-words group-hover:text-primary transition-colors" title="${m.name || 'Member'}">
+              ${m.name || 'Member'}
+            </h4>
+            <span class="text-[11px] text-primary-light font-label uppercase font-bold tracking-wider block mt-1">
+              Member Since: ${memberDate}
+            </span>
+          </div>
+
+          <div class="space-y-3 pt-4 border-t border-white/10 relative z-10">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-label font-extrabold uppercase tracking-wider leading-normal border ${badgeClass}">
+                ${badgeLabel}
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-headline font-bold uppercase tracking-wider leading-normal shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+                <span class="material-symbols-outlined text-[15px]">verified</span> Verified Member
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  renderGrid('all');
+}
+
+async function initHonorRoll() {
+  const grid = document.getElementById('lifetime-members-grid');
+  if (!grid) return;
+
+  // STEP 1: Instantly show cached members from sessionStorage (no loading flash)
+  if (!_honorRollRendered) {
+    try {
+      const cached = sessionStorage.getItem('_honorMembers');
+      if (cached) {
+        const cachedMembers = JSON.parse(cached);
+        if (cachedMembers && cachedMembers.length > 0) {
+          _renderHonorGrid(grid, cachedMembers);
+        }
+      }
+    } catch(e) {}
+  }
+
+  // STEP 2: Fetch fresh data from server (with timeout + retry)
+  try {
+    const members = await _fetchMembersWithTimeout(12000);
+    // Only render if we got valid data - NEVER wipe with empty on a re-fetch
+    if (members && members.length > 0) {
+      _renderHonorGrid(grid, members);
+    } else if (!_honorRollRendered) {
+      // First load and truly no members exist
+      _renderHonorGrid(grid, []);
+    }
+  } catch (err) {
+    console.warn('[HonorRoll] Fetch failed, trying retry...', err.message);
+    // RETRY once after 3 seconds
+    try {
+      await new Promise(r => setTimeout(r, 3000));
+      const members = await _fetchMembersWithTimeout(15000);
+      if (members && members.length > 0) {
+        _renderHonorGrid(grid, members);
+      } else if (!_honorRollRendered) {
+        _renderHonorGrid(grid, []);
+      }
+    } catch (retryErr) {
+      console.error('[HonorRoll] Retry also failed:', retryErr.message);
+      // If we never rendered anything, show empty state
+      if (!_honorRollRendered) {
+        _renderHonorGrid(grid, []);
+      }
+      // If we already have cached content showing, leave it as-is (DON'T WIPE!)
+    }
+  }
+}
+window.initHonorRoll = initHonorRoll;
+
+function initAll() {
+  if (typeof initSlider === 'function') initSlider();
+  if (typeof initNavbar === 'function') initNavbar();
+  if (typeof initMobileNav === 'function') initMobileNav();
+  if (typeof initDropdownTouch === 'function') initDropdownTouch();
+  if (typeof initScrollReveal === 'function') initScrollReveal();
+  if (typeof initCounters === 'function') initCounters();
+  if (typeof initBackToTop === 'function') initBackToTop();
+  if (typeof initContactForm === 'function') initContactForm();
+  if (typeof initSmoothAnchors === 'function') initSmoothAnchors();
+  if (typeof initScrollProgress === 'function') initScrollProgress();
+  if (typeof initDynamicYear === 'function') initDynamicYear();
+  if (typeof initLanguage === 'function') initLanguage();
+  if (typeof initNewsletterForm === 'function') initNewsletterForm();
+  if (typeof initHonorRoll === 'function') initHonorRoll();
+}
+window.initAll = initAll;
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAll);
+} else {
+  initAll();
+}
+
+window.closeMobileNav = function() {
+  document.getElementById('mobileOverlay')?.classList.remove('open');
+  document.getElementById('hamburger')?.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+/* ═══ POST-PAYMENT AUTO-REFRESH ═══ 
+ * After a successful Razorpay payment, the membership page dispatches
+ * a 'membershipPaymentSuccess' event. This listener auto-refreshes the
+ * Wall of Honor grid so the new member appears immediately.
+ */
+window.addEventListener('membershipPaymentSuccess', () => {
+  console.log('[Honor Roll] Payment detected — refreshing member list in 2s...');
+  setTimeout(() => {
+    if (typeof initHonorRoll === 'function') {
+      initHonorRoll();
+      console.log('[Honor Roll]  Member list refreshed after payment.');
+    }
+  }, 2000); // 2s delay to allow DB sync to complete
+});
+
+// Also expose a direct refreshHonorRoll function for inline scripts
+window.refreshHonorRoll = function() {
+  if (typeof initHonorRoll === 'function') {
+    setTimeout(() => initHonorRoll(), 2000);
+  }
+};
+

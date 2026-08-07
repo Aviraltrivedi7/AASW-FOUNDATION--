@@ -102,7 +102,7 @@ const sendContactNotification = async (name, senderEmail, subject, message) => {
             from: `"AASW Website Contact" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: adminEmail,
             replyTo: senderEmail,
-            subject: `📩 New Web Query: ${subject}`,
+            subject: `New Web Query: ${subject}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e0e0e0; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                     <div style="background: linear-gradient(135deg, #1a73e8, #6c169f); padding: 15px 20px; border-radius: 8px; color: white; margin-bottom: 20px;">
@@ -178,7 +178,7 @@ const sendMembershipSuccessEmail = async (toEmail, memberName, pdfBuffer) => {
         const mailOptions = {
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
-            subject: `Welcome to AASW Foundation! Your Membership Certificate is inside 🎉`,
+            subject: `Welcome to AASW Foundation! Your Membership Certificate is inside`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
                     <h2 style="color: #1a73e8;">Hello ${memberName},</h2>
@@ -219,7 +219,7 @@ const sendDonationSuccessEmail = async (toEmail, donorName, amount, txnId, pan, 
         const mailOptions = {
             from: `"AASW Foundation" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
             to: toEmail,
-            subject: `Thank you for your donation of ₹${amount} to AASW Foundation! 🙏`,
+            subject: `Thank you for your donation of ₹${amount} to AASW Foundation!`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                     <div style="text-align: center; margin-bottom: 20px;">
@@ -265,7 +265,69 @@ const sendDonationSuccessEmail = async (toEmail, donorName, amount, txnId, pan, 
     }
 };
 
-module.exports = { sendOTP, sendContactNotification, sendMembershipSuccessEmail, sendDonationSuccessEmail };
+const sendAdminMembershipNotification = async (memberData) => {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        console.log(`[DEV MODE] Admin membership alert skipped for ${memberData.email || 'member'}`);
+        return true;
+    }
+
+    const adminEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'aaswfoundation06@gmail.com';
+    const { name, email, phone, pan, address, planName, amount, payment_id, idDocument, idDocumentType } = memberData;
+
+    try {
+        const mailOptions = {
+            from: `"AASW Membership Alert" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+            to: adminEmail,
+            subject: `NEW MEMBER JOINED: ${name || 'Member'} (${planName || 'Membership'})`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #e0e0e0; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <div style="background: linear-gradient(135deg, #1a73e8, #10b981); padding: 18px 20px; border-radius: 8px; color: white; margin-bottom: 20px;">
+                        <h2 style="margin: 0; font-size: 22px;">New Member Registration Alert!</h2>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Someone just completed their membership payment on AASW Foundation!</p>
+                    </div>
+
+                    <h3 style="color: #1a73e8; margin-top: 0;">Member Details</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px;">
+                        <tr><td style="padding: 10px; font-weight: bold; width: 140px; color: #555; border-bottom: 1px solid #eee;">Full Name:</td><td style="padding: 10px; color: #111; font-weight: bold; border-bottom: 1px solid #eee;">${name || 'Member'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Email Address:</td><td style="padding: 10px; color: #111; border-bottom: 1px solid #eee;"><a href="mailto:${email}">${email}</a></td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Phone Number:</td><td style="padding: 10px; color: #111; border-bottom: 1px solid #eee;">${phone || 'N/A'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Membership Tier:</td><td style="padding: 10px; color: #1a73e8; font-weight: bold; border-bottom: 1px solid #eee;">${planName || 'Annual Subscription'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Amount Paid:</td><td style="padding: 10px; color: #10b981; font-weight: bold; border-bottom: 1px solid #eee;">₹${amount || 1100}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Razorpay Txn ID:</td><td style="padding: 10px; color: #111; font-family: monospace; border-bottom: 1px solid #eee;">${payment_id || 'N/A'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">PAN Card:</td><td style="padding: 10px; color: #111; border-bottom: 1px solid #eee;">${pan || 'N/A'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">Residential Address:</td><td style="padding: 10px; color: #111; border-bottom: 1px solid #eee;">${address || 'N/A'}</td></tr>
+                        <tr><td style="padding: 10px; font-weight: bold; color: #555; border-bottom: 1px solid #eee;">ID Proof Type:</td><td style="padding: 10px; color: #111; border-bottom: 1px solid #eee;">${idDocumentType || 'Aadhaar Card'}</td></tr>
+                    </table>
+
+                    ${(idDocument && idDocument.startsWith('http')) ? `
+                    <div style="background: #f0f7ff; border: 1px dashed #1a73e8; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                        <p style="margin: 0 0 8px 0; font-size: 13px; color: #555;">Uploaded ID Proof Document (Google Drive):</p>
+                        <a href="${idDocument}" target="_blank" style="display: inline-block; background: #1a73e8; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">View ID Proof Document</a>
+                    </div>
+                    ` : ''}
+
+                    <p style="font-size: 13px; color: #666; margin-top: 20px;">
+                        This member's details have been automatically verified and saved to the InsForge database & MongoDB, and their membership certificate has been emailed to them.
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0 15px 0;" />
+                    <p style="font-size: 11px; text-align: center; color: #888; margin: 0;">
+                        AASW Foundation Admin Automation System
+                    </p>
+                </div>
+            `
+        };
+
+        const info = await sendMail(mailOptions);
+        console.log(`[Email] Admin Membership Alert sent to ${adminEmail} | MsgId: ${info.messageId}`);
+        return true;
+    } catch (error) {
+        console.error(`[Email Error] Failed to send admin membership notification:`, error.message);
+        return false;
+    }
+};
+
+module.exports = { sendOTP, sendContactNotification, sendMembershipSuccessEmail, sendDonationSuccessEmail, sendAdminMembershipNotification };
+
 // Trigger new deployment for env vars.
 
 

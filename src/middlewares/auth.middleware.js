@@ -63,6 +63,12 @@ const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.adminId) {
         return next();
     }
+
+    // Development mode bypass
+    if (process.env.NODE_ENV === 'development') {
+        req.admin = { id: 'dev-admin', email: 'admin@aasw.foundation', role: 'admin' };
+        return next();
+    }
     
     // If it's an API request, send JSON error
     if (req.originalUrl.startsWith('/admin/api')) {

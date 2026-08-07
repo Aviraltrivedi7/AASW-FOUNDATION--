@@ -61,7 +61,7 @@ const fetchWithRetry = async (url, options = {}) => {
       // Last attempt — return a synthetic error response instead of throwing
       // This ensures InsForge errors NEVER crash the app or reach the user
       if (attempt === RETRY_CONFIG.maxRetries - 1) {
-        console.error(`[InsForge] ✗ All ${RETRY_CONFIG.maxRetries} attempts exhausted. Returning graceful error. Last: ${err.message}`);
+        console.error(`[InsForge]  All ${RETRY_CONFIG.maxRetries} attempts exhausted. Returning graceful error. Last: ${err.message}`);
         return new Response(JSON.stringify({ message: 'InsForge unavailable', hint: 'Database cold start' }), {
           status: 503,
           headers: { 'Content-Type': 'application/json' }
@@ -95,12 +95,12 @@ function pingDatabase(baseUrl, key, label = 'Ping') {
     signal: AbortSignal.timeout(15000)
   })
     .then(res => {
-      if (res.ok) console.log(`[InsForge] ✓ ${label} successful — DB is awake`);
-      else console.warn(`[InsForge] ⚠ ${label} got HTTP ${res.status}`);
+      if (res.ok) console.log(`[InsForge]  ${label} successful — DB is awake`);
+      else console.warn(`[InsForge]  ${label} got HTTP ${res.status}`);
       return res.ok;
     })
     .catch(() => {
-      console.warn(`[InsForge] ⚠ ${label} failed`);
+      console.warn(`[InsForge]  ${label} failed`);
       return false;
     });
 }
@@ -113,7 +113,7 @@ async function warmUpDatabase(baseUrl, key) {
     // Wait before next warm-up attempt: 3s, 6s
     await new Promise(r => setTimeout(r, 3000 * (i + 1)));
   }
-  console.warn('[InsForge] ⚠ All warm-up attempts failed — DB may be slow on first request');
+  console.warn('[InsForge]  All warm-up attempts failed — DB may be slow on first request');
 }
 
 function startKeepAlive(baseUrl, key) {
@@ -121,7 +121,7 @@ function startKeepAlive(baseUrl, key) {
   setInterval(() => {
     pingDatabase(baseUrl, key, 'Keep-alive');
   }, RETRY_CONFIG.keepAliveInterval);
-  console.log(`[InsForge] ✓ Keep-alive started (every ${RETRY_CONFIG.keepAliveInterval / 60000} min)`);
+  console.log(`[InsForge]  Keep-alive started (every ${RETRY_CONFIG.keepAliveInterval / 60000} min)`);
 }
 
 // ─── Initialize Client ───────────────────────────────────────────────────
@@ -134,7 +134,7 @@ async function getInsforge() {
 
   insforgePromise = (async () => {
     if (!insforgeUrl || !insforgeKey) {
-      console.warn("[InsForge] ⚠️  Missing INSFORGE_URL or INSFORGE_KEY — database features disabled.");
+      console.warn("[InsForge]   Missing INSFORGE_URL or INSFORGE_KEY — database features disabled.");
       return null;
     }
 
@@ -156,10 +156,10 @@ async function getInsforge() {
       if (authErr) {
           console.error("[InsForge] Admin Auth failed:", authErr.message);
       } else {
-          console.log("[InsForge] ✓ Admin Auth successful.");
+          console.log("[InsForge]  Admin Auth successful.");
       }
 
-      console.log("[InsForge] ✓ Official SDK Client initialized with Enhanced Cold-Start Protection (6 retries, exponential backoff, keep-alive)");
+      console.log("[InsForge]  Official SDK Client initialized with Enhanced Cold-Start Protection (6 retries, exponential backoff, keep-alive)");
 
       // Proactive warm-up — wake the DB immediately
       warmUpDatabase(insforgeUrl, insforgeKey);

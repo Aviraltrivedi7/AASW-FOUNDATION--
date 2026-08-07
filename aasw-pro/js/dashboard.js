@@ -200,12 +200,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             const idBtn = mem.idDocument
                                 ? `<a href="${escHtml(mem.idDocument)}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#cb7bff]/15 text-[#cb7bff] font-bold text-[10px] uppercase tracking-wider hover:bg-[#cb7bff]/25 transition-colors"><span class="material-symbols-outlined text-xs">badge</span> ${escHtml(mem.idDocumentType || 'ID Proof')}</a>`
                                 : '<span class="text-white/30">—</span>';
+                            const isLife = mem.planId === 'lifetime' || (mem.planName && mem.planName.toLowerCase().includes('lifetime')) || mem.amount >= 10000;
+                            const planBadge = isLife
+                                ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(245,158,11,0.2)]"><span class="material-symbols-outlined text-[13px]">military_tech</span> Lifetime Member</span>`
+                                : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[11px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(59,130,246,0.2)]"><span class="material-symbols-outlined text-[13px]">workspace_premium</span> 1 Year Member</span>`;
+
                             allMembershipsTbody.insertAdjacentHTML('beforeend', `
                                 <tr class="hover:bg-white/[0.02] transition-colors">
                                     <td class="px-7 py-4 font-mono text-[11px] text-white/50">${escHtml(mem.id || mem.payment_id)}</td>
                                     <td class="px-7 py-4 text-sm font-semibold text-white">${escHtml(mem.name ? mem.name + ' (' + mem.email + ')' : mem.email)}</td>
-                                    <td class="px-7 py-4"><span class="px-3 py-1 rounded-full bg-[#94aaff]/10 text-[#94aaff] text-[10px] font-bold uppercase tracking-wider">${escHtml(mem.planName || mem.planId)}</span></td>
-                                    <td class="px-7 py-4 text-sm font-bold text-[#10b981]">₹${mem.amount || (mem.planId === 'lifetime' ? '10,000' : '1,100')}</td>
+                                    <td class="px-7 py-4">${planBadge}</td>
+                                    <td class="px-7 py-4 text-sm font-bold text-[#10b981]">₹${(mem.amount || (isLife ? 10000 : 1100)).toLocaleString('en-IN')}</td>
                                     <td class="px-7 py-4 text-xs text-white/70 max-w-[180px] truncate" title="${escHtml(mem.address || '')}">${escHtml(mem.address || '—')}</td>
                                     <td class="px-7 py-4">${idBtn}</td>
                                     <td class="px-7 py-4 font-mono text-[11px] text-white/50">${escHtml(mem.txnId || mem.payment_id)}</td>

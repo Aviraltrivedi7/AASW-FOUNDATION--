@@ -39,7 +39,7 @@ async function processFiles() {
     const mainJsPath = path.join(baseDir, 'js', 'main.js');
     if (fs.existsSync(mainJsPath)) {
         let js = fs.readFileSync(mainJsPath, 'utf8');
-        const minifiedJs = await minifyJs(js);
+        const minifiedJs = await minifyJs(js, { compress: { unused: false } });
         fs.writeFileSync(path.join(baseDir, 'js', 'main.min.js'), minifiedJs.code);
         console.log('✓ Minified JS');
     }

@@ -1,7 +1,7 @@
 const { catchAsync } = require('../utils/catchAsync');
 const { ApiResponse } = require('../utils/apiResponse');
 const { ApiError } = require('../utils/apiError');
-const { sendOTP, sendMembershipSuccessEmail } = require('../utils/email');
+const { sendOTP, sendMembershipSuccessEmail, sendAdminMembershipNotification } = require('../utils/email');
 const { generateCertificatePdf } = require('../services/certificate.service');
 const { uploadIdToGoogleDrive } = require('../services/gdrive.service');
 const db = require('../services/db.service');
@@ -19,7 +19,7 @@ const MEMBERSHIP_PLANS = [
         price: 1100,
         duration: 'year',
         tagline: 'Standard 1-year membership',
-        badge: '🌟',
+        badge: '',
         color: '#1a73e8',
         popular: true,
         features: [
@@ -36,7 +36,7 @@ const MEMBERSHIP_PLANS = [
         price: 10000,
         duration: 'lifetime',
         tagline: 'Become a permanent member',
-        badge: '🏆',
+        badge: '',
         color: '#d97706',
         features: [
             'All Annual benefits (lifetime access)',
@@ -91,7 +91,7 @@ const requestEmailOTP = catchAsync(async (req, res) => {
         console.warn('[Membership] Google Drive upload notice:', gerr.message);
     }
 
-    // ⚡ Run DB save + Email send in PARALLEL (not sequential)
+    //  Run DB save + Email send in PARALLEL (not sequential)
     // This cuts total time to max(DB, Email) instead of DB + Email
     const startTime = Date.now();
 
@@ -257,17 +257,25 @@ const submitPayment = catchAsync(async (req, res) => {
         date: new Date().toISOString()
     };
 
-    await db.insertMember({
+    const memberRecord = {
         name: membershipData.name,
         email: membershipData.email,
         phone: userData.phone || '',
         payment_id: txnId,
         status: 'Pending Verification',
         planId: planId,
+        planName: planName || (planId === 'lifetime' ? 'Lifetime Membership' : 'Annual Subscription'),
+        amount: Number(amount),
         pan: userData.pan || '',
         address: userData.address || req.body.address || '',
         idDocument: userData.idDocument || req.body.idDocument || '',
         idDocumentType: userData.idDocumentType || req.body.idDocumentType || 'Aadhaar Card'
+    };
+    await db.insertMember(memberRecord);
+
+    // Send instant Admin Email Alert
+    sendAdminMembershipNotification(memberRecord).catch(err => {
+        console.warn("[Membership] Admin email alert error on submitPayment:", err.message);
     });
 
     // Clear verification after initiating manual submission to prevent reuse
@@ -396,22 +404,48 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     const secureAddress = order.notes.address || userData.address || '';
     const secureIdDocType = order.notes.idDocumentType || userData.idDocumentType || 'Aadhaar Card';
 
-    // Upsert member via hybrid DB service
-    await db.upsertMember({
+    // Upsert member via hybrid DB service — fully automated, no manual admin needed
+    const plan = MEMBERSHIP_PLANS.find(p => p.id === securePlanId);
+    const memberRecord = {
         name: userData.name || 'Member', 
         email: email,
         phone: userData.phone || '',
         payment_id: razorpay_payment_id,
         status: 'Active',
+        verified: true,
         planId: securePlanId,
+        planName: plan ? plan.name : (securePlanId === 'lifetime' ? 'Lifetime Membership' : 'Annual Subscription'),
+        amount: plan ? plan.price : (order.amount / 100),
         pan: securePan || userData.pan || '',
         address: secureAddress,
         idDocument: userData.idDocument || '',
         idDocumentType: secureIdDocType
-    });
+    };
+
+    // If ID document is raw base64 (Drive upload failed during OTP), retry Drive upload now
+    if (memberRecord.idDocument && memberRecord.idDocument.startsWith('data:')) {
+        try {
+            console.log('[Membership] Base64 ID detected during payment verification. Uploading to Google Drive...');
+            const driveUrl = await uploadIdToGoogleDrive(memberRecord.idDocument, memberRecord.idDocumentType || 'ID_Proof', memberRecord.name);
+            if (driveUrl && driveUrl.startsWith('http')) {
+                memberRecord.idDocument = driveUrl;
+                console.log('[Membership] Successfully uploaded ID to Google Drive:', driveUrl);
+            }
+        } catch (err) {
+            console.warn('[Membership] Google Drive auto-upload retry error:', err.message);
+        }
+    }
+
+    await db.upsertMember(memberRecord);
+    clearFeaturedCache();
 
     res.clearCookie('verified_email');
     await db.deleteOtpByEmail(email);
+
+    // Send instant Admin Email Alert so NGO Admin knows immediately when someone joins!
+    sendAdminMembershipNotification(memberRecord).catch(err => {
+        console.warn("[Membership] Admin email alert error:", err.message);
+    });
 
     // Generate and email certificate BEFORE responding (Vercel kills background tasks after response)
     try {
@@ -464,18 +498,41 @@ const razorpayWebhook = catchAsync(async (req, res) => {
             const existingMember = await db.findMemberByPaymentId(payment.id);
             
             if (!existingMember) {
-                // 2. Upsert the member
-                await db.upsertMember({
+                // 2. Upsert the member — fully automated from webhook
+                const webhookPlanId = notes.planId || 'annual';
+                const webhookMemberRecord = {
                     name: notes.name || 'Member', 
                     email: notes.email || payment.email,
                     phone: notes.phone || '',
                     payment_id: payment.id,
                     status: 'Active',
-                    planId: notes.planId,
+                    verified: true,
+                    planId: webhookPlanId,
+                    planName: webhookPlanId === 'lifetime' ? 'Lifetime Membership' : 'Annual Subscription',
+                    amount: payment.amount / 100,
                     pan: notes.pan || '',
                     address: notes.address || '',
                     idDocument: notes.idDocument || '',
                     idDocumentType: notes.idDocumentType || 'Aadhaar Card'
+                };
+
+                if (webhookMemberRecord.idDocument && webhookMemberRecord.idDocument.startsWith('data:')) {
+                    try {
+                        const driveUrl = await uploadIdToGoogleDrive(webhookMemberRecord.idDocument, webhookMemberRecord.idDocumentType || 'ID_Proof', webhookMemberRecord.name);
+                        if (driveUrl && driveUrl.startsWith('http')) {
+                            webhookMemberRecord.idDocument = driveUrl;
+                        }
+                    } catch (err) {
+                        console.warn('[Webhook] Google Drive upload error:', err.message);
+                    }
+                }
+
+                await db.upsertMember(webhookMemberRecord);
+                clearFeaturedCache();
+
+                // Send instant Admin Email Alert
+                sendAdminMembershipNotification(webhookMemberRecord).catch(err => {
+                    console.warn("[Webhook] Admin email alert error:", err.message);
                 });
 
                 // 3. Email Certificate (Webhook Fallback)
@@ -531,12 +588,71 @@ const downloadCertificate = catchAsync(async (req, res) => {
 });
 
 // GET /api/v1/membership/featured
+// ─── FEATURED MEMBERS CACHE (instant response, no cold-start delay) ───
+let _featuredCache = null;        // cached array of members
+let _featuredCacheTime = 0;       // timestamp of last successful fetch
+const FEATURED_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+let _featuredRefreshing = false;  // prevent parallel refreshes
+
+function clearFeaturedCache() {
+    _featuredCache = null;
+    _featuredCacheTime = 0;
+    console.log('[FeaturedCache] Cache cleared for fresh active members fetch.');
+}
+
+async function _refreshFeaturedCache() {
+    if (_featuredRefreshing) return;
+    _featuredRefreshing = true;
+    try {
+        const members = await db.getActiveMembers();
+        // ONLY update cache if we got real data back (never wipe with empty)
+        if (members && members.length > 0) {
+            _featuredCache = members;
+            _featuredCacheTime = Date.now();
+            console.log(`[FeaturedCache] Refreshed — ${members.length} members cached`);
+        } else if (!_featuredCache) {
+            // First ever load and DB returned empty — store empty
+            _featuredCache = [];
+            _featuredCacheTime = Date.now();
+        }
+        // If DB returned empty but we have old cache, keep old cache (don't wipe names)
+    } catch (err) {
+        console.warn('[FeaturedCache] Refresh failed, keeping old cache:', err.message);
+        // Never wipe existing cache on error
+    } finally {
+        _featuredRefreshing = false;
+    }
+}
+
 const getFeaturedMembers = catchAsync(async (req, res) => {
-    const members = await db.getActiveLifetimeMembers();
+    const now = Date.now();
+    const cacheAge = now - _featuredCacheTime;
+
+    // If cache is fresh, serve instantly
+    if (_featuredCache && cacheAge < FEATURED_CACHE_TTL) {
+        return res.status(200).json(
+            new ApiResponse(200, _featuredCache, 'Featured active members fetched successfully.')
+        );
+    }
+
+    // If we have stale cache, serve it immediately AND refresh in background
+    if (_featuredCache && _featuredCache.length > 0) {
+        // Trigger background refresh (don't await)
+        _refreshFeaturedCache();
+        return res.status(200).json(
+            new ApiResponse(200, _featuredCache, 'Featured active members fetched successfully.')
+        );
+    }
+
+    // No cache at all — first ever request, must wait
+    await _refreshFeaturedCache();
     return res.status(200).json(
-        new ApiResponse(200, members, 'Featured lifetime members fetched successfully.')
+        new ApiResponse(200, _featuredCache || [], 'Featured active members fetched successfully.')
     );
 });
+
+// Pre-warm the cache on server startup (runs after 3 seconds)
+setTimeout(() => _refreshFeaturedCache(), 3000);
 
 // POST /api/v1/membership/reconcile
 const reconcilePayments = catchAsync(async (req, res) => {

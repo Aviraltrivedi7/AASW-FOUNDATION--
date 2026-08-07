@@ -146,16 +146,12 @@ app.use(express.static(staticPath, {
     lastModified: true,    // Enable Last-Modified headers
     immutable: true,       // Tell browsers cached assets won't change
     setHeaders: (res, filePath) => {
-        // HTML files should not be cached aggressively (they change)
-        if (filePath.endsWith('.html')) {
-            res.setHeader('Cache-Control', 'no-cache, must-revalidate');
-        }
-        // Disable aggressive caching for light-mode.css so styling fixes are fetched instantly
-        else if (filePath.endsWith('light-mode.css')) {
+        // HTML, JS, CSS files should not be aggressively cached in dev/staging so updates take effect instantly
+        if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css')) {
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         }
-        // Images, CSS, JS, fonts — aggressive caching
-        else if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$/.test(filePath)) {
+        // Images, fonts — aggressive caching
+        else if (/\.(png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$/.test(filePath)) {
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
     }

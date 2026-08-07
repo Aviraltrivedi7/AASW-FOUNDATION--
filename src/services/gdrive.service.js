@@ -58,11 +58,20 @@ async function uploadIdToGoogleDrive(base64DataDataUrl, fileTitle = 'ID_Proof', 
           base64Data: rawBase64
         };
 
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        let response;
+        try {
+            response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timeoutId);
+        }
 
         if (!response.ok) {
             console.warn(`[GoogleDrive] Upload HTTP error ${response.status}: ${response.statusText}`);

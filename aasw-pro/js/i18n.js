@@ -191,8 +191,8 @@ const TRANSLATIONS = {
   "mem-pro-tag": { en: "Advanced Impact", hi: "उन्नत प्रभाव" },
   "mem-pro": { en: "Pro", hi: "प्रो" },
   "mem-popular": { en: "Most Popular", hi: "सबसे लोकप्रिय" },
-  "mem-patron-tag": { en: "Strategic Leader", hi: "रणनीतिक नेता" },
-  "mem-patron": { en: "Patron", hi: "पेट्रन" },
+  "mem-patron-tag": { en: "Permanent Member", hi: "स्थायी सदस्य" },
+  "mem-patron": { en: "Lifetime Member", hi: "आजीवन सदस्य" },
   "mem-join": { en: "Join Now", hi: "अभी जुड़ें" },
   "mem-cert": { en: "Digital Certificate", hi: "डिजिटल प्रमाणपत्र" },
   "mem-newsletter": { en: "Monthly Newsletter", hi: "मासिक न्यूज़लेटर" },
@@ -242,11 +242,11 @@ const TRANSLATIONS = {
   // Featured Lifetime Members
   "mem-featured-tag": { en: "Wall of Honor", hi: "सम्मान पटल" },
   "mem-featured-title": { en: "Honor Roll of Lifetime Members", hi: "आजीवन सदस्यों का सम्मान पटल" },
-  "mem-featured-desc": { en: "A tribute to our permanent patrons whose lifetime commitment empowers transformative change across India.", hi: "हमारे स्थायी संरक्षकों को एक श्रद्धांजलि जिनकी आजीवन प्रतिबद्धता पूरे भारत में परिवर्तनकारी बदलाव को सशक्त बनाती है।" },
+  "mem-featured-desc": { en: "A tribute to our permanent members whose lifetime commitment empowers transformative change across India.", hi: "हमारे स्थायी सदस्यों को एक श्रद्धांजलि जिनकी आजीवन प्रतिबद्धता पूरे भारत में परिवर्तनकारी बदलाव को सशक्त बनाती है।" },
   "mem-featured-empty-title": { en: "Be the Pioneer", hi: "प्रथम सदस्य बनें" },
   "mem-featured-empty": { en: "No lifetime members featured yet. Be the first to join the Honor Roll and make a permanent impact!", hi: "अभी तक कोई आजीवन सदस्य शामिल नहीं हुआ है। सम्मान पटल में शामिल होने वाले पहले व्यक्ति बनें और स्थायी प्रभाव डालें!" },
   "mem-featured-join-btn": { en: "Join as Lifetime Member", hi: "आजीवन सदस्य के रूप में जुड़ें" },
-  "mem-featured-joined": { en: "Patron Since", hi: "आजीवन सदस्य वर्ष" },
+  "mem-featured-joined": { en: "Member Since", hi: "सदस्यता वर्ष" },
 
   // ═══════════════════════════════════════════
   //  PRIVACY PAGE — privacy.html
@@ -363,10 +363,19 @@ function updateLangButtons(lang) {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+function initLanguage() {
   const lang = getCurrentLang();
   if (lang !== 'en') {
     applyTranslations(lang);
   }
   updateLangButtons(lang);
+}
+window.initLanguage = initLanguage;
+window.getCurrentLang = getCurrentLang;
+window.setLang = setLang;
+window.applyTranslations = applyTranslations;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initLanguage();
 });
+

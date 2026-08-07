@@ -10,7 +10,7 @@ async function connectMongoDB() {
     const uri = process.env.MONGODB_URI;
 
     if (!uri) {
-        console.warn('[MongoDB] ⚠️  MONGODB_URI not set — MongoDB features disabled. Using InsForge as fallback.');
+        console.warn('[MongoDB]   MONGODB_URI not set — MongoDB features disabled. Using InsForge as fallback.');
         return false;
     }
 
@@ -23,7 +23,7 @@ async function connectMongoDB() {
         });
 
         isConnected = true;
-        console.log('[MongoDB] ✓ Connected successfully');
+        console.log('[MongoDB]  Connected successfully');
 
         mongoose.connection.on('error', (err) => {
             console.error('[MongoDB] Connection error:', err.message);
@@ -36,13 +36,13 @@ async function connectMongoDB() {
         });
 
         mongoose.connection.on('reconnected', () => {
-            console.log('[MongoDB] ✓ Reconnected');
+            console.log('[MongoDB]  Reconnected');
             isConnected = true;
         });
 
         return true;
     } catch (err) {
-        console.error('[MongoDB] ❌ Initial connection failed:', err.message);
+        console.error('[MongoDB]  Initial connection failed:', err.message);
         console.warn('[MongoDB] Falling back to InsForge as primary database.');
         isConnected = false;
         return false;
