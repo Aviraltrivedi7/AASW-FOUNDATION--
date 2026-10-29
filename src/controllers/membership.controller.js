@@ -5,7 +5,7 @@ const { sendOTP, sendMembershipSuccessEmail, sendAdminMembershipNotification } =
 const { generateCertificatePdf } = require('../services/certificate.service');
 const { uploadIdToGoogleDrive } = require('../services/gdrive.service');
 const db = require('../services/db.service');
-const Razorpay = require('razorpay');
+const { getRazorpayKeys, getRazorpayInstance } = require('../config/razorpay');
 const crypto = require('crypto');
 
 
@@ -347,14 +347,8 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
         throw new ApiError(400, 'You already have an active membership. Thank you for your support!');
     }
 
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
-    }
-
-    const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+    const { keyId } = getRazorpayKeys();
+    const razorpay = getRazorpayInstance();
 
     const options = {
         amount: Math.round(secureAmount * 100), // amount in smallest currency unit (paise)
@@ -388,7 +382,7 @@ const createRazorpayOrder = catchAsync(async (req, res) => {
         new ApiResponse(200, {
             orderId: order.id,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID
+            keyId: keyId
         }, 'Order created successfully')
     );
 });
@@ -403,10 +397,8 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
 
     const userData = await validateVerifiedUser(email, req);
 
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
-    }
-    const secret = process.env.RAZORPAY_KEY_SECRET;
+    const { keySecret } = getRazorpayKeys();
+    const secret = keySecret;
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -419,10 +411,7 @@ const verifyRazorpayPayment = catchAsync(async (req, res) => {
     }
 
     // Fetch the original order to prevent tampering with planId, pan, or amount
-    const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+    const razorpay = getRazorpayInstance();
     
     let order;
     try {
@@ -692,13 +681,7 @@ setTimeout(() => _refreshFeaturedCache(), 3000);
 
 // POST /api/v1/membership/reconcile
 const reconcilePayments = catchAsync(async (req, res) => {
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        throw new ApiError(500, 'Razorpay keys not configured');
-    }
-    const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+    const razorpay = getRazorpayInstance();
 
     const payments = await razorpay.payments.all({ count: 100 });
     const capturedPayments = payments.items.filter(p => p.status === 'captured');

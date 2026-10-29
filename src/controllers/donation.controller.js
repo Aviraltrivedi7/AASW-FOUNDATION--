@@ -3,7 +3,7 @@ const { ApiResponse } = require('../utils/apiResponse');
 const { ApiError } = require('../utils/apiError');
 const { sendDonationSuccessEmail } = require('../utils/email');
 const db = require('../services/db.service');
-const Razorpay = require('razorpay');
+const { getRazorpayKeys, getRazorpayInstance } = require('../config/razorpay');
 const crypto = require('crypto');
 
 // POST /api/v1/donation/create-order
@@ -19,14 +19,8 @@ const createDonationOrder = catchAsync(async (req, res) => {
         throw new ApiError(400, 'Minimum donation amount is ₹100.');
     }
 
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
-    }
-
-    const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+    const { keyId } = getRazorpayKeys();
+    const razorpay = getRazorpayInstance();
 
     const options = {
         amount: Math.round(secureAmount * 100), // amount in paise
@@ -53,13 +47,11 @@ const createDonationOrder = catchAsync(async (req, res) => {
         throw new ApiError(500, 'Failed to create Razorpay order');
     }
 
-
-
     return res.status(200).json(
         new ApiResponse(200, {
             orderId: order.id,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID
+            keyId: keyId
         }, 'Donation order created successfully')
     );
 });
@@ -72,11 +64,8 @@ const verifyDonationPayment = catchAsync(async (req, res) => {
         throw new ApiError(400, 'Missing payment verification details.');
     }
 
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-        throw new ApiError(500, 'Payment gateway not configured. Contact admin.');
-    }
-
-    const secret = process.env.RAZORPAY_KEY_SECRET;
+    const { keySecret } = getRazorpayKeys();
+    const secret = keySecret;
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -89,10 +78,7 @@ const verifyDonationPayment = catchAsync(async (req, res) => {
     }
 
     // Fetch the original order to prevent tampering with donation metadata
-    const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+    const razorpay = getRazorpayInstance();
 
     let order;
     try {
