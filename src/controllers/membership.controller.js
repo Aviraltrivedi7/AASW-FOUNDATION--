@@ -185,11 +185,25 @@ const verifyEmailOTP = catchAsync(async (req, res) => {
     // Mark as verified
     await db.updateOtpVerified(email);
 
+    // Generate signed verification token
+    const jwt = require('jsonwebtoken');
+    const verificationToken = jwt.sign(
+        { email: email.trim().toLowerCase(), verified: true },
+        process.env.JWT_SECRET || 'development_secret_key_1234567890_aasw',
+        { expiresIn: '2h' }
+    );
+
     // Create a temporary cookie as a secondary measure (stateless fallback)
-    res.cookie('verified_email', email, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000 });
+    const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    res.cookie('verified_email', email, { 
+        httpOnly: true, 
+        secure: isHttps, 
+        sameSite: 'lax',
+        maxAge: 3600000 
+    });
 
     return res.status(200).json(
-        new ApiResponse(200, { email, verified: true }, 'Email address verified successfully!')
+        new ApiResponse(200, { email, verified: true, token: verificationToken }, 'Email address verified successfully!')
     );
 });
 
@@ -202,30 +216,52 @@ const getMembershipPlans = catchAsync(async (req, res) => {
 
 // Helper validation module using stateless OTPs
 async function validateVerifiedUser(email, req) {
-    // Check cookie first for quick validation
-    const cookieValid = req.cookies && req.cookies.verified_email === email;
-    
-    // Always try to fetch OTP data for name/phone/pan info
+    if (!email) throw new ApiError(400, 'Email address is required.');
+    email = email.trim().toLowerCase();
+
+    // 1. In-memory fast verification check (immune to database sync delays)
+    const inMemoryOk = db.isEmailVerifiedInMemory && db.isEmailVerifiedInMemory(email);
+
+    // 2. Check signed JWT token in Authorization header or body
+    let tokenValid = false;
+    const authHeader = req.headers.authorization;
+    const bearerToken = (authHeader && authHeader.startsWith('Bearer ')) 
+        ? authHeader.split(' ')[1] 
+        : (req.body?.token || req.query?.token);
+
+    if (bearerToken) {
+        try {
+            const jwt = require('jsonwebtoken');
+            const decoded = jwt.verify(bearerToken, process.env.JWT_SECRET || 'development_secret_key_1234567890_aasw');
+            if (decoded && decoded.email?.toLowerCase() === email && decoded.verified) {
+                tokenValid = true;
+            }
+        } catch (_) {}
+    }
+
+    // 3. Check cookie
+    const cookieValid = req.cookies && req.cookies.verified_email?.toLowerCase() === email;
+
+    // 4. Check database record
     const otpData = await db.findOtpByEmail(email);
-    
+
     if (otpData && otpData.verified) {
         return otpData;
     }
-    
-    // Cookie is valid but OTP record may have been cleaned up — return minimal data
-    if (cookieValid) {
+
+    if (inMemoryOk || tokenValid || cookieValid) {
         return {
             email,
             verified: true,
-            name: otpData?.name || 'Member',
-            phone: otpData?.phone || '',
-            pan: otpData?.pan || '',
-            address: otpData?.address || '',
-            idDocument: otpData?.idDocument || '',
-            idDocumentType: otpData?.idDocumentType || 'Aadhaar Card'
+            name: otpData?.name || req.body?.name || 'Member',
+            phone: otpData?.phone || req.body?.phone || '',
+            pan: otpData?.pan || req.body?.pan || '',
+            address: otpData?.address || req.body?.address || '',
+            idDocument: otpData?.idDocument || req.body?.idDocument || '',
+            idDocumentType: otpData?.idDocumentType || req.body?.idDocumentType || 'Aadhaar Card'
         };
     }
-    
+
     throw new ApiError(401, 'Session invalid or email verification required.');
 }
 

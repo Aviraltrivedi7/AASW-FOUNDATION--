@@ -25,6 +25,27 @@ const Donation = require('../models/Donation');
 let inMemoryMembers = [];
 let _cacheInitialized = false;
 
+// Fast in-memory verification cache to eliminate DB sync lag during OTP checkout
+const verifiedOtpEmails = new Map();
+
+function markEmailAsVerified(email) {
+    if (!email) return;
+    const cleanEmail = email.trim().toLowerCase();
+    verifiedOtpEmails.set(cleanEmail, Date.now() + 60 * 60 * 1000); // 1 hour validity
+}
+
+function isEmailVerifiedInMemory(email) {
+    if (!email) return false;
+    const cleanEmail = email.trim().toLowerCase();
+    const exp = verifiedOtpEmails.get(cleanEmail);
+    if (!exp) return false;
+    if (Date.now() > exp) {
+        verifiedOtpEmails.delete(cleanEmail);
+        return false;
+    }
+    return true;
+}
+
 function sanitizeForInsforge(data) {
     if (!data) return data;
     if (typeof data !== 'object') return data;
@@ -212,7 +233,10 @@ async function findOtpByEmail(email) {
     if (isMongoConnected()) {
         try {
             const otp = await Otp.findOne({ email }).lean();
-            if (otp) return otp;
+            if (otp) {
+                if (isEmailVerifiedInMemory(email)) otp.verified = true;
+                return otp;
+            }
         } catch (err) {
             console.error('[DB] MongoDB OTP lookup failed:', err.message);
         }
@@ -224,6 +248,7 @@ async function findOtpByEmail(email) {
         try {
             const { data, error } = await insforge.database.from('otps').select('*').eq('email', email).single();
             if (!error && data) {
+                if (isEmailVerifiedInMemory(email)) data.verified = true;
                 // Cache into MongoDB
                 if (isMongoConnected()) {
                     Otp.findOneAndUpdate({ email }, data, { upsert: true })
@@ -236,11 +261,16 @@ async function findOtpByEmail(email) {
         }
     }
 
+    if (isEmailVerifiedInMemory(email)) {
+        return { email, verified: true, name: 'Member' };
+    }
+
     return null;
 }
 
 async function updateOtpVerified(email) {
     email = email.trim().toLowerCase();
+    markEmailAsVerified(email);
 
     if (isMongoConnected()) {
         try {
@@ -250,14 +280,15 @@ async function updateOtpVerified(email) {
         }
     }
 
-    // Sync to InsForge in background
+    // Sync to InsForge and await completion
     const insforge = await getInsforge();
     if (insforge) {
-        insforge.database.from('otps').update({ verified: true }).eq('email', email)
-            .then(({ error }) => {
-                if (error) console.warn('[Sync] InsForge OTP verify sync failed:', error.message);
-            })
-            .catch(err => console.warn('[Sync] InsForge OTP verify sync error:', err.message));
+        try {
+            const { error } = await insforge.database.from('otps').update({ verified: true }).eq('email', email);
+            if (error) console.warn('[Sync] InsForge OTP verify sync failed:', error.message);
+        } catch (err) {
+            console.warn('[Sync] InsForge OTP verify sync error:', err.message);
+        }
     }
 }
 
@@ -881,6 +912,8 @@ module.exports = {
     findOtpByEmail,
     updateOtpVerified,
     deleteOtpByEmail,
+    markEmailAsVerified,
+    isEmailVerifiedInMemory,
     // Members
     insertMember,
     upsertMember,

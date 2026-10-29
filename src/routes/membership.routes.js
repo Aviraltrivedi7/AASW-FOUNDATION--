@@ -39,11 +39,12 @@ const createOrderSchema = Joi.object({
     planId: Joi.string().required(),
     planName: Joi.string().required(),
     amount: Joi.number().required(),
-    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).optional(),
+    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).allow('', null).optional(),
     address: Joi.string().allow('', null).optional(),
     idDocument: Joi.string().allow('', null).optional(),
-    idDocumentType: Joi.string().allow('', null).optional()
-});
+    idDocumentType: Joi.string().allow('', null).optional(),
+    token: Joi.string().allow('', null).optional()
+}).unknown(true);
 
 const verifyPaymentSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -53,11 +54,12 @@ const verifyPaymentSchema = Joi.object({
     razorpay_order_id: Joi.string().required(),
     razorpay_payment_id: Joi.string().required(),
     razorpay_signature: Joi.string().required(),
-    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).optional(),
+    pan: Joi.string().pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i).allow('', null).optional(),
     address: Joi.string().allow('', null).optional(),
     idDocument: Joi.string().allow('', null).optional(),
-    idDocumentType: Joi.string().allow('', null).optional()
-});
+    idDocumentType: Joi.string().allow('', null).optional(),
+    token: Joi.string().allow('', null).optional()
+}).unknown(true);
 
 router.post('/send-otp', validate(sendOtpSchema), requestEmailOTP);
 router.post('/verify-otp', validate(verifyOtpSchema), verifyEmailOTP);
