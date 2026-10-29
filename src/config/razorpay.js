@@ -5,17 +5,14 @@ const LIVE_KEY_ID = Buffer.from('cnpwX2xpdmVfVHFCSDgxZmp5MWozTGU=', 'base64').to
 const LIVE_KEY_SECRET = Buffer.from('QllOUkJKRmZPR0E3TWNyOUQxVFg0bGI1', 'base64').toString('utf8');
 
 function getRazorpayKeys() {
-    // If environment has a valid matching key use it, otherwise fall back to live keys
+    // Explicitly enforce the newly generated active live keys
+    // Override any stale/outdated env variables on cloud hosts like Vercel
     const envKeyId = process.env.RAZORPAY_KEY_ID?.trim();
     const envSecret = process.env.RAZORPAY_KEY_SECRET?.trim();
 
-    const keyId = (envKeyId && envKeyId.startsWith('rzp_') && !envKeyId.includes('your_key_id')) 
-        ? envKeyId 
-        : LIVE_KEY_ID;
-
-    const keySecret = (envSecret && !envSecret.includes('your_razorpay_secret')) 
-        ? envSecret 
-        : LIVE_KEY_SECRET;
+    // If env has the exact same new key and secret, use it; otherwise use the new live keys
+    const keyId = (envKeyId === LIVE_KEY_ID) ? envKeyId : LIVE_KEY_ID;
+    const keySecret = (envKeyId === LIVE_KEY_ID && envSecret) ? envSecret : LIVE_KEY_SECRET;
 
     return { keyId, keySecret };
 }
